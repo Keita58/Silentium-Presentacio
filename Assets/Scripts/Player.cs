@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.EnhancedTouch;
 
 public class Player : MonoBehaviour
 {
@@ -28,10 +29,16 @@ public class Player : MonoBehaviour
     float maxAngle = 45.0f;
     float minAngle = -30.0f;
 
+    bool crouched=false;
+    float crouchedCenterCollider = -0.5f;
+    float crouchedHeightCollider = 1;
+    float cameraPositionBeforeCrouch = 0.74f;
+
+
     private void Awake()
     {
         _inputActions = new InputSystem_Actions();
-
+        _inputActions.Player.Crouch.performed += Crouch;
         _MoveAction = _inputActions.Player.Move;
         _LookAction = _inputActions.Player.Look;
         _RunAction = _inputActions.Player.Run;
@@ -60,6 +67,31 @@ public class Player : MonoBehaviour
 
     }
 
+    private void Crouch(InputAction.CallbackContext context)
+    {
+        if (!crouched)
+        {
+            this.GetComponent<CapsuleCollider>().center = new Vector3(0f,  crouchedCenterCollider, 0f);
+            this.GetComponent<CapsuleCollider>().height = crouchedHeightCollider;
+            _Camera.transform.localPosition = Vector3.zero;
+            crouched = true;
+            _VelocityMove /= 2;
+            //moving = false;
+            //StartCoroutine(EmetreSOCrouch());
+        }
+        else
+        {
+            this.GetComponent<CapsuleCollider>().center = Vector3.zero;
+            this.GetComponent<CapsuleCollider>().height = 2;
+            _Camera.transform.localPosition = new Vector3 (0f, cameraPositionBeforeCrouch, 0f);
+            crouched = false;
+            //moving = true;
+            _VelocityMove *= 2;
+        }
+    }
+
+    #region FSM
+
     enum PlayerStates {IDLE, MOVE, RUN, HURT, RUNMOVE }
     [SerializeField] PlayerStates actualState;
     [SerializeField] float stateTime;
@@ -76,10 +108,6 @@ public class Player : MonoBehaviour
         actualState = initState;
         stateTime = 0f;
 
-        //Vector3 moviment = (transform.right * movementInput.x +
-               // transform.forward * movementInput.y).normalized * _VelocityMove;
-
-        //_Rigidbody.linearVelocity = new Vector3(moviment.x, _Rigidbody.linearVelocity.y, moviment.z);
         switch (actualState)
         {
             case PlayerStates.IDLE:
@@ -118,7 +146,7 @@ public class Player : MonoBehaviour
                 if (movementInput == Vector2.zero)
                     ChangeState(PlayerStates.IDLE);
                 
-                if (_RunAction.IsPressed())
+                if (_RunAction.IsPressed() && !crouched)
                 {
                     ChangeState(PlayerStates.RUN);
                 }
@@ -130,7 +158,6 @@ public class Player : MonoBehaviour
                 break;
             case PlayerStates.RUN:
                 //running = true;
-
 
                 _Rigidbody.linearVelocity =
                 (transform.right * movementInput.x +
@@ -166,6 +193,8 @@ public class Player : MonoBehaviour
                 break;
         }
     }
+
+    #endregion
 
 
 }
