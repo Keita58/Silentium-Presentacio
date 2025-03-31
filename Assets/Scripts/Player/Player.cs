@@ -34,6 +34,8 @@ public class Player : MonoBehaviour
     float crouchedHeightCollider = 1;
     float cameraPositionBeforeCrouch = 0.74f;
 
+    [SerializeField] Transform gunPosition;
+
 
     private void Awake()
     {
