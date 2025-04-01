@@ -49,6 +49,7 @@ public class Player : MonoBehaviour
     [SerializeField] Material material;
     GameObject equippedItem;
     [SerializeField] private Material baseMaterial;
+    private GameObject itemEquipped;
 
 
     private void Awake()
@@ -62,13 +63,12 @@ public class Player : MonoBehaviour
         _inputActions.Player.Aim.performed +=Aim;
         _Rigidbody= GetComponent<Rigidbody>();
         _inputActions.Player.Enable();
-
     }
 
     void Start()
     {
         Cursor.visible = false;
-        StartCoroutine(interactuarRaycast());
+        StartCoroutine(InteractuarRaycast());
     }
 
     private void Update()
@@ -258,7 +258,7 @@ public class Player : MonoBehaviour
 
     #endregion
 
-    public IEnumerator interactuarRaycast()
+    public IEnumerator InteractuarRaycast()
     {
         while (true)
         {
@@ -289,7 +289,5 @@ public class Player : MonoBehaviour
             }
             yield return new WaitForSeconds(0.5f);
         }
-
-
     }
 }
