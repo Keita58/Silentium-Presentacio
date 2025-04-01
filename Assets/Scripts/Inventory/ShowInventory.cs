@@ -7,7 +7,7 @@ public class ShowInventory : MonoBehaviour
 
     [SerializeField] GameObject parentGameObject;
 
-    [SerializeField] InventorySO inventari;
+    [SerializeField] InventorySO inventory;
 
     [SerializeField] GameObject itemPrefab;
 
@@ -26,10 +26,10 @@ public class ShowInventory : MonoBehaviour
         
         parentGameObject.transform.parent.gameObject.SetActive(true);
         int i = 0;
-        for (i = 0; i < inventari.items.Count; i++)
+        for (i = 0; i < inventory.items.Count; i++)
         {
             GameObject displayedItem = Instantiate(itemPrefab, parentGameObject.transform.GetChild(i).transform);
-            displayedItem.GetComponent<ShowItem>().Load(inventari.items[i]);
+            displayedItem.GetComponent<ShowItem>().Load(inventory.items[i]);
             displayedItem.GetComponent<ShowItem>().OnUseItem += Show;
         }
     }
@@ -46,10 +46,9 @@ public class ShowInventory : MonoBehaviour
         }
     }
 
-    enum ActionStates {NOACTION, SELECT_ACTION, ACTION_USE, ACTION_COMBINE, ACTION_EQUIP_ITEM }
-    [SerializeField] ActionStates actionState;
-
     #region FSM
+    enum ActionStates { NOACTION, SELECT_ACTION, ACTION_USE, ACTION_COMBINE, ACTION_EQUIP_ITEM }
+    [SerializeField] ActionStates actionState;
     private void ChangeState(ActionStates newState)
     {
         Debug.Log($"---------------------- Sortint de {actionState} a {newState} ------------------------");
@@ -109,7 +108,6 @@ public class ShowInventory : MonoBehaviour
                 break;
         }
     }
-
     #endregion
 
 
