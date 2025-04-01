@@ -61,6 +61,7 @@ public class Player : MonoBehaviour
         _RunAction = _inputActions.Player.Run;
         _inputActions.Player.Shoot.performed+=Shoot;
         _inputActions.Player.Aim.performed +=Aim;
+        _inputActions.Player.PickUpItem.performed +=PickUpItem;
         _Rigidbody= GetComponent<Rigidbody>();
         _inputActions.Player.Enable();
     }
@@ -83,6 +84,19 @@ public class Player : MonoBehaviour
         _Camera.transform.localRotation = Quaternion.Euler(_LookRotation.y, 0, 0);
 
         UpdateState();
+
+    }
+
+    private void PickUpItem(InputAction.CallbackContext context)
+    {
+        if (interactiveGameObject != null)
+        {
+
+            GameManager.instance.AddItem(interactiveGameObject.GetComponent<PickItem>().item);
+            Debug.Log("QUE COJO?" + interactiveGameObject.GetComponent<PickItem>().item);
+            interactiveGameObject.gameObject.SetActive(false);
+            Debug.Log("Entro Coger item");
+        }
 
     }
 

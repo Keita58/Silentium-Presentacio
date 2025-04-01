@@ -31,14 +31,14 @@ public class GameManager : MonoBehaviour
         inventoryUI.Hide();
     }
 
-    public void UseHealingItem(int curacion, Item item)
+    public void UseHealingItem(int healing, Item item)
     {
         //player.hp+=curacion;
         Debug.Log("Player usa item de curaci�n");
         inventory.UseItem(item);
     }
 
-    public void UseAmmo(int numBales, Item item)
+    public void UseAmmo(int numAmmo, Item item)
     {
         //player.RecarregaBales(numBales);
         Debug.Log("Player recarrega les bales");
@@ -49,9 +49,9 @@ public class GameManager : MonoBehaviour
         inventory.UseItem(item);
     }
 
-    public void UseThrowableItem(Item item, GameObject objeto)
+    public void UseThrowableItem(Item item, GameObject equipableObject)
     {
         inventory.UseItem(item);
-        player.EquipItem(objeto);
+        player.EquipItem(equipableObject);
     }
 }
