@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
@@ -30,11 +31,18 @@ public class Player : MonoBehaviour
     float minAngle = -30.0f;
 
     bool crouched=false;
+    bool aim=false;
     float crouchedCenterCollider = -0.5f;
     float crouchedHeightCollider = 1;
-    float cameraPositionBeforeCrouch = 0.74f;
+    Vector3 cameraPositionBeforeCrouch = new Vector3(0, 0.627f, -0.198f);
+    int gunAmmo =3;
 
-    [SerializeField] Transform gunPosition;
+    [SerializeField] GameObject cameraShenanigansGameObject;
+
+    [SerializeField] Transform shootPosition;
+    [SerializeField] GameObject gunGameObject;
+    [SerializeField] LayerMask enemyLayerMask;
+    [SerializeField] Camera weaponCamera;
 
 
     private void Awake()
@@ -44,6 +52,8 @@ public class Player : MonoBehaviour
         _MoveAction = _inputActions.Player.Move;
         _LookAction = _inputActions.Player.Look;
         _RunAction = _inputActions.Player.Run;
+        _inputActions.Player.Shoot.performed+=Shoot;
+        _inputActions.Player.Aim.performed +=Aim;
         _Rigidbody= GetComponent<Rigidbody>();
         _inputActions.Player.Enable();
 
@@ -71,30 +81,36 @@ public class Player : MonoBehaviour
 
     private void Crouch(InputAction.CallbackContext context)
     {
-        if (!crouched)
+        crouched = !crouched;
+    }
+
+    private void Shoot(InputAction.CallbackContext context)
+    {
+        if (gunAmmo >= 1)
         {
-            this.GetComponent<CapsuleCollider>().center = new Vector3(0f,  crouchedCenterCollider, 0f);
-            this.GetComponent<CapsuleCollider>().height = crouchedHeightCollider;
-            _Camera.transform.localPosition = Vector3.zero;
-            crouched = true;
-            _VelocityMove /= 2;
-            //moving = false;
-            //StartCoroutine(EmetreSOCrouch());
+            Debug.DrawRay(shootPosition.transform.position, -shootPosition.transform.right, Color.magenta, 5f);
+            Debug.Log("TIRO DEBUGRAY");
+            if (Physics.Raycast(shootPosition.transform.position, -shootPosition.transform.right, enemyLayerMask))
+            {
+                //e.RebreMal(5);
+                Debug.Log("Enemy hit");
+            }
+            //_Bales--;
+            //OnDisparar?.Invoke();
         }
-        else
-        {
-            this.GetComponent<CapsuleCollider>().center = Vector3.zero;
-            this.GetComponent<CapsuleCollider>().height = 2;
-            _Camera.transform.localPosition = new Vector3 (0f, cameraPositionBeforeCrouch, 0f);
-            crouched = false;
-            //moving = true;
-            _VelocityMove *= 2;
-        }
+    }
+
+
+    private void Aim(InputAction.CallbackContext context)
+    {
+        aim= !aim;
+        gunGameObject.transform.localPosition = aim ? new Vector3 (0.057f, -0.312999994f, 0.391000003f) : new Vector3(0.456f, -0.313f, 0.505f);
+        weaponCamera.transform.localPosition= aim ?  new Vector3 (0f, 0f, -0.28f) : Vector3.zero;
     }
 
     #region FSM
 
-    enum PlayerStates {IDLE, MOVE, RUN, HURT, RUNMOVE }
+    enum PlayerStates {IDLE, MOVE, RUN, HURT, RUNMOVE, CROUCH }
     [SerializeField] PlayerStates actualState;
     [SerializeField] float stateTime;
 
@@ -127,6 +143,14 @@ public class Player : MonoBehaviour
                 //StartCoroutine(EmetreSORun());
                 //StartCoroutine(EmetrePols());
                 break;
+            case PlayerStates.CROUCH:
+                this.GetComponent<CapsuleCollider>().center = new Vector3(0f, crouchedCenterCollider, 0f);
+                this.GetComponent<CapsuleCollider>().height = crouchedHeightCollider;
+                _Camera.transform.localPosition = new Vector3(0f, 0f, -0.198f);
+                cameraShenanigansGameObject.transform.localPosition = Vector3.zero;
+                _VelocityMove /= 2;
+                //StartCoroutine(EmetreSOCrouch());
+                break;
             default:
                 break;
         }
@@ -139,8 +163,13 @@ public class Player : MonoBehaviour
         {
 
             case PlayerStates.IDLE:
-                if (movementInput != Vector2.zero)
+                if (movementInput != Vector2.zero && !crouched)
+                {
                     ChangeState(PlayerStates.MOVE);
+                }else if (crouched)
+                {
+                    ChangeState(PlayerStates.CROUCH);
+                }
                 break;
             case PlayerStates.MOVE:
                 //moving = true;
@@ -151,6 +180,9 @@ public class Player : MonoBehaviour
                 if (_RunAction.IsPressed() && !crouched)
                 {
                     ChangeState(PlayerStates.RUN);
+                }else if (crouched)
+                {
+                    ChangeState(PlayerStates.CROUCH);
                 }
 
                 _Rigidbody.linearVelocity =
@@ -166,10 +198,24 @@ public class Player : MonoBehaviour
                 transform.forward * movementInput.y)
                 .normalized * _VelocityRun;
 
+
                 if (!_RunAction.IsPressed())
                     ChangeState(PlayerStates.MOVE);
                 //StartCoroutine(EmetreSORun());
                 //StartCoroutine(EmetrePols());
+                break;
+            case PlayerStates.CROUCH:
+                _Rigidbody.linearVelocity =
+                (transform.right * movementInput.x +
+                transform.forward * movementInput.y)
+                .normalized * _VelocityMove/2;
+                if (!crouched && movementInput == Vector2.zero)
+                {
+                    ChangeState(PlayerStates.IDLE);
+                }else if (!crouched)
+                {
+                    ChangeState(PlayerStates.MOVE);
+                }
                 break;
             default:
                 break;
@@ -190,6 +236,13 @@ public class Player : MonoBehaviour
                 break;
             case PlayerStates.RUN:
                 //corriendo = false;
+                break;
+            case PlayerStates.CROUCH:
+                this.GetComponent<CapsuleCollider>().center = Vector3.zero;
+                this.GetComponent<CapsuleCollider>().height = 2;
+                _Camera.transform.localPosition = cameraPositionBeforeCrouch;
+                cameraShenanigansGameObject.transform.localPosition = new Vector3(0f, _Camera.transform.localPosition.y, 0f);
+                _VelocityMove *= 2;
                 break;
             default:
                 break;
