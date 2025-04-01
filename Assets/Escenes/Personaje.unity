@@ -639,7 +639,7 @@ GameObject:
   - component: {fileID: 927610401}
   - component: {fileID: 927610400}
   - component: {fileID: 927610399}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -973,7 +973,13 @@ MonoBehaviour:
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 256
+  interactLayerMask:
+    serializedVersion: 2
+    m_Bits: 512
   weaponCamera: {fileID: 636996612}
+  interactiveGameObject: {fileID: 0}
+  material: {fileID: 0}
+  baseMaterial: {fileID: 2100000, guid: 245be0caa7e11f441a60e9ec2a7f78e5, type: 2}
   actualState: 0
   stateTime: 0
 --- !u!1 &1285893386 stripped
@@ -1155,7 +1161,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 375
+    m_Bits: 1911
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0

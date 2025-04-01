@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
@@ -42,7 +43,12 @@ public class Player : MonoBehaviour
     [SerializeField] Transform shootPosition;
     [SerializeField] GameObject gunGameObject;
     [SerializeField] LayerMask enemyLayerMask;
+    [SerializeField] LayerMask interactLayerMask;
     [SerializeField] Camera weaponCamera;
+    [SerializeField] GameObject interactiveGameObject;
+    [SerializeField] Material material;
+    GameObject equippedItem;
+    [SerializeField] private Material baseMaterial;
 
 
     private void Awake()
@@ -62,6 +68,7 @@ public class Player : MonoBehaviour
     void Start()
     {
         Cursor.visible = false;
+        StartCoroutine(interactuarRaycast());
     }
 
     private void Update()
@@ -251,5 +258,38 @@ public class Player : MonoBehaviour
 
     #endregion
 
+    public IEnumerator interactuarRaycast()
+    {
+        while (true)
+        {
+            Debug.DrawRay(_Camera.transform.position, _Camera.transform.forward, Color.magenta, 5f);
+            //Lanzar Raycast interactuar con el mundo.
 
+            if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask)
+                && !hit.collider.gameObject.Equals(interactiveGameObject))
+            {
+                interactiveGameObject = hit.collider.gameObject;
+                baseMaterial = interactiveGameObject.GetComponent<MeshRenderer>().materials[0];
+                interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[]
+                {
+                    interactiveGameObject.GetComponent<MeshRenderer>().materials[0],
+
+                    material
+                };
+               // onInteractuable?.Invoke();
+            }
+            else if (!Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit2, 10f, interactLayerMask))
+            {
+                if (interactiveGameObject != null)
+                {
+                    interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
+                    interactiveGameObject = null;
+                }
+                //onNotInteractuable?.Invoke();
+            }
+            yield return new WaitForSeconds(0.5f);
+        }
+
+
+    }
 }
