@@ -290,4 +290,9 @@ public class Player : MonoBehaviour
             yield return new WaitForSeconds(0.5f);
         }
     }
+
+    internal void EquipItem(GameObject objeto)
+    {
+        throw new NotImplementedException();
+    }
 }
