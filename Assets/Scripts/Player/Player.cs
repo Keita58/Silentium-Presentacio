@@ -318,7 +318,7 @@ public class Player : MonoBehaviour
             Debug.DrawRay(_Camera.transform.position, _Camera.transform.forward, Color.magenta, 5f);
             //Lanzar Raycast interactuar con el mundo.
 
-            if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask){
+            if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask)){
                 if (hit.transform.gameObject.layer== 9 && !hit.collider.gameObject.Equals(interactiveGameObject))
                 {
                     interactiveGameObject = hit.collider.gameObject;
@@ -348,6 +348,8 @@ public class Player : MonoBehaviour
         }
     }
 
+    #region SOUNDS
+
     IEnumerator MakeNoiseMove()
     {
         while (true)
@@ -357,7 +359,7 @@ public class Player : MonoBehaviour
             {
                 if (collider.gameObject.TryGetComponent<Enemy>(out Enemy en))
                 {
-                    en.Escuchar(this.transform.position, 2);
+                    en.ListenSound(this.transform.position, 2);
                 }
             }
             yield return new WaitForSeconds(3);
@@ -369,9 +371,9 @@ public class Player : MonoBehaviour
         while (true)
         {
             Collider[] colliderHits = Physics.OverlapSphere(this.transform.position, 7);
-            if (GetComponent<Collider>().gameObject.TryGetComponent<Enemic>(out Enemic en))
+            if (GetComponent<Collider>().gameObject.TryGetComponent<Enemy>(out Enemy en))
             {
-                en.Escuchar(this.transform.position, 7);
+                en.ListenSound(this.transform.position, 7);
             }
             yield return new WaitForSeconds(1);
         }
@@ -382,11 +384,12 @@ public class Player : MonoBehaviour
         while (true)
         {
             Collider[] colliderHits = Physics.OverlapSphere(this.transform.position, 5);
-            if (GetComponent<Collider>().gameObject.TryGetComponent<Enemic>(out Enemic en))
+            if (GetComponent<Collider>().gameObject.TryGetComponent<Enemy>(out Enemy en))
             {
-                en.Escuchar(this.transform.position, 5);
+                en.ListenSound(this.transform.position, 5);
             }
             yield return new WaitForSeconds(1);
         }
     }
+    #endregion
 }
