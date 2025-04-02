@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
+using static InventorySO;
 
 public class Player : MonoBehaviour
 {
@@ -50,7 +51,10 @@ public class Player : MonoBehaviour
     GameObject equippedItem;
     [SerializeField] private Material baseMaterial;
     private GameObject itemEquipped;
-
+    private bool inventoryOpened;
+    private bool itemSlotOccuped;
+    [SerializeField] private GameObject equipedObject;
+    [SerializeField] Transform itemSlot;
 
     private void Awake()
     {
@@ -62,8 +66,40 @@ public class Player : MonoBehaviour
         _inputActions.Player.Shoot.performed+=Shoot;
         _inputActions.Player.Aim.performed +=Aim;
         _inputActions.Player.PickUpItem.performed +=PickUpItem;
+        _inputActions.Player.Inventory.performed += OpenInventory;
         _Rigidbody= GetComponent<Rigidbody>();
         _inputActions.Player.Enable();
+    }
+
+    private void OpenInventory(InputAction.CallbackContext context)
+    {
+
+        GameManager.instance.OpenInventory(this.gameObject);
+        if (!inventoryOpened)
+        {
+            Cursor.visible = true;
+            GameManager.instance.OpenInventory(this.gameObject);
+            inventoryOpened = true;
+            _inputActions.Player.Shoot.Disable();
+            _inputActions.Player.Aim.Disable();
+            _inputActions.Player.Move.Disable();
+            _inputActions.Player.Look.Disable();
+            _inputActions.Player.Crouch.Disable();
+            _inputActions.Player.PickUpItem.Disable();
+
+        }
+        else
+        {
+            Cursor.visible = false;
+            GameManager.instance.CloseInventory();
+            inventoryOpened = false;
+            _inputActions.Player.Shoot.Enable();
+            _inputActions.Player.Aim.Enable();
+            _inputActions.Player.Move.Enable();
+            _inputActions.Player.Look.Enable();
+            _inputActions.Player.Crouch.Enable();
+            _inputActions.Player.PickUpItem.Enable();
+        }
     }
 
     void Start()
@@ -89,15 +125,27 @@ public class Player : MonoBehaviour
 
     private void PickUpItem(InputAction.CallbackContext context)
     {
+        Debug.Log("ENTRO?");
         if (interactiveGameObject != null)
         {
-
+            Debug.Log("ENTRO DEFINITIVAMENTE");
             GameManager.instance.AddItem(interactiveGameObject.GetComponent<PickItem>().item);
             Debug.Log("QUE COJO?" + interactiveGameObject.GetComponent<PickItem>().item);
             interactiveGameObject.gameObject.SetActive(false);
             Debug.Log("Entro Coger item");
         }
 
+    }
+
+    public void EquipItem(GameObject itemAEquipar)
+    {
+        if (!itemSlotOccuped)
+        {
+            GameObject equip = Instantiate(itemAEquipar, itemSlot.transform);
+            equip.transform.position = itemSlot.transform.position;
+            itemSlotOccuped = true;
+            equipedObject = equip;
+        }
     }
 
     private void Crouch(InputAction.CallbackContext context)
@@ -274,6 +322,7 @@ public class Player : MonoBehaviour
 
     public IEnumerator InteractuarRaycast()
     {
+        //Interactuar con todo y mirar que me devuelve;
         while (true)
         {
             Debug.DrawRay(_Camera.transform.position, _Camera.transform.forward, Color.magenta, 5f);
@@ -303,10 +352,5 @@ public class Player : MonoBehaviour
             }
             yield return new WaitForSeconds(0.5f);
         }
-    }
-
-    internal void EquipItem(GameObject objeto)
-    {
-        throw new NotImplementedException();
     }
 }
