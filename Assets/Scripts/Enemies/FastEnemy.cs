@@ -287,15 +287,14 @@ public class FastEnemy : Enemy
             }
         }
 
-        if (lvlSound >= 1)
+        if(lvlSound > 0)
         {
-            if (_CurrentState == EnemyStates.SEARCH)
+            ChangeState(EnemyStates.SEARCH);
+
+            if (lvlSound > 0 && lvlSound <= 2)
                 _NavMeshAgent.SetDestination(_SoundPos);
-            else if (_CurrentState == EnemyStates.PATROL)
-            {
-                RandomPoint(_SoundPos, 5f, out _);
-                ChangeState(EnemyStates.SEARCH);
-            }
+            else if (lvlSound > 2 && lvlSound <= 5)
+                RandomPoint(transform.position, 2, out _);
         }
     }
 
