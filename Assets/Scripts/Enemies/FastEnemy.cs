@@ -274,7 +274,7 @@ public class FastEnemy : Enemy
         }
     }
 
-    public void Listen(Vector3 pos, int lvlSound)
+    public override void ListenSound(Vector3 pos, int lvlSound)
     {
         _SoundPos = pos;
         RaycastHit[] hits = Physics.RaycastAll(this.transform.position, _SoundPos - this.transform.position, Vector3.Distance(_SoundPos, this.transform.position));
@@ -297,11 +297,6 @@ public class FastEnemy : Enemy
                 ChangeState(EnemyStates.SEARCH);
             }
         }
-    }
-
-    public override void ListenSound()
-    {
-
     }
 
     public void TakeHealth()
