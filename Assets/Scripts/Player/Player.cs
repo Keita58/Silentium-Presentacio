@@ -202,15 +202,12 @@ public class Player : MonoBehaviour
                 _Rigidbody.angularVelocity=Vector3.zero;
                 break;
             case PlayerStates.MOVE:
-                //moving = true;
-                //StartCoroutine(EmetreSOMove());
+                StartCoroutine(MakeNoiseMove());
        
 
                 break;
             case PlayerStates.RUN:
-                //running = true;
-                //StartCoroutine(EmetreSORun());
-                //StartCoroutine(EmetrePols());
+                StartCoroutine(MakeNoiseRun());
                 break;
             case PlayerStates.CROUCH:
                 this.GetComponent<CapsuleCollider>().center = new Vector3(0f, crouchedCenterCollider, 0f);
@@ -218,7 +215,7 @@ public class Player : MonoBehaviour
                 _Camera.transform.localPosition = new Vector3(0f, 0f, -0.198f);
                 cameraShenanigansGameObject.transform.localPosition = Vector3.zero;
                 _VelocityMove /= 2;
-                //StartCoroutine(EmetreSOCrouch());
+                StartCoroutine(MakeNoiseCrouch());
                 break;
             default:
                 break;
@@ -241,8 +238,6 @@ public class Player : MonoBehaviour
                 }
                 break;
             case PlayerStates.MOVE:
-                //moving = true;
-                //StartCoroutine(EmetreSOMove());
                 if (movementInput == Vector2.zero)
                     ChangeState(PlayerStates.IDLE);
                 
@@ -260,7 +255,6 @@ public class Player : MonoBehaviour
                 .normalized * _VelocityMove;
                 break;
             case PlayerStates.RUN:
-                //running = true;
 
                 _Rigidbody.linearVelocity =
                 (transform.right * movementInput.x +
@@ -270,8 +264,6 @@ public class Player : MonoBehaviour
 
                 if (!_RunAction.IsPressed())
                     ChangeState(PlayerStates.MOVE);
-                //StartCoroutine(EmetreSORun());
-                //StartCoroutine(EmetrePols());
                 break;
             case PlayerStates.CROUCH:
                 _Rigidbody.linearVelocity =
@@ -298,15 +290,13 @@ public class Player : MonoBehaviour
         switch (exitState)
         {
             case PlayerStates.MOVE:
-                //Comentar por si hacemos que haya mini estados.
-                //rb.linearVelocity = Vector2.zero;
-                //rb.angularVelocity = Vector3.zero;
-                //moving = false;
+                StopCoroutine(MakeNoiseMove());
                 break;
             case PlayerStates.RUN:
-                //corriendo = false;
+                StopCoroutine(MakeNoiseRun());
                 break;
             case PlayerStates.CROUCH:
+                StopCoroutine(MakeNoiseCrouch());
                 this.GetComponent<CapsuleCollider>().center = Vector3.zero;
                 this.GetComponent<CapsuleCollider>().height = 2;
                 _Camera.transform.localPosition = cameraPositionBeforeCrouch;
@@ -328,18 +318,18 @@ public class Player : MonoBehaviour
             Debug.DrawRay(_Camera.transform.position, _Camera.transform.forward, Color.magenta, 5f);
             //Lanzar Raycast interactuar con el mundo.
 
-            if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask)
-                && !hit.collider.gameObject.Equals(interactiveGameObject))
-            {
-                interactiveGameObject = hit.collider.gameObject;
-                baseMaterial = interactiveGameObject.GetComponent<MeshRenderer>().materials[0];
-                interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[]
+            if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask){
+                if (hit.transform.gameObject.layer== 9 && !hit.collider.gameObject.Equals(interactiveGameObject))
                 {
+                    interactiveGameObject = hit.collider.gameObject;
+                    baseMaterial = interactiveGameObject.GetComponent<MeshRenderer>().materials[0];
+                    interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[]
+                    {
                     interactiveGameObject.GetComponent<MeshRenderer>().materials[0],
 
                     material
-                };
-               // onInteractuable?.Invoke();
+                    };
+                }
             }
             else if (!Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit2, 10f, interactLayerMask))
             {
@@ -350,7 +340,53 @@ public class Player : MonoBehaviour
                 }
                 //onNotInteractuable?.Invoke();
             }
+
+
+            // onInteractuable?.Invoke();
+
             yield return new WaitForSeconds(0.5f);
+        }
+    }
+
+    IEnumerator MakeNoiseMove()
+    {
+        while (true)
+        {
+            Collider[] colliderHits = Physics.OverlapSphere(this.transform.position, 30);
+            foreach (Collider collider in colliderHits)
+            {
+                if (collider.gameObject.TryGetComponent<Enemy>(out Enemy en))
+                {
+                    en.Escuchar(this.transform.position, 2);
+                }
+            }
+            yield return new WaitForSeconds(3);
+        }
+    }
+
+    IEnumerator MakeNoiseRun()
+    {
+        while (true)
+        {
+            Collider[] colliderHits = Physics.OverlapSphere(this.transform.position, 7);
+            if (GetComponent<Collider>().gameObject.TryGetComponent<Enemic>(out Enemic en))
+            {
+                en.Escuchar(this.transform.position, 7);
+            }
+            yield return new WaitForSeconds(1);
+        }
+    }
+
+    IEnumerator MakeNoiseCrouch()
+    {
+        while (true)
+        {
+            Collider[] colliderHits = Physics.OverlapSphere(this.transform.position, 5);
+            if (GetComponent<Collider>().gameObject.TryGetComponent<Enemic>(out Enemic en))
+            {
+                en.Escuchar(this.transform.position, 5);
+            }
+            yield return new WaitForSeconds(1);
         }
     }
 }
