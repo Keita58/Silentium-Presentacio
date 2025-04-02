@@ -54,4 +54,9 @@ public class GameManager : MonoBehaviour
         inventory.UseItem(item);
         player.EquipItem(equipableObject);
     }
+
+    public void SolvedClock()
+    {
+
+    }
 }
