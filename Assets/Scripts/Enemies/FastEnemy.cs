@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -12,8 +13,8 @@ public class FastEnemy : Enemy
     [SerializeField] private LayerMask _LayerObjectsAndPlayer;
 
     private NavMeshAgent _NavMeshAgent;
-    private float _BetaDotProduct;
     private Vector3 _SoundPos;
+    private float _BetaDotProduct;
     private bool _Chase;
     private bool _SearchSound;
     private bool _Detected;
@@ -21,9 +22,18 @@ public class FastEnemy : Enemy
     private bool _Wait;
     private bool _Attack;
 
+    private int _Hp;
+    public override int hp => _Hp;
+
+    private int _DownTime;
+    public override int downTime => _DownTime;
+
+    private int MAXHEALTH = 3;
+
     private void Awake()
     {
         _NavMeshAgent = GetComponent<NavMeshAgent>();
+        _SoundPos = Vector3.zero;
         _BetaDotProduct = 60;
         _SearchSound = false;
         _Detected = false;
@@ -31,7 +41,7 @@ public class FastEnemy : Enemy
         _Chase = false;
         _Wait = false;
         _Attack = false;
-        _SoundPos = Vector3.zero;
+        _Hp = MAXHEALTH;
     }
 
     private void Start()
@@ -63,19 +73,20 @@ public class FastEnemy : Enemy
                 StartCoroutine(Patrol());
                 break;
             case EnemyStates.SEARCH:
-
+                _SearchSound = true;
+                StartCoroutine(Search());
                 break;
             case EnemyStates.CHASE:
-
+                _NavMeshAgent.speed = 7;
                 break;
             case EnemyStates.ATTACK:
-
+                _Attack = true;
+                StartCoroutine(AttackPlayer());
                 break;
             case EnemyStates.KNOCKED:
-
+                StartCoroutine(WakeUp());
                 break;
             case EnemyStates.STOPPED:
-
                 break;
         }
     }
@@ -89,9 +100,9 @@ public class FastEnemy : Enemy
             case EnemyStates.PATROL:
             case EnemyStates.SEARCH:
             case EnemyStates.CHASE:
+            case EnemyStates.ATTACK:
                 DetectPlayer();
                 break;
-            case EnemyStates.ATTACK:
             case EnemyStates.KNOCKED:
             case EnemyStates.STOPPED:
                 break;
@@ -112,6 +123,9 @@ public class FastEnemy : Enemy
             case EnemyStates.ATTACK:
                 _Attack = false;
                 break;
+            case EnemyStates.KNOCKED:
+                _Hp = MAXHEALTH;
+                break;
         }
     }
 
@@ -122,7 +136,8 @@ public class FastEnemy : Enemy
         UpdateState(_CurrentState);
     }
 
-    private IEnumerator Patrol()
+    // Funció per moure l'enemic pel mapa
+    IEnumerator Patrol()
     {
         Vector3 coord = Vector3.zero;
         float range = 30.0f;
@@ -135,6 +150,7 @@ public class FastEnemy : Enemy
                     Debug.DrawRay(coord, Vector3.up, UnityEngine.Color.black, 1.0f);
                 }
 
+                _NavMeshAgent.speed = Random.Range(3.5f, 6);
                 _NavMeshAgent.SetDestination(new Vector3(coord.x, transform.position.y, coord.z));
                 _Patrolling = true;
             }
@@ -143,11 +159,11 @@ public class FastEnemy : Enemy
             {
                 _Patrolling = false;
             }
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(2);
         }
     }
 
-    IEnumerator Investigar()
+    IEnumerator Search()
     {
         while (_SearchSound)
         {
@@ -189,7 +205,8 @@ public class FastEnemy : Enemy
 
     private void DetectPlayer()
     {
-        if (Physics.OverlapSphere(transform.position, 10f, _LayerPlayer) != null)
+        Collider[] aux = Physics.OverlapSphere(transform.position, 10f, _LayerPlayer);
+        if (aux.Length > 0)
         {
             float alphaDocProduct = Vector3.Dot(transform.forward, (_Player.transform.position - this.transform.position).normalized);
 
@@ -202,27 +219,58 @@ public class FastEnemy : Enemy
                 {
                     if (info.transform.gameObject == _Player)
                     {
-                        //Debug.Log("Detecto alguna cosa aprop!");
+                        if(Vector3.Distance(transform.position, info.transform.position) > 3)
+                        {
+                            Debug.Log("Detecto alguna cosa aprop!");
+                            _SearchSound = false;
+                            _Chase = true;
+                            StopAllCoroutines();
+                            transform.LookAt(info.transform.position);
+                            _NavMeshAgent.SetDestination(_Player.transform.position);
+                            if (_CurrentState != EnemyStates.CHASE)
+                                ChangeState(EnemyStates.CHASE);
+                        }
+                        else
+                        {
+                            transform.LookAt(info.transform.position);
+                            if(_CurrentState != EnemyStates.ATTACK)
+                                ChangeState(EnemyStates.ATTACK);
+                        }
+                    }
+                }
+                else
+                {
+                    if (Vector3.Distance(transform.position, _Player.transform.position) > 3)
+                    {
+                        Debug.Log("Detecto alguna cosa aprop!");
                         _SearchSound = false;
                         _Chase = true;
-                        StopCoroutine(StopChase());
+                        StopAllCoroutines();
+                        transform.LookAt(_Player.transform.position);
                         _NavMeshAgent.SetDestination(_Player.transform.position);
                         if (_CurrentState != EnemyStates.CHASE)
                             ChangeState(EnemyStates.CHASE);
+                    }
+                    else
+                    {
+                        transform.LookAt(_Player.transform.position);
+                        if (_CurrentState != EnemyStates.ATTACK)
+                            ChangeState(EnemyStates.ATTACK);
                     }
                 }
             }
             else if (_Chase)
             {
+                RandomPoint(_Player.transform.position, 2, out Vector3 point);
                 StartCoroutine(StopChase());
-                _NavMeshAgent.SetDestination(_Player.transform.position);
+                _NavMeshAgent.SetDestination(point);
             }
         }
         else
         {
-            //Debug.Log("No detecto res a la meva mirada!");
+            Debug.Log("No detecto res a la meva mirada!");
             if (_CurrentState == EnemyStates.CHASE)
-                ChangeState(EnemyStates.SEARCH);
+                ChangeState(EnemyStates.PATROL);
         }
     }
 
@@ -231,15 +279,13 @@ public class FastEnemy : Enemy
         _SoundPos = pos;
         RaycastHit[] hits = Physics.RaycastAll(this.transform.position, _SoundPos - this.transform.position, Vector3.Distance(_SoundPos, this.transform.position));
         
-        /*
         foreach (RaycastHit hit in hits)
         {
-            
             if (hit.collider.TryGetComponent<IAtenuacio>(out IAtenuacio a))
             {
                 lvlSound = a.atenuarSo(lvlSound);
             }
-        }*/
+        }
 
         if (lvlSound >= 1)
         {
@@ -253,9 +299,41 @@ public class FastEnemy : Enemy
         }
     }
 
+    public override void ListenSound()
+    {
+
+    }
+
+    public void TakeHealth()
+    {
+        if (_CurrentState != EnemyStates.KNOCKED)
+        {
+            _Hp--;
+            if (_Hp == 0)
+                ChangeState(EnemyStates.KNOCKED);
+        }
+    }
+
+    IEnumerator WakeUp()
+    {
+        yield return new WaitForSeconds(5);
+        ChangeState(EnemyStates.PATROL);
+    }
+
+    IEnumerator AttackPlayer()
+    {
+        while(_Attack)
+        {
+            //Animation -> attack
+            //Cridar a la funció de mal del personatge
+            yield return new WaitForSeconds(1);
+        }
+    }
+
+    // Comptador per parar de perseguir al jugador
     IEnumerator StopChase()
     {
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(5);
         _Chase = false;
     }
 
@@ -263,5 +341,10 @@ public class FastEnemy : Enemy
     {
         yield return new WaitForSeconds(10);
         ChangeState(EnemyStates.PATROL);
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireSphere(transform.position, 10f);
     }
 }
