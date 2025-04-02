@@ -329,6 +329,9 @@ public class Player : MonoBehaviour
 
                     material
                     };
+                }else if (hit.transform.gameObject.layer == 10)
+                {
+
                 }
             }
             else if (!Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit2, 10f, interactLayerMask))
