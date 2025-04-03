@@ -313,7 +313,19 @@ public class FastEnemy : Enemy
     IEnumerator WakeUp()
     {
         yield return new WaitForSeconds(5);
-        ChangeState(EnemyStates.PATROL);
+        Collider[] aux = Physics.OverlapSphere(transform.position, 2f, _LayerPlayer);
+        if (aux.Length > 0)
+        {
+            if (Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit info, _LayerObjectsAndPlayer))
+            {
+                if (info.transform.tag == "Player")
+                {
+                    ChangeState(EnemyStates.ATTACK);
+                }
+            }
+        }
+        else
+            ChangeState(EnemyStates.PATROL);
     }
 
     IEnumerator AttackPlayer()
@@ -335,7 +347,7 @@ public class FastEnemy : Enemy
 
     IEnumerator WaitChange()
     {
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(10f);
         ChangeState(EnemyStates.PATROL);
     }
 

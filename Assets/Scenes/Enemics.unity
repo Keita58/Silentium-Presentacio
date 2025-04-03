@@ -1199,36 +1199,14 @@ GameObject:
   - component: {fileID: 1000412932}
   - component: {fileID: 1000412931}
   - component: {fileID: 1000412930}
-  - component: {fileID: 1000412929}
+  - component: {fileID: 1000412935}
   m_Layer: 8
   m_Name: FatEnemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1000412929
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1000412928}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9cf4a8281291eb7478b111e04c73fe98, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _CurrentState: 0
-  _LastState: 0
-  _StateTime: 0
-  _Player: {fileID: 270537898}
-  _LayerPlayer:
-    serializedVersion: 2
-    m_Bits: 64
-  _LayerObjectsAndPlayer:
-    serializedVersion: 2
-    m_Bits: 1600
+  m_IsActive: 0
 --- !u!195 &1000412930
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -1336,12 +1314,34 @@ Transform:
   m_GameObject: {fileID: 1000412928}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: -20, y: 1, z: -20}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1000412935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000412928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd83fb523c45b7d498fce3f6ac3fc344, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _CurrentState: 0
+  _LastState: 0
+  _StateTime: 0
+  _Player: {fileID: 270537898}
+  _LayerPlayer:
+    serializedVersion: 2
+    m_Bits: 64
+  _LayerObjectsAndPlayer:
+    serializedVersion: 2
+    m_Bits: 1600
 --- !u!1 &1073508167
 GameObject:
   m_ObjectHideFlags: 0
@@ -1362,7 +1362,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1073508168
 MonoBehaviour:
   m_ObjectHideFlags: 0
