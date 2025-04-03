@@ -38,6 +38,7 @@ public class Player : MonoBehaviour
     float crouchedHeightCollider = 1;
     Vector3 cameraPositionBeforeCrouch = new Vector3(0, 0.627f, -0.198f);
     int gunAmmo =3;
+    int hp = 5;
 
     [SerializeField] GameObject cameraShenanigansGameObject;
 
@@ -167,6 +168,11 @@ public class Player : MonoBehaviour
             //_Bales--;
             //OnDisparar?.Invoke();
         }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        hp-=damage;
     }
 
 
@@ -329,6 +335,9 @@ public class Player : MonoBehaviour
 
                     material
                     };
+                }else if (hit.transform.gameObject.layer == 10)
+                {
+
                 }
             }
             else if (!Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit2, 10f, interactLayerMask))
