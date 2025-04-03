@@ -8,18 +8,33 @@ public class Door : MonoBehaviour
     [SerializeField] private bool isRotatingDoor = true;
     [SerializeField] private float speed = 1f;
 
+    [Header("Rotation Configs")]
+    [SerializeField] private float rotationAmount=90f;
+
+    [SerializeField] private float forwardDirection=0;
+
+    private Vector3 startRotation;
+
+    //To control if the animation is in progress.
+    private Coroutine animationCoroutine;
+
     private void Awake()
     {
         isOpen = false;
-    }
-    void Start()
-    {
-        
+        startRotation = transform.rotation.eulerAngles;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Open(Vector3 playerPosition)
     {
-        
+        if (!isOpen)
+        {
+            if (animationCoroutine != null)
+            {
+                StopCoroutine(animationCoroutine);
+            }
+
+
+        }
+
     }
 }
