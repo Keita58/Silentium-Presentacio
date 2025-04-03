@@ -278,21 +278,24 @@ public class FastEnemy : Enemy
         if(lvlSound > 0 && _CurrentState == EnemyStates.PATROL)
         {
             if (lvlSound > 0 && lvlSound <= 2)
-                _NavMeshAgent.SetDestination(_SoundPos);
-            else if (lvlSound > 2 && lvlSound <= 5)
             {
-                RandomPoint(_SoundPos, 2, out _);
-                _RangeSearchSound = 2;
+                RandomPoint(_SoundPos, 10, out _);
+                _RangeSearchSound = 10;
             }
-            else if (lvlSound > 5 && lvlSound <= 9)
+            else if (lvlSound > 2 && lvlSound <= 5)
             {
                 RandomPoint(_SoundPos, 5, out _);
                 _RangeSearchSound = 5;
             }
-            else if (lvlSound > 9 && lvlSound <= 15)
+            else if (lvlSound > 5 && lvlSound <= 9)
             {
-                RandomPoint(_SoundPos, 10, out _);
-                _RangeSearchSound = 10;
+                RandomPoint(_SoundPos, 2, out _);
+                _RangeSearchSound = 2;
+            }
+            else if (lvlSound > 9)
+            {
+                _NavMeshAgent.SetDestination(_SoundPos);
+                
             }
 
             if(_CurrentState != EnemyStates.SEARCH)

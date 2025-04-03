@@ -2,9 +2,9 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class FatEnemy : Enemy
+public class BlindEnemy : Enemy
 {
-    private enum EnemyStates { PATROL, SEARCH, ATTACK, KNOCKED }
+    private enum EnemyStates { PATROL, ATTACK, KNOCKED }
     [SerializeField] private EnemyStates _CurrentState;
     [SerializeField] private EnemyStates _LastState;
     [SerializeField] private float _StateTime;
@@ -18,7 +18,6 @@ public class FatEnemy : Enemy
     private bool _Detected;
     private bool _Patrolling;
     private bool _Wait;
-    private bool _Attack;
 
     private int _Hp;
     public override int hp => _Hp;
@@ -38,7 +37,6 @@ public class FatEnemy : Enemy
         _Detected = false;
         _Patrolling = false;
         _Wait = false;
-        _Attack = false;
         _Hp = MAXHEALTH;
     }
 
@@ -72,13 +70,7 @@ public class FatEnemy : Enemy
                 _Patrolling = false;
                 StartCoroutine(Patrol());
                 break;
-            case EnemyStates.SEARCH:
-                _SearchSound = true;
-                StartCoroutine(Search(_RangeSearchSound));
-                break;
             case EnemyStates.ATTACK:
-                _Attack = true;
-                StartCoroutine(AttackPlayer());
                 break;
             case EnemyStates.KNOCKED:
                 StartCoroutine(WakeUp());
@@ -93,7 +85,6 @@ public class FatEnemy : Enemy
         switch (updateState)
         {
             case EnemyStates.PATROL:
-            case EnemyStates.SEARCH:
             case EnemyStates.ATTACK:
             case EnemyStates.KNOCKED:
                 break;
@@ -107,12 +98,7 @@ public class FatEnemy : Enemy
             case EnemyStates.PATROL:
                 _Detected = true;
                 break;
-            case EnemyStates.SEARCH:
-                _SearchSound = false;
-                _Wait = false;
-                break;
             case EnemyStates.ATTACK:
-                _Attack = false;
                 break;
             case EnemyStates.KNOCKED:
                 _Hp = MAXHEALTH;
@@ -209,29 +195,25 @@ public class FatEnemy : Enemy
 
         if (lvlSound > 0 && _CurrentState == EnemyStates.PATROL)
         {
-            if (lvlSound > 0 && lvlSound <= 3)
+            if (lvlSound > 0 && lvlSound <= 2)
             {
                 RandomPoint(_SoundPos, 5, out _);
                 _RangeSearchSound = 5;
             }
-            else if (lvlSound > 3 && lvlSound <= 5)
+            else if (lvlSound > 2 && lvlSound <= 3)
             {
                 RandomPoint(_SoundPos, 3, out _);
                 _RangeSearchSound = 3;
             }
-            else if (lvlSound > 5 && lvlSound <= 7)
+            else if (lvlSound > 3 && lvlSound <= 5)
             {
                 RandomPoint(_SoundPos, 2, out _);
                 _RangeSearchSound = 2;
             }
-            else if (lvlSound > 7)
+            else if (lvlSound > 5)
             {
                 _NavMeshAgent.SetDestination(_SoundPos);
-                
             }
-
-            if (_CurrentState != EnemyStates.SEARCH)
-                ChangeState(EnemyStates.SEARCH);
         }
     }
 
@@ -248,29 +230,13 @@ public class FatEnemy : Enemy
     IEnumerator WakeUp()
     {
         yield return new WaitForSeconds(5);
-        Collider[] aux = Physics.OverlapSphere(transform.position, 3f, _LayerPlayer);
-        if (aux.Length > 0)
-        {
-            if (Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit info, _LayerObjectsAndPlayer))
-            {
-                if (info.transform.tag == "Player")
-                {
-                    ChangeState(EnemyStates.ATTACK);
-                }
-            }
-        }
-        else
-            ChangeState(EnemyStates.PATROL);
+        ChangeState(EnemyStates.PATROL);
     }
 
-    IEnumerator AttackPlayer()
+    private void AttackPlayer()
     {
-        while (_Attack)
-        {
-            //Animation -> attack
-            _Player.GetComponent<Player>().TakeDamage(1);
-            yield return new WaitForSeconds(1);
-        }
+        //Animation -> attack
+        _Player.GetComponent<Player>().TakeDamage(3);    
     }
 
     IEnumerator WaitChange()
