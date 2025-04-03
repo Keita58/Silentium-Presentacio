@@ -12,6 +12,9 @@ public class AmmunitionItem : Item
     [SerializeField] private Sprite sprite;
     public override Sprite Sprite => sprite;
 
+    [SerializeField] private GameObject prefab;
+    public override GameObject prefabToEquip => prefab;
+
     [Header("Specific values")]
     [SerializeField] public int bales;
 
@@ -22,6 +25,11 @@ public class AmmunitionItem : Item
     }
 
     public override void Combine()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void Equip()
     {
         throw new System.NotImplementedException();
     }

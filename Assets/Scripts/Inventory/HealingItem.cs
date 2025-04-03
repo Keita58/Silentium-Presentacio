@@ -17,12 +17,20 @@ public class HealingItem : Item
     [SerializeField] private int healing;
     public int Healing => healing;
 
+    [SerializeField] private GameObject prefab;
+    public override GameObject prefabToEquip => prefab;
+
     public override void Use()
     {
         GameManager.instance.UseHealingItem(healing, this);
     }
 
     public override void Combine()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void Equip()
     {
         throw new System.NotImplementedException();
     }

@@ -10,7 +10,6 @@ public class ShowItem : MonoBehaviour
     [SerializeField] TextMeshProUGUI textQuantitat;
     public event Action OnUseItem;
     Item selectedItem;
-    ShowInventory inventoryUI;
 
     private void Awake()
     {
@@ -26,9 +25,10 @@ public class ShowItem : MonoBehaviour
 
     public void ClickItem()
     {
+        Debug.Log("Clico Item");
         if (selectedItem != null)
         {
-            inventoryUI.ItemSelected(selectedItem);
+            InventoryManager.instance.ItemSelected(selectedItem);
             //selectedItem.Use();
             //OnUseItem?.Invoke();
         }

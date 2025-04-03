@@ -12,15 +12,13 @@ public class ThrowableItem : Item
     [SerializeField] private Sprite sprite;
     public override Sprite Sprite => sprite;
 
-    [SerializeField] private GameObject itemPrefab;
-
-    public GameObject ItemPrefab => itemPrefab;
+    [SerializeField] private GameObject prefab;
+    public override GameObject prefabToEquip => prefab;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public override void Use()
     {
-        GameManager.instance.UseThrowableItem(this, itemPrefab);
     }
 
     public override void Combine()
@@ -28,4 +26,8 @@ public class ThrowableItem : Item
         throw new System.NotImplementedException();
     }
 
+    public override void Equip()
+    {
+        GameManager.instance.EquipThrowableItem(this, prefab);
+    }
 }

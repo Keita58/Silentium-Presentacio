@@ -47,7 +47,7 @@ public class Clock : MonoBehaviour
         // moveMinutes();
         StartCoroutine(Finished());
     }
-    void moveMinutes()
+    public void MoveMinutes()
     {
         msecs += Time.deltaTime * clockSpeed;
         if (msecs >= 1.0f)
@@ -66,7 +66,7 @@ public class Clock : MonoBehaviour
         }
     }
 
-    void moveHour()
+    public void MoveHour()
     {
         msecs += Time.deltaTime * clockSpeed;
         if (msecs >= 1.0f)
@@ -80,7 +80,7 @@ public class Clock : MonoBehaviour
         }
     }
 
-    IEnumerator Finished()
+    private IEnumerator Finished()
     {
         if((hour >= 8.9 && hour <9.7 || hour >= 20.9 && hour < 21.7) && minutes >= 20.9 && minutes < 21.7)
         {        

@@ -49,7 +49,7 @@ public class GameManager : MonoBehaviour
         inventory.UseItem(item);
     }
 
-    public void UseThrowableItem(Item item, GameObject equipableObject)
+    public void EquipThrowableItem(Item item, GameObject equipableObject)
     {
         inventory.UseItem(item);
         player.EquipItem(equipableObject);

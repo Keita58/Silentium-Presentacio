@@ -2,6 +2,8 @@ using UnityEngine;
 
 public abstract class Enemy : MonoBehaviour
 {
-    int hp;
-    int downTime;
+    public abstract int hp { get; }
+    public abstract int downTime { get; }
+
+    public abstract void ListenSound(Vector3 pos, int lvlSound);
 }

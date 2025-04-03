@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
+using static InventorySO;
 
 public class Player : MonoBehaviour
 {
@@ -37,6 +38,7 @@ public class Player : MonoBehaviour
     float crouchedHeightCollider = 1;
     Vector3 cameraPositionBeforeCrouch = new Vector3(0, 0.627f, -0.198f);
     int gunAmmo =3;
+    int hp = 5;
 
     [SerializeField] GameObject cameraShenanigansGameObject;
 
@@ -50,7 +52,14 @@ public class Player : MonoBehaviour
     GameObject equippedItem;
     [SerializeField] private Material baseMaterial;
     private GameObject itemEquipped;
-
+    private bool inventoryOpened;
+    private bool itemSlotOccuped;
+    [SerializeField] private GameObject equipedObject;
+    [SerializeField] Transform itemSlot;
+    bool door=false;
+    bool clockPuzzleHour = false;
+    bool clockPuzzleMinute = false;
+    GameObject clockPuzzleHand;
 
     private void Awake()
     {
@@ -60,10 +69,46 @@ public class Player : MonoBehaviour
         _LookAction = _inputActions.Player.Look;
         _RunAction = _inputActions.Player.Run;
         _inputActions.Player.Shoot.performed+=Shoot;
+        _inputActions.Player.HoldInteract.performed += interactClockPuzzle;
         _inputActions.Player.Aim.performed +=Aim;
         _inputActions.Player.PickUpItem.performed +=PickUpItem;
+        _inputActions.Player.Inventory.performed += OpenInventory;
         _Rigidbody= GetComponent<Rigidbody>();
         _inputActions.Player.Enable();
+    }
+
+
+    private void OpenInventory(InputAction.CallbackContext context)
+    {
+
+        GameManager.instance.OpenInventory(this.gameObject);
+        if (!inventoryOpened)
+        {
+            Cursor.visible = true;
+            GameManager.instance.OpenInventory(this.gameObject);
+            inventoryOpened = true;
+            _inputActions.Player.Shoot.Disable();
+            _inputActions.Player.Aim.Disable();
+            _inputActions.Player.Move.Disable();
+            _inputActions.Player.Look.Disable();
+            _inputActions.Player.Crouch.Disable();
+            _inputActions.Player.HoldInteract.Disable();
+            _inputActions.Player.PickUpItem.Disable();
+
+        }
+        else
+        {
+            Cursor.visible = false;
+            GameManager.instance.CloseInventory();
+            inventoryOpened = false;
+            _inputActions.Player.Shoot.Enable();
+            _inputActions.Player.Aim.Enable();
+            _inputActions.Player.Move.Enable();
+            _inputActions.Player.Look.Enable();
+            _inputActions.Player.HoldInteract.Enable();
+            _inputActions.Player.Crouch.Enable();
+            _inputActions.Player.PickUpItem.Enable();
+        }
     }
 
     void Start()
@@ -89,15 +134,64 @@ public class Player : MonoBehaviour
 
     private void PickUpItem(InputAction.CallbackContext context)
     {
+        Debug.Log("ENTRO?");
         if (interactiveGameObject != null)
         {
-
+            Debug.Log("ENTRO DEFINITIVAMENTE");
             GameManager.instance.AddItem(interactiveGameObject.GetComponent<PickItem>().item);
             Debug.Log("QUE COJO?" + interactiveGameObject.GetComponent<PickItem>().item);
             interactiveGameObject.gameObject.SetActive(false);
             Debug.Log("Entro Coger item");
         }
+        else
+        {
+            if (door)
+            {
+                Debug.DrawRay(_Camera.transform.position, _Camera.transform.forward, Color.magenta, 5f);
+                if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask))
+                {
+                    if (hit.collider.TryGetComponent<Door>(out Door door))
+                    {
+                        if (door.isOpen)
+                        {
+                            door.Close();
+                        }
+                        else
+                        {
+                            door.Open(transform.position);
+                        }
+                    }
+                }
+            }
+            
+           
+        }
 
+    }
+
+    private void interactClockPuzzle(InputAction.CallbackContext context)
+    {
+
+        if (clockPuzzleHour)
+        {
+            clockPuzzleHand.GetComponent<Clock>().MoveHour();
+        }
+        else if (clockPuzzleMinute)
+        {
+            clockPuzzleHand.GetComponent<Clock>().MoveMinutes();
+
+        }
+    }
+
+    public void EquipItem(GameObject itemAEquipar)
+    {
+        if (!itemSlotOccuped)
+        {
+            GameObject equip = Instantiate(itemAEquipar, itemSlot.transform);
+            equip.transform.position = itemSlot.transform.position;
+            itemSlotOccuped = true;
+            equipedObject = equip;
+        }
     }
 
     private void Crouch(InputAction.CallbackContext context)
@@ -119,6 +213,11 @@ public class Player : MonoBehaviour
             //_Bales--;
             //OnDisparar?.Invoke();
         }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        hp-=damage;
     }
 
 
@@ -154,15 +253,12 @@ public class Player : MonoBehaviour
                 _Rigidbody.angularVelocity=Vector3.zero;
                 break;
             case PlayerStates.MOVE:
-                //moving = true;
-                //StartCoroutine(EmetreSOMove());
+                StartCoroutine(MakeNoiseMove());
        
 
                 break;
             case PlayerStates.RUN:
-                //running = true;
-                //StartCoroutine(EmetreSORun());
-                //StartCoroutine(EmetrePols());
+                StartCoroutine(MakeNoiseRun());
                 break;
             case PlayerStates.CROUCH:
                 this.GetComponent<CapsuleCollider>().center = new Vector3(0f, crouchedCenterCollider, 0f);
@@ -170,7 +266,7 @@ public class Player : MonoBehaviour
                 _Camera.transform.localPosition = new Vector3(0f, 0f, -0.198f);
                 cameraShenanigansGameObject.transform.localPosition = Vector3.zero;
                 _VelocityMove /= 2;
-                //StartCoroutine(EmetreSOCrouch());
+                StartCoroutine(MakeNoiseCrouch());
                 break;
             default:
                 break;
@@ -193,8 +289,6 @@ public class Player : MonoBehaviour
                 }
                 break;
             case PlayerStates.MOVE:
-                //moving = true;
-                //StartCoroutine(EmetreSOMove());
                 if (movementInput == Vector2.zero)
                     ChangeState(PlayerStates.IDLE);
                 
@@ -212,7 +306,6 @@ public class Player : MonoBehaviour
                 .normalized * _VelocityMove;
                 break;
             case PlayerStates.RUN:
-                //running = true;
 
                 _Rigidbody.linearVelocity =
                 (transform.right * movementInput.x +
@@ -222,8 +315,6 @@ public class Player : MonoBehaviour
 
                 if (!_RunAction.IsPressed())
                     ChangeState(PlayerStates.MOVE);
-                //StartCoroutine(EmetreSORun());
-                //StartCoroutine(EmetrePols());
                 break;
             case PlayerStates.CROUCH:
                 _Rigidbody.linearVelocity =
@@ -250,15 +341,13 @@ public class Player : MonoBehaviour
         switch (exitState)
         {
             case PlayerStates.MOVE:
-                //Comentar por si hacemos que haya mini estados.
-                //rb.linearVelocity = Vector2.zero;
-                //rb.angularVelocity = Vector3.zero;
-                //moving = false;
+                StopCoroutine(MakeNoiseMove());
                 break;
             case PlayerStates.RUN:
-                //corriendo = false;
+                StopCoroutine(MakeNoiseRun());
                 break;
             case PlayerStates.CROUCH:
+                StopCoroutine(MakeNoiseCrouch());
                 this.GetComponent<CapsuleCollider>().center = Vector3.zero;
                 this.GetComponent<CapsuleCollider>().height = 2;
                 _Camera.transform.localPosition = cameraPositionBeforeCrouch;
@@ -274,26 +363,45 @@ public class Player : MonoBehaviour
 
     public IEnumerator InteractuarRaycast()
     {
+        //Interactuar con todo y mirar que me devuelve;
         while (true)
         {
             Debug.DrawRay(_Camera.transform.position, _Camera.transform.forward, Color.magenta, 5f);
             //Lanzar Raycast interactuar con el mundo.
 
-            if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask)
-                && !hit.collider.gameObject.Equals(interactiveGameObject))
-            {
-                interactiveGameObject = hit.collider.gameObject;
-                baseMaterial = interactiveGameObject.GetComponent<MeshRenderer>().materials[0];
-                interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[]
+            if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask)){
+                if (hit.transform.gameObject.layer== 9 && !hit.collider.gameObject.Equals(interactiveGameObject))
                 {
+                    interactiveGameObject = hit.collider.gameObject;
+                    baseMaterial = interactiveGameObject.GetComponent<MeshRenderer>().materials[0];
+                    interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[]
+                    {
                     interactiveGameObject.GetComponent<MeshRenderer>().materials[0],
 
                     material
-                };
-               // onInteractuable?.Invoke();
+                    };
+                }else if (hit.transform.gameObject.layer == 10)
+                {
+                    door = true;
+                }else if (hit.transform.gameObject.layer == 11)
+                {
+                    clockPuzzleHand=hit.collider.gameObject;
+                    if (hit.transform.gameObject.name == "HourHand")
+                    {
+                        clockPuzzleHour = true;
+                    }
+                    else
+                    {
+                        clockPuzzleMinute = true;
+                    }
+                    
+                }
             }
             else if (!Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit2, 10f, interactLayerMask))
             {
+                door=false;
+                clockPuzzleMinute = true;
+                clockPuzzleHour = true;
                 if (interactiveGameObject != null)
                 {
                     interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
@@ -301,12 +409,56 @@ public class Player : MonoBehaviour
                 }
                 //onNotInteractuable?.Invoke();
             }
+
+
+            // onInteractuable?.Invoke();
+
             yield return new WaitForSeconds(0.5f);
         }
     }
 
-    internal void EquipItem(GameObject objeto)
+    #region SOUNDS
+
+    IEnumerator MakeNoiseMove()
     {
-        throw new NotImplementedException();
+        while (true)
+        {
+            Collider[] colliderHits = Physics.OverlapSphere(this.transform.position, 30);
+            foreach (Collider collider in colliderHits)
+            {
+                if (collider.gameObject.TryGetComponent<Enemy>(out Enemy en))
+                {
+                    en.ListenSound(this.transform.position, 2);
+                }
+            }
+            yield return new WaitForSeconds(3);
+        }
     }
+
+    IEnumerator MakeNoiseRun()
+    {
+        while (true)
+        {
+            Collider[] colliderHits = Physics.OverlapSphere(this.transform.position, 7);
+            if (GetComponent<Collider>().gameObject.TryGetComponent<Enemy>(out Enemy en))
+            {
+                en.ListenSound(this.transform.position, 7);
+            }
+            yield return new WaitForSeconds(1);
+        }
+    }
+
+    IEnumerator MakeNoiseCrouch()
+    {
+        while (true)
+        {
+            Collider[] colliderHits = Physics.OverlapSphere(this.transform.position, 5);
+            if (GetComponent<Collider>().gameObject.TryGetComponent<Enemy>(out Enemy en))
+            {
+                en.ListenSound(this.transform.position, 5);
+            }
+            yield return new WaitForSeconds(1);
+        }
+    }
+    #endregion
 }

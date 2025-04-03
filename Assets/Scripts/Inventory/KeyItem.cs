@@ -12,6 +12,10 @@ public class KeyItem : Item
 
     [SerializeField] private Sprite sprite;
     public override Sprite Sprite => sprite;
+
+    [SerializeField] private GameObject prefab;
+    public override GameObject prefabToEquip => prefab;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public override void Use()
     {
@@ -19,6 +23,11 @@ public class KeyItem : Item
     }
 
     public override void Combine()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void Equip()
     {
         throw new System.NotImplementedException();
     }
