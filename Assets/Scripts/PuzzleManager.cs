@@ -22,7 +22,10 @@ public class PuzzleManager : MonoBehaviour
     {
         
     }
+    public void InteractClockPuzzle()
+    {
 
+    }
     public void ClockSolved()
     {
         this.KeyClock.SetActive(true);

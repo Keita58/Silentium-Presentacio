@@ -39,6 +39,10 @@ public class Clock : MonoBehaviour
             hour = System.DateTime.Now.Hour;
             minutes = System.DateTime.Now.Minute;
             seconds = System.DateTime.Now.Second;
+            float rotationMinutes = (360.0f / 60.0f) * minutes;
+            pointerMinutes.transform.localEulerAngles = new Vector3(0.0f, 0.0f, rotationMinutes);
+            float rotationHours = ((360.0f / 12.0f) * hour) + ((360.0f / (60.0f * 12.0f)) * minutes);
+            pointerHours.transform.localEulerAngles = new Vector3(0.0f, 0.0f, rotationHours);
         }
     }
 
