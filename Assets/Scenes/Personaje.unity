@@ -392,6 +392,38 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &386995782
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 386995783}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &386995783
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 386995782}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.014009747, z: -0, w: 0.9999019}
+  m_LocalPosition: {x: -0.392, y: 1.555, z: 6.232}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 901373752}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 1.605, z: 0}
 --- !u!1 &405366242
 GameObject:
   m_ObjectHideFlags: 0
@@ -1556,7 +1588,8 @@ GameObject:
   - component: {fileID: 901373751}
   - component: {fileID: 901373750}
   - component: {fileID: 901373749}
-  m_Layer: 0
+  - component: {fileID: 901373753}
+  m_Layer: 10
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1645,13 +1678,29 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 901373748}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.997585, y: 1.555, z: 6.232}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.605585, y: 0, z: 0}
   m_LocalScale: {x: 1.3124918, y: 2.6923, z: 0.1624328}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 386995783}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &901373753
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 901373748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f91d7e66faf9d4b4a934ad25faa43644, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isRotatingDoor: 1
+  speed: 1
+  rotationAmount: 90
+  forwardDirection: 0
 --- !u!1 &927610398
 GameObject:
   m_ObjectHideFlags: 0
@@ -2156,7 +2205,7 @@ MonoBehaviour:
     m_Bits: 256
   interactLayerMask:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 1536
   weaponCamera: {fileID: 636996612}
   interactiveGameObject: {fileID: 0}
   material: {fileID: 2100000, guid: 245be0caa7e11f441a60e9ec2a7f78e5, type: 2}
@@ -3448,4 +3497,4 @@ SceneRoots:
   - {fileID: 1886124386}
   - {fileID: 1888783194}
   - {fileID: 531111}
-  - {fileID: 901373752}
+  - {fileID: 386995783}
