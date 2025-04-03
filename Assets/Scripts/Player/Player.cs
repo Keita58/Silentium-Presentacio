@@ -57,9 +57,8 @@ public class Player : MonoBehaviour
     [SerializeField] private GameObject equipedObject;
     [SerializeField] Transform itemSlot;
     bool door=false;
-    bool clockPuzzleHour = false;
-    bool clockPuzzleMinute = false;
-    GameObject clockPuzzleHand;
+    bool clockPuzzle = false;
+
 
     private void Awake()
     {
@@ -69,7 +68,6 @@ public class Player : MonoBehaviour
         _LookAction = _inputActions.Player.Look;
         _RunAction = _inputActions.Player.Run;
         _inputActions.Player.Shoot.performed+=Shoot;
-        _inputActions.Player.HoldInteract.performed += interactClockPuzzle;
         _inputActions.Player.Aim.performed +=Aim;
         _inputActions.Player.PickUpItem.performed +=PickUpItem;
         _inputActions.Player.Inventory.performed += OpenInventory;
@@ -92,7 +90,6 @@ public class Player : MonoBehaviour
             _inputActions.Player.Move.Disable();
             _inputActions.Player.Look.Disable();
             _inputActions.Player.Crouch.Disable();
-            _inputActions.Player.HoldInteract.Disable();
             _inputActions.Player.PickUpItem.Disable();
 
         }
@@ -105,7 +102,6 @@ public class Player : MonoBehaviour
             _inputActions.Player.Aim.Enable();
             _inputActions.Player.Move.Enable();
             _inputActions.Player.Look.Enable();
-            _inputActions.Player.HoldInteract.Enable();
             _inputActions.Player.Crouch.Enable();
             _inputActions.Player.PickUpItem.Enable();
         }
@@ -162,25 +158,14 @@ public class Player : MonoBehaviour
                         }
                     }
                 }
+            }else if (clockPuzzle)
+            {
+                PuzzleManager.instance.InteractClockPuzzle();
             }
             
            
         }
 
-    }
-
-    private void interactClockPuzzle(InputAction.CallbackContext context)
-    {
-
-        if (clockPuzzleHour)
-        {
-            clockPuzzleHand.GetComponent<Clock>().MoveHour();
-        }
-        else if (clockPuzzleMinute)
-        {
-            clockPuzzleHand.GetComponent<Clock>().MoveMinutes();
-
-        }
     }
 
     public void EquipItem(GameObject itemAEquipar)
@@ -385,23 +370,12 @@ public class Player : MonoBehaviour
                     door = true;
                 }else if (hit.transform.gameObject.layer == 11)
                 {
-                    clockPuzzleHand=hit.collider.gameObject;
-                    if (hit.transform.gameObject.name == "HourHand")
-                    {
-                        clockPuzzleHour = true;
-                    }
-                    else
-                    {
-                        clockPuzzleMinute = true;
-                    }
-                    
+                    clockPuzzle = true;
                 }
             }
             else if (!Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit2, 10f, interactLayerMask))
             {
                 door=false;
-                clockPuzzleMinute = true;
-                clockPuzzleHour = true;
                 if (interactiveGameObject != null)
                 {
                     interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
