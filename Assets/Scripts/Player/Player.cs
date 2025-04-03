@@ -56,6 +56,9 @@ public class Player : MonoBehaviour
     private bool itemSlotOccuped;
     [SerializeField] private GameObject equipedObject;
     [SerializeField] Transform itemSlot;
+    bool door=false;
+    bool clockPuzzle = false;
+
 
     private void Awake()
     {
@@ -71,6 +74,7 @@ public class Player : MonoBehaviour
         _Rigidbody= GetComponent<Rigidbody>();
         _inputActions.Player.Enable();
     }
+
 
     private void OpenInventory(InputAction.CallbackContext context)
     {
@@ -134,6 +138,33 @@ public class Player : MonoBehaviour
             Debug.Log("QUE COJO?" + interactiveGameObject.GetComponent<PickItem>().item);
             interactiveGameObject.gameObject.SetActive(false);
             Debug.Log("Entro Coger item");
+            interactiveGameObject = null;
+        }
+        else
+        {
+            if (door)
+            {
+                Debug.DrawRay(_Camera.transform.position, _Camera.transform.forward, Color.magenta, 5f);
+                if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask))
+                {
+                    if (hit.collider.TryGetComponent<Door>(out Door door))
+                    {
+                        if (door.isOpen)
+                        {
+                            door.Close();
+                        }
+                        else
+                        {
+                            door.Open(transform.position);
+                        }
+                    }
+                }
+            }else if (clockPuzzle)
+            {
+                PuzzleManager.instance.InteractClockPuzzle();
+            }
+            
+           
         }
 
     }
@@ -337,11 +368,15 @@ public class Player : MonoBehaviour
                     };
                 }else if (hit.transform.gameObject.layer == 10)
                 {
-
+                    door = true;
+                }else if (hit.transform.gameObject.layer == 11)
+                {
+                    clockPuzzle = true;
                 }
             }
             else if (!Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit2, 10f, interactLayerMask))
             {
+                door=false;
                 if (interactiveGameObject != null)
                 {
                     interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
@@ -353,7 +388,7 @@ public class Player : MonoBehaviour
 
             // onInteractuable?.Invoke();
 
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.1f);
         }
     }
 
