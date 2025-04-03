@@ -138,6 +138,7 @@ public class Player : MonoBehaviour
             Debug.Log("QUE COJO?" + interactiveGameObject.GetComponent<PickItem>().item);
             interactiveGameObject.gameObject.SetActive(false);
             Debug.Log("Entro Coger item");
+            interactiveGameObject = null;
         }
         else
         {
@@ -387,7 +388,7 @@ public class Player : MonoBehaviour
 
             // onInteractuable?.Invoke();
 
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.1f);
         }
     }
 
