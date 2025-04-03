@@ -827,6 +827,74 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Clock",
+            "id": "fd271812-fad6-4f6f-8fe7-5d41198484a2",
+            "actions": [
+                {
+                    "name": "MoveClockHand",
+                    "type": "Button",
+                    "id": "d1c165d1-395a-4c61-991d-c40dee8d8b46",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Exit",
+                    "type": "Button",
+                    "id": "22e45ba1-9991-46d1-81ff-a04c10e500ca",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "MoveClockHandReversed",
+                    "type": "Button",
+                    "id": "36b313a4-6ad3-4b0e-a0e5-0a69ebb5f7ef",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "beb0e4e9-ae49-414f-96d5-efc0b81b92e0",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "MoveClockHand",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "eabfdade-2c28-4884-9256-b52bcf96dbce",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Exit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "087c2ebb-e7ed-4d06-936b-4430bbe326a8",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MoveClockHandReversed",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [

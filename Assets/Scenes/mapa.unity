@@ -9634,6 +9634,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   KeyClock: {fileID: 1670742753}
+  cam_Clock: {fileID: 1123947667}
+  cam_Player: {fileID: 257690617}
 --- !u!4 &1019975274
 Transform:
   m_ObjectHideFlags: 0

@@ -11,7 +11,7 @@ public class Player : MonoBehaviour
 
     Rigidbody _Rigidbody;
 
-    InputSystem_Actions _inputActions;
+    public InputSystem_Actions _inputActions { get; private set; }
 
     InputAction _MoveAction;
     InputAction _LookAction;
