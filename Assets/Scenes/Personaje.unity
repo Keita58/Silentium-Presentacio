@@ -164,6 +164,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemSelected: {fileID: 0}
   buttonsActionRoot: {fileID: 1168904723}
+  inventoryUI: {fileID: 623106270}
+  player: {fileID: 1074130822}
+  inventory: {fileID: 11400000, guid: 7d4e43e77f2c9dd4582e5d1d3311b499, type: 2}
   actionState: 0
 --- !u!1 &11196952
 GameObject:

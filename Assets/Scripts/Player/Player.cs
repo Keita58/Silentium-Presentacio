@@ -61,6 +61,7 @@ public class Player : MonoBehaviour
     private Coroutine coroutineRun;
     private Coroutine coroutineMove;
     private Coroutine coroutineCrouch;
+    private Coroutine coroutineInteract;
 
     private void Awake()
     {
@@ -112,7 +113,7 @@ public class Player : MonoBehaviour
     void Start()
     {
         Cursor.visible = false;
-        StartCoroutine(InteractuarRaycast());
+        coroutineInteract= StartCoroutine(InteractuarRaycast());
     }
 
     private void Update()
@@ -164,11 +165,15 @@ public class Player : MonoBehaviour
             }else if (clockPuzzle)
             {
                 PuzzleManager.instance.InteractClockPuzzle();
-            }
-            
-           
+                StopCoroutine(coroutineInteract);
+            } 
         }
 
+    }
+
+    public void ResumeInteract()
+    {
+        coroutineInteract = StartCoroutine(InteractuarRaycast());
     }
 
     public void EquipItem(GameObject itemAEquipar)

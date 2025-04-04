@@ -61,6 +61,11 @@ public class ShowInventory : MonoBehaviour
 
     }
 
+    public void ChangeItemSelected()
+    {
+
+    }
+
 
 
 

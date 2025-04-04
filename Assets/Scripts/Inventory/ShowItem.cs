@@ -21,10 +21,9 @@ public class ShowItem : MonoBehaviour
     public void ClickItem()
     {
         Debug.Log("Clico Item");
-        if (selectedItem != null)
-        {
-            InventoryManager.instance.ItemSelected(selectedItem);
-        }
+        InventoryManager.instance.ChangeSelectedItem();
+        this.GetComponent<Image>().color=Color.magenta;
+        InventoryManager.instance.ItemSelected(selectedItem);
     }
 
     

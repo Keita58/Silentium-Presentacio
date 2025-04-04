@@ -151,4 +151,9 @@ public class InventoryManager : MonoBehaviour
         inventory.UseItem(item);
         player.EquipItem(equipableObject);
     }
+
+    public void ChangeSelectedItem()
+    {
+        inventoryUI.GetComponent<ShowInventory>().ChangeItemSelected();
+    }
 }
