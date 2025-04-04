@@ -9,7 +9,7 @@ public class Player : MonoBehaviour
 
     Rigidbody _Rigidbody;
 
-    InputSystem_Actions _inputActions;
+    public InputSystem_Actions _inputActions { get; private set; }
 
     InputAction _MoveAction;
     InputAction _LookAction;
@@ -166,7 +166,11 @@ public class Player : MonoBehaviour
             {
                 PuzzleManager.instance.InteractClockPuzzle();
                 StopCoroutine(coroutineInteract);
+                clockPuzzle= false;
             } 
+            }
+            
+           
         }
 
     }
@@ -394,7 +398,7 @@ public class Player : MonoBehaviour
             else if (!Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit2, 10f, interactLayerMask))
             {
                 door=false;
-
+                clockPuzzle = false;
                 if (interactiveGameObject != null)
                 {
                     interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };

@@ -850,6 +850,105 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Clock"",
+            ""id"": ""fd271812-fad6-4f6f-8fe7-5d41198484a2"",
+            ""actions"": [
+                {
+                    ""name"": ""MoveClockHand"",
+                    ""type"": ""Button"",
+                    ""id"": ""d1c165d1-395a-4c61-991d-c40dee8d8b46"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Exit"",
+                    ""type"": ""Button"",
+                    ""id"": ""22e45ba1-9991-46d1-81ff-a04c10e500ca"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MoveClockHandReversed"",
+                    ""type"": ""Button"",
+                    ""id"": ""36b313a4-6ad3-4b0e-a0e5-0a69ebb5f7ef"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""FinishClock"",
+                    ""type"": ""Button"",
+                    ""id"": ""3213b9bc-1e8f-49f5-8e8b-e2ea14637783"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""beb0e4e9-ae49-414f-96d5-efc0b81b92e0"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""MoveClockHand"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""eabfdade-2c28-4884-9256-b52bcf96dbce"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Exit"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""087c2ebb-e7ed-4d06-936b-4430bbe326a8"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveClockHandReversed"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e84227e3-6856-4b6f-8e3a-e8646ced9554"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": ""Press(behavior=1)"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FinishClock"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e3c0e814-0d51-4fba-88ed-6990c9aa6bac"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": ""Press(behavior=1)"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FinishClock"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -937,12 +1036,19 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_UI_ScrollWheel = m_UI.FindAction("ScrollWheel", throwIfNotFound: true);
         m_UI_TrackedDevicePosition = m_UI.FindAction("TrackedDevicePosition", throwIfNotFound: true);
         m_UI_TrackedDeviceOrientation = m_UI.FindAction("TrackedDeviceOrientation", throwIfNotFound: true);
+        // Clock
+        m_Clock = asset.FindActionMap("Clock", throwIfNotFound: true);
+        m_Clock_MoveClockHand = m_Clock.FindAction("MoveClockHand", throwIfNotFound: true);
+        m_Clock_Exit = m_Clock.FindAction("Exit", throwIfNotFound: true);
+        m_Clock_MoveClockHandReversed = m_Clock.FindAction("MoveClockHandReversed", throwIfNotFound: true);
+        m_Clock_FinishClock = m_Clock.FindAction("FinishClock", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
     {
         Debug.Assert(!m_Player.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Player.Disable() has not been called.");
         Debug.Assert(!m_UI.enabled, "This will cause a leak and performance issues, InputSystem_Actions.UI.Disable() has not been called.");
+        Debug.Assert(!m_Clock.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Clock.Disable() has not been called.");
     }
 
     public void Dispose()
@@ -1220,6 +1326,76 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         }
     }
     public UIActions @UI => new UIActions(this);
+
+    // Clock
+    private readonly InputActionMap m_Clock;
+    private List<IClockActions> m_ClockActionsCallbackInterfaces = new List<IClockActions>();
+    private readonly InputAction m_Clock_MoveClockHand;
+    private readonly InputAction m_Clock_Exit;
+    private readonly InputAction m_Clock_MoveClockHandReversed;
+    private readonly InputAction m_Clock_FinishClock;
+    public struct ClockActions
+    {
+        private @InputSystem_Actions m_Wrapper;
+        public ClockActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @MoveClockHand => m_Wrapper.m_Clock_MoveClockHand;
+        public InputAction @Exit => m_Wrapper.m_Clock_Exit;
+        public InputAction @MoveClockHandReversed => m_Wrapper.m_Clock_MoveClockHandReversed;
+        public InputAction @FinishClock => m_Wrapper.m_Clock_FinishClock;
+        public InputActionMap Get() { return m_Wrapper.m_Clock; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(ClockActions set) { return set.Get(); }
+        public void AddCallbacks(IClockActions instance)
+        {
+            if (instance == null || m_Wrapper.m_ClockActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_ClockActionsCallbackInterfaces.Add(instance);
+            @MoveClockHand.started += instance.OnMoveClockHand;
+            @MoveClockHand.performed += instance.OnMoveClockHand;
+            @MoveClockHand.canceled += instance.OnMoveClockHand;
+            @Exit.started += instance.OnExit;
+            @Exit.performed += instance.OnExit;
+            @Exit.canceled += instance.OnExit;
+            @MoveClockHandReversed.started += instance.OnMoveClockHandReversed;
+            @MoveClockHandReversed.performed += instance.OnMoveClockHandReversed;
+            @MoveClockHandReversed.canceled += instance.OnMoveClockHandReversed;
+            @FinishClock.started += instance.OnFinishClock;
+            @FinishClock.performed += instance.OnFinishClock;
+            @FinishClock.canceled += instance.OnFinishClock;
+        }
+
+        private void UnregisterCallbacks(IClockActions instance)
+        {
+            @MoveClockHand.started -= instance.OnMoveClockHand;
+            @MoveClockHand.performed -= instance.OnMoveClockHand;
+            @MoveClockHand.canceled -= instance.OnMoveClockHand;
+            @Exit.started -= instance.OnExit;
+            @Exit.performed -= instance.OnExit;
+            @Exit.canceled -= instance.OnExit;
+            @MoveClockHandReversed.started -= instance.OnMoveClockHandReversed;
+            @MoveClockHandReversed.performed -= instance.OnMoveClockHandReversed;
+            @MoveClockHandReversed.canceled -= instance.OnMoveClockHandReversed;
+            @FinishClock.started -= instance.OnFinishClock;
+            @FinishClock.performed -= instance.OnFinishClock;
+            @FinishClock.canceled -= instance.OnFinishClock;
+        }
+
+        public void RemoveCallbacks(IClockActions instance)
+        {
+            if (m_Wrapper.m_ClockActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IClockActions instance)
+        {
+            foreach (var item in m_Wrapper.m_ClockActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_ClockActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public ClockActions @Clock => new ClockActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     public InputControlScheme KeyboardMouseScheme
     {
@@ -1288,5 +1464,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         void OnScrollWheel(InputAction.CallbackContext context);
         void OnTrackedDevicePosition(InputAction.CallbackContext context);
         void OnTrackedDeviceOrientation(InputAction.CallbackContext context);
+    }
+    public interface IClockActions
+    {
+        void OnMoveClockHand(InputAction.CallbackContext context);
+        void OnExit(InputAction.CallbackContext context);
+        void OnMoveClockHandReversed(InputAction.CallbackContext context);
+        void OnFinishClock(InputAction.CallbackContext context);
     }
 }
