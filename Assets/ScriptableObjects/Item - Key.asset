@@ -9,11 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5d5eeb7c4299d849a99d23ff99ffa0e, type: 3}
-  m_Name: Inventory
+  m_Script: {fileID: 11500000, guid: 6def871b41b14a243806b2681e8dda7f, type: 3}
+  m_Name: Item - Key
   m_EditorClassIdentifier: 
-  items:
-  - item: {fileID: 11400000, guid: e2149e4831f8919479f916f924c429ba, type: 2}
-    amount: 1
-  - item: {fileID: 11400000, guid: 3e7ee1ca131436e42a5d807c6648622f, type: 2}
-    amount: 1
+  nom: 
+  description: 
+  sprite: {fileID: 0}
+  prefab: {fileID: 0}

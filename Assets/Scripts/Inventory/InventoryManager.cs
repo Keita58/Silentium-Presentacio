@@ -1,4 +1,6 @@
+using System.Linq.Expressions;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InventoryManager : MonoBehaviour
 {
@@ -12,6 +14,8 @@ public class InventoryManager : MonoBehaviour
 
     [SerializeField] Player player;
     [SerializeField] InventorySO inventory;
+    public bool isCombining { get; private set; }
+    private Item targetItemToCombine;
     private void Awake()
     {
         if (instance == null)
@@ -24,7 +28,7 @@ public class InventoryManager : MonoBehaviour
     }
 
     #region FSM
-    enum ActionStates { NOACTION, SELECT_ACTION, ACTION_USE, ACTION_COMBINE, ACTION_EQUIP_ITEM }
+    enum ActionStates { NOACTION, SELECT_ACTION, ACTION_USE, ACTION_COMBINE, ACTION_EQUIP_ITEM, ACTION_COMBINE_SELECT }
     [SerializeField] ActionStates actionState;
     private void ChangeState(ActionStates newState)
     {
@@ -38,6 +42,7 @@ public class InventoryManager : MonoBehaviour
     public void ItemSelected(Item item)
     {
         itemSelected = item;
+        ChangeSelectedItem();
         //inventoryUI.GetComponent<ShowInventory>().ItemSelected(itemSelected);
         ChangeState(ActionStates.SELECT_ACTION);
     }
@@ -67,6 +72,10 @@ public class InventoryManager : MonoBehaviour
                 break;
             case ActionStates.ACTION_COMBINE:
                 inventoryUI.ShowHideItemsToCombine(itemSelected.combinableItems, itemSelected);
+                ChangeState(ActionStates.ACTION_COMBINE_SELECT);
+                break;
+            case ActionStates.ACTION_COMBINE_SELECT:
+                InhabilitateButtons();
                 break;
             case ActionStates.ACTION_EQUIP_ITEM:
                 itemSelected.Equip();
@@ -92,6 +101,29 @@ public class InventoryManager : MonoBehaviour
         }
     }
     #endregion
+
+    private void InhabilitateButtons()
+    {
+        foreach (Transform child in buttonsActionRoot.transform)
+        {
+            child.GetComponent<Button>().interactable = false;
+        }
+    }
+
+    public void SelectItemToCombine(Item item)
+    {
+        targetItemToCombine=item;
+    }
+
+    public void AddNewItemAfterCombine(Item newItem)
+    {
+        inventory.UseItem(itemSelected);
+        inventory.UseItem(targetItemToCombine);
+        inventory.AddItem(newItem);
+        ChangeState(ActionStates.NOACTION);
+
+    }
+
 
 
     public void UseItem()

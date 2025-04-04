@@ -27,7 +27,7 @@ public class AmmunitionItem : Item
         InventoryManager.instance.UseAmmo(bales, this);
     }
 
-    public override void Combine()
+    public override void Combine(Item item)
     {
         throw new System.NotImplementedException();
     }

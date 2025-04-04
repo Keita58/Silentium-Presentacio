@@ -20,11 +20,19 @@ public class ShowItem : MonoBehaviour
 
     public void ClickItem()
     {
-        Debug.Log("Clico Item");
-        InventoryManager.instance.ChangeSelectedItem();
-        this.GetComponent<Image>().color=Color.magenta;
-        InventoryManager.instance.ItemSelected(selectedItem);
+        if (!InventoryManager.instance.isCombining)
+        {
+            Debug.Log("Clico Item");
+            InventoryManager.instance.ChangeSelectedItem();
+            InventoryManager.instance.ItemSelected(selectedItem);
+            this.GetComponent<Image>().color = Color.magenta;
+        }
+        else
+        {
+            InventoryManager.instance.SelectItemToCombine(selectedItem);
+        }
+       
     }
 
-    
+
 }

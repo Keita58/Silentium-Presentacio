@@ -18,4 +18,4 @@ MonoBehaviour:
   healing: 3
   prefab: {fileID: 0}
   itemsToCombine:
-  - {fileID: 11400000, guid: e2149e4831f8919479f916f924c429ba, type: 2}
+  - {fileID: 11400000, guid: add6a8a400676b045a41ba1fb77aee1a, type: 2}

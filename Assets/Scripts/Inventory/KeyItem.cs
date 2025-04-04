@@ -25,7 +25,7 @@ public class KeyItem : Item
         InventoryManager.instance.UseKeyItem(this);
     }
 
-    public override void Combine()
+    public override void Combine(Item item)
     {
         throw new System.NotImplementedException();
     }

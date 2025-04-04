@@ -15,7 +15,7 @@ public abstract class Item : ScriptableObject
 
     public abstract void Use();
 
-    public abstract void Combine();
+    public abstract void Combine(Item item);
 
     public abstract void Equip();
 }

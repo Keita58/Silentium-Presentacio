@@ -166,11 +166,8 @@ public class Player : MonoBehaviour
             {
                 PuzzleManager.instance.InteractClockPuzzle();
                 StopCoroutine(coroutineInteract);
-                clockPuzzle= false;
+                clockPuzzle = false;
             } 
-            }
-            
-           
         }
 
     }

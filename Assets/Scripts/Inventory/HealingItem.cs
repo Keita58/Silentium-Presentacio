@@ -25,14 +25,19 @@ public class HealingItem : Item
     [SerializeField] private List<Item> itemsToCombine;
     public override List<Item> combinableItems => itemsToCombine;
 
+    [SerializeField] private Item itemAfterCombine;
+
     public override void Use()
     {
         InventoryManager.instance.UseHealingItem(healing, this);
     }
 
-    public override void Combine()
+    public override void Combine(Item item)
     {
-        
+        if (item is ThrowableItem)
+        {
+            InventoryManager.instance.AddNewItemAfterCombine(itemAfterCombine);
+        }
     }
 
     public override void Equip()
