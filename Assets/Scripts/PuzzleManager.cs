@@ -33,18 +33,21 @@ public class PuzzleManager : MonoBehaviour
     {
         cam_Player.gameObject.SetActive(false);
         cam_Clock.gameObject.SetActive(true);
+        cam_Player.transform.parent.position = new Vector3(-32.8191757f, 6.21000004f, -32.4704895f);
+        cam_Player.transform.parent.rotation = new Quaternion(0, -0.608760536f, 0, 0.793354094f);
         cam_Player.transform.parent.GetComponent<Player>()._inputActions.Player.Disable();
-        cam_Player.transform.parent.GetComponent<Player>()._inputActions.Clock.Enable();
+        cam_Clock.transform.parent.GetComponent<Clock>().inputActions.Clock.Enable();
     }
     public void ExitClockPuzzle()
     {
         cam_Player.gameObject.SetActive(true);
         cam_Clock.gameObject.SetActive(false);
         cam_Player.transform.parent.GetComponent<Player>()._inputActions.Player.Enable();
-        cam_Player.transform.parent.GetComponent<Player>()._inputActions.Clock.Disable();
+        cam_Clock.transform.parent.GetComponent<Clock>().inputActions.Clock.Disable();
     }
     public void ClockSolved()
     {
+        ExitClockPuzzle();
         this.KeyClock.SetActive(true);
     }
 }

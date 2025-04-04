@@ -161,6 +161,7 @@ public class Player : MonoBehaviour
             }else if (clockPuzzle)
             {
                 PuzzleManager.instance.InteractClockPuzzle();
+                clockPuzzle= false;
             }
             
            
@@ -376,6 +377,7 @@ public class Player : MonoBehaviour
             else if (!Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit2, 10f, interactLayerMask))
             {
                 door=false;
+                clockPuzzle = false;
                 if (interactiveGameObject != null)
                 {
                     interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };

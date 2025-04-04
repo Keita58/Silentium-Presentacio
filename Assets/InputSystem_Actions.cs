@@ -881,6 +881,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""FinishClock"",
+                    ""type"": ""Button"",
+                    ""id"": ""3213b9bc-1e8f-49f5-8e8b-e2ea14637783"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -914,6 +923,28 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""MoveClockHandReversed"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e84227e3-6856-4b6f-8e3a-e8646ced9554"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": ""Press(behavior=1)"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FinishClock"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e3c0e814-0d51-4fba-88ed-6990c9aa6bac"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": ""Press(behavior=1)"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FinishClock"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1010,6 +1041,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Clock_MoveClockHand = m_Clock.FindAction("MoveClockHand", throwIfNotFound: true);
         m_Clock_Exit = m_Clock.FindAction("Exit", throwIfNotFound: true);
         m_Clock_MoveClockHandReversed = m_Clock.FindAction("MoveClockHandReversed", throwIfNotFound: true);
+        m_Clock_FinishClock = m_Clock.FindAction("FinishClock", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
@@ -1301,6 +1333,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Clock_MoveClockHand;
     private readonly InputAction m_Clock_Exit;
     private readonly InputAction m_Clock_MoveClockHandReversed;
+    private readonly InputAction m_Clock_FinishClock;
     public struct ClockActions
     {
         private @InputSystem_Actions m_Wrapper;
@@ -1308,6 +1341,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         public InputAction @MoveClockHand => m_Wrapper.m_Clock_MoveClockHand;
         public InputAction @Exit => m_Wrapper.m_Clock_Exit;
         public InputAction @MoveClockHandReversed => m_Wrapper.m_Clock_MoveClockHandReversed;
+        public InputAction @FinishClock => m_Wrapper.m_Clock_FinishClock;
         public InputActionMap Get() { return m_Wrapper.m_Clock; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1326,6 +1360,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @MoveClockHandReversed.started += instance.OnMoveClockHandReversed;
             @MoveClockHandReversed.performed += instance.OnMoveClockHandReversed;
             @MoveClockHandReversed.canceled += instance.OnMoveClockHandReversed;
+            @FinishClock.started += instance.OnFinishClock;
+            @FinishClock.performed += instance.OnFinishClock;
+            @FinishClock.canceled += instance.OnFinishClock;
         }
 
         private void UnregisterCallbacks(IClockActions instance)
@@ -1339,6 +1376,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @MoveClockHandReversed.started -= instance.OnMoveClockHandReversed;
             @MoveClockHandReversed.performed -= instance.OnMoveClockHandReversed;
             @MoveClockHandReversed.canceled -= instance.OnMoveClockHandReversed;
+            @FinishClock.started -= instance.OnFinishClock;
+            @FinishClock.performed -= instance.OnFinishClock;
+            @FinishClock.canceled -= instance.OnFinishClock;
         }
 
         public void RemoveCallbacks(IClockActions instance)
@@ -1430,5 +1470,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         void OnMoveClockHand(InputAction.CallbackContext context);
         void OnExit(InputAction.CallbackContext context);
         void OnMoveClockHandReversed(InputAction.CallbackContext context);
+        void OnFinishClock(InputAction.CallbackContext context);
     }
 }

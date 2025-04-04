@@ -858,6 +858,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "FinishClock",
+                    "type": "Button",
+                    "id": "3213b9bc-1e8f-49f5-8e8b-e2ea14637783",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -891,6 +900,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "MoveClockHandReversed",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e84227e3-6856-4b6f-8e3a-e8646ced9554",
+                    "path": "<Keyboard>/d",
+                    "interactions": "Press(behavior=1)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "FinishClock",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e3c0e814-0d51-4fba-88ed-6990c9aa6bac",
+                    "path": "<Keyboard>/a",
+                    "interactions": "Press(behavior=1)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "FinishClock",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

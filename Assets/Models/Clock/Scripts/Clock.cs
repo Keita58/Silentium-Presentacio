@@ -12,32 +12,24 @@ public class Clock : MonoBehaviour
     private float hour = 0;
     [SerializeField]
     private int seconds = 0;
-    public bool realTime = true;
     [SerializeField]
     private GameObject pointerSeconds;
     [SerializeField]
     private GameObject pointerMinutes;
     [SerializeField]
     private GameObject pointerHours;
-
-    [SerializeField]
-    private bool selectedMinnute = false;
-    [SerializeField]
-    private bool selected = false;
     //-- time speed factor
     private float clockSpeed = 10.0f;     // 1.0f = realtime, < 1.0f = slower, > 1.0f = faster
 
     //-- internal vars
     float msecs = 0;
 
-    [SerializeField]
-    private bool solved = false;
-
-    InputSystem_Actions inputActions;
-    InputAction moveClock;
+    public InputSystem_Actions inputActions { get; private set; }
+    private InputAction moveClock;
 
     private Coroutine MinutesCoroutine;
     private Coroutine MinutesCoroutineReversed;
+    private Coroutine FinishedCoroutine;
 
     private void Awake()
     {
@@ -46,19 +38,19 @@ public class Clock : MonoBehaviour
         inputActions.Clock.MoveClockHand.canceled += HandleInputMinutes;
         inputActions.Clock.MoveClockHandReversed.performed += HandleInputMinutesReverse;
         inputActions.Clock.MoveClockHandReversed.canceled += HandleInputMinutesReverse;
+        inputActions.Clock.FinishClock.started += HandleMinutesFinished;
+        inputActions.Clock.FinishClock.canceled += HandleMinutesFinished;
         moveClock = inputActions.Clock.MoveClockHand;
         inputActions.Clock.Exit.started += Exit;
-        inputActions.Clock.Enable();
+        //    inputActions.Clock.Enable();
     }
     void Start()
     {
         //-- set real time
-        if (realTime)
-        {
-            hour = System.DateTime.Now.Hour;
-            minutes = System.DateTime.Now.Minute;
-            seconds = System.DateTime.Now.Second;
-        }
+        float rotationMinutes = (360.0f / 60.0f) * minutes;
+        pointerMinutes.transform.localEulerAngles = new Vector3(0.0f, 0.0f, rotationMinutes);
+        float rotationHours = ((360.0f / 12.0f) * hour) + ((360.0f / (60.0f * 12.0f)) * minutes);
+        pointerHours.transform.localEulerAngles = new Vector3(0.0f, 0.0f, rotationHours);
     }
 
     void Update()
@@ -74,6 +66,10 @@ public class Clock : MonoBehaviour
         else
             StopCoroutine(MinutesCoroutine);
     }
+    private void HandleMinutesFinished(InputAction.CallbackContext context)
+    {
+        FinishedCoroutine = StartCoroutine(Finished());
+    }
 
     private IEnumerator MoveMinutes()
     {
@@ -88,12 +84,13 @@ public class Clock : MonoBehaviour
                 if (hour >= 24)
                     hour = 0;
             }
-            float rotationMinutes = (360.0f / 60.0f) * minutes;
-            pointerMinutes.transform.localEulerAngles = new Vector3(0.0f, 0.0f, rotationMinutes);
             float rotationHours = ((360.0f / 12.0f) * hour) + ((360.0f / (60.0f * 12.0f)) * minutes);
             pointerHours.transform.localEulerAngles = new Vector3(0.0f, 0.0f, rotationHours);
+            float rotationMinutes = (360.0f / 60.0f) * minutes;
+            pointerMinutes.transform.localEulerAngles = new Vector3(0.0f, 0.0f, rotationMinutes);
+
             yield return new WaitForSeconds(updateTime);
-            updateTime = Mathf.Max( updateTime* 0.5f, 0.05f);
+            updateTime = Mathf.Max(updateTime * 0.5f, 0.02f);
         }
     }
 
@@ -111,9 +108,9 @@ public class Clock : MonoBehaviour
         while (true)
         {
             minutes--;
-            if (minutes < 0)
+            if (minutes <= 0)
             {
-                minutes = 0;
+                minutes = 60;
                 hour -= 1;
                 if (hour <= 00)
                     hour = 24;
@@ -123,7 +120,7 @@ public class Clock : MonoBehaviour
             float rotationHours = ((360.0f / 12.0f) * hour) + ((360.0f / (60.0f * 12.0f)) * minutes);
             pointerHours.transform.localEulerAngles = new Vector3(0.0f, 0.0f, rotationHours);
             yield return new WaitForSeconds(updateTime);
-            updateTime = Mathf.Max(updateTime * 0.5f, 0.05f);
+            updateTime = Mathf.Max(updateTime * 0.5f, 0.02f);
         }
     }
     public void Exit(InputAction.CallbackContext context)
@@ -151,8 +148,10 @@ public class Clock : MonoBehaviour
             print("Lo hago");
             yield return new WaitForSeconds(1.5f);
             if ((hour >= 8.9 && hour < 9.7 || hour >= 20.9 && hour < 21.7) && minutes >= 20.9 && minutes < 21.7)
-                print("Ahora activo reloj");
-            PuzzleManager.instance.ClockSolved();
+            {
+                this.gameObject.layer = 0;
+                PuzzleManager.instance.ClockSolved();
+            }
         }
     }
 }
