@@ -16,3 +16,6 @@ MonoBehaviour:
   description: A healign item
   sprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
   healing: 3
+  prefab: {fileID: 0}
+  itemsToCombine:
+  - {fileID: 11400000, guid: e2149e4831f8919479f916f924c429ba, type: 2}

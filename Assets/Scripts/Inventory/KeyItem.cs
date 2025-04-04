@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Item - Key", menuName = "Scriptable Objects/Items/Item - Key")]
@@ -16,10 +17,12 @@ public class KeyItem : Item
     [SerializeField] private GameObject prefab;
     public override GameObject prefabToEquip => prefab;
 
+    public override List<Item> combinableItems => throw new System.NotImplementedException();
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public override void Use()
     {
-        GameManager.instance.UseKeyItem(this);
+        InventoryManager.instance.UseKeyItem(this);
     }
 
     public override void Combine()

@@ -1,4 +1,8 @@
+using NUnit.Framework;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ShowInventory : MonoBehaviour
 {
@@ -11,13 +15,13 @@ public class ShowInventory : MonoBehaviour
 
     [SerializeField] GameObject itemPrefab;
 
+
     public void Show()
     {
         Hide();
         
         parentGameObject.transform.parent.gameObject.SetActive(true);
-        int i = 0;
-        for (i = 0; i < inventory.items.Count; i++)
+        for (int i = 0; i < inventory.items.Count; i++)
         {
             GameObject displayedItem = Instantiate(itemPrefab, parentGameObject.transform.GetChild(i).transform);
             displayedItem.GetComponent<ShowItem>().Load(inventory.items[i]);
@@ -37,7 +41,28 @@ public class ShowInventory : MonoBehaviour
         }
     }
 
-   
+    public void ShowHideItemsToCombine(List<Item> itemsToCombine, Item selfItem)
+    {
+        for (int x = 0; x < itemsToCombine.Count; x++)
+        {
+            for (int i = 0; i < inventory.items.Count; i++)
+            {
+                if (inventory.items.ElementAt(i).item == itemsToCombine.ElementAt(x) && inventory.items.ElementAt(i).item!= selfItem)
+                {
+                    for (int j = 0; j < parentGameObject.transform.childCount; j++)
+                    {
+                        parentGameObject.transform.GetChild(i).GetComponent<Image>().color = Color.magenta;
+
+                    }
+                }
+               
+            }
+        }
+
+    }
+
+
+
 
 
 }

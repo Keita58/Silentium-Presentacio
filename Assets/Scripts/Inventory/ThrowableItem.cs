@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Item - Throwable", menuName = "Scriptable Objects/Items/Item - Throwable")]
@@ -15,6 +16,8 @@ public class ThrowableItem : Item
     [SerializeField] private GameObject prefab;
     public override GameObject prefabToEquip => prefab;
 
+    public override List<Item> combinableItems => throw new System.NotImplementedException();
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public override void Use()
@@ -28,6 +31,6 @@ public class ThrowableItem : Item
 
     public override void Equip()
     {
-        GameManager.instance.EquipThrowableItem(this, prefab);
+        InventoryManager.instance.EquipThrowableItem(this, prefab);
     }
 }

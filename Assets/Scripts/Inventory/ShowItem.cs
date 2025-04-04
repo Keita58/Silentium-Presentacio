@@ -11,11 +11,6 @@ public class ShowItem : MonoBehaviour
     public event Action OnUseItem;
     Item selectedItem;
 
-    private void Awake()
-    {
-        
-    }
-
     public void Load(InventorySO.ItemSlot item)
     {
         this.GetComponent<Image>().sprite=item.item.Sprite;
@@ -29,8 +24,6 @@ public class ShowItem : MonoBehaviour
         if (selectedItem != null)
         {
             InventoryManager.instance.ItemSelected(selectedItem);
-            //selectedItem.Use();
-            //OnUseItem?.Invoke();
         }
     }
 

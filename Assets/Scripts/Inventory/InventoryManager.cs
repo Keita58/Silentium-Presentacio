@@ -8,6 +8,10 @@ public class InventoryManager : MonoBehaviour
 
     [SerializeField] GameObject buttonsActionRoot;
 
+    [SerializeField] private ShowInventory inventoryUI;
+
+    [SerializeField] Player player;
+    [SerializeField] InventorySO inventory;
     private void Awake()
     {
         if (instance == null)
@@ -34,6 +38,7 @@ public class InventoryManager : MonoBehaviour
     public void ItemSelected(Item item)
     {
         itemSelected = item;
+        //inventoryUI.GetComponent<ShowInventory>().ItemSelected(itemSelected);
         ChangeState(ActionStates.SELECT_ACTION);
     }
 
@@ -57,8 +62,11 @@ public class InventoryManager : MonoBehaviour
                 ToggleActionsButtons(true);
                 break;
             case ActionStates.ACTION_USE:
+                itemSelected.Use();
+                ChangeState(ActionStates.NOACTION);
                 break;
             case ActionStates.ACTION_COMBINE:
+                inventoryUI.ShowHideItemsToCombine(itemSelected.combinableItems, itemSelected);
                 break;
             case ActionStates.ACTION_EQUIP_ITEM:
                 itemSelected.Equip();
@@ -85,6 +93,7 @@ public class InventoryManager : MonoBehaviour
     }
     #endregion
 
+
     public void UseItem()
     {
         ChangeState(ActionStates.ACTION_USE);
@@ -98,5 +107,48 @@ public class InventoryManager : MonoBehaviour
     public void EquipItem()
     {
         ChangeState(ActionStates.ACTION_EQUIP_ITEM);
+    }
+
+    public void AddItem(Item item)
+    {
+        inventory.AddItem(item);
+        Debug.Log("Afegeixo item " + item.name);
+    }
+
+    public void OpenInventory(GameObject target)
+    {
+        inventoryUI.target = target;
+        inventoryUI.Show();
+        ChangeState(ActionStates.NOACTION);
+    }
+
+    public void CloseInventory()
+    {
+        inventoryUI.target = null;
+        inventoryUI.Hide();
+    }
+
+    public void UseHealingItem(int healing, Item item)
+    {
+        //player.hp+=curacion;
+        Debug.Log("Player usa item de curacion");
+        inventory.UseItem(item);
+    }
+
+    public void UseAmmo(int numAmmo, Item item)
+    {
+        //player.RecarregaBales(numBales);
+        Debug.Log("Player recarrega les bales");
+        inventory.UseItem(item);
+    }
+    public void UseKeyItem(Item item)
+    {
+        inventory.UseItem(item);
+    }
+
+    public void EquipThrowableItem(Item item, GameObject equipableObject)
+    {
+        inventory.UseItem(item);
+        player.EquipItem(equipableObject);
     }
 }
