@@ -1,10 +1,8 @@
+using NUnit.Framework;
 using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.EnhancedTouch;
-using static InventorySO;
-
 public class Player : MonoBehaviour
 {
     [SerializeField] GameObject _Camera;
@@ -23,7 +21,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float _VelocityMove = 3f;
 
     [Tooltip("Mouse velocity in degrees per second.")]
-    [Range(10f, 360f)]
+    [UnityEngine.Range(10f, 360f)]
     [SerializeField] private float _LookVelocity = 100;
 
     [SerializeField] private bool _InvertY = false;
@@ -58,7 +56,7 @@ public class Player : MonoBehaviour
     [SerializeField] Transform itemSlot;
     bool door=false;
     bool clockPuzzle = false;
-
+    private GameObject clockGameObject;
 
     private void Awake()
     {
@@ -138,6 +136,7 @@ public class Player : MonoBehaviour
             Debug.Log("QUE COJO?" + interactiveGameObject.GetComponent<PickItem>().item);
             interactiveGameObject.gameObject.SetActive(false);
             Debug.Log("Entro Coger item");
+            interactiveGameObject = null;
         }
         else
         {
@@ -369,8 +368,17 @@ public class Player : MonoBehaviour
                 }else if (hit.transform.gameObject.layer == 10)
                 {
                     door = true;
+
                 }else if (hit.transform.gameObject.layer == 11)
                 {
+                    clockGameObject = hit.collider.gameObject;
+                    baseMaterial = clockGameObject.GetComponent<MeshRenderer>().materials[0];
+                    clockGameObject.GetComponent<MeshRenderer>().materials = new Material[]
+                    {
+                    clockGameObject.GetComponent<MeshRenderer>().materials[0],
+
+                    material
+                    };
                     clockPuzzle = true;
                 }
             }
@@ -383,13 +391,18 @@ public class Player : MonoBehaviour
                     interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
                     interactiveGameObject = null;
                 }
+                if(clockGameObject != null)
+                {
+                    clockGameObject.GetComponent<MeshRenderer>().materials = new Material[] { clockGameObject.GetComponent<MeshRenderer>().materials[0] };
+                    clockGameObject = null;
+                }
                 //onNotInteractuable?.Invoke();
             }
 
 
             // onInteractuable?.Invoke();
 
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.1f);
         }
     }
 

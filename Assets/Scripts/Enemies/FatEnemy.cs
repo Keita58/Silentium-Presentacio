@@ -1,11 +1,10 @@
-﻿using System.Collections;
-using UnityEditor;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class FastEnemy : Enemy
+public class FatEnemy : Enemy
 {
-    private enum EnemyStates { PATROL, SEARCH, CHASE, ATTACK, KNOCKED, STOPPED }
+    private enum EnemyStates { PATROL, SEARCH, ATTACK, KNOCKED }
     [SerializeField] private EnemyStates _CurrentState;
     [SerializeField] private EnemyStates _LastState;
     [SerializeField] private float _StateTime;
@@ -29,7 +28,7 @@ public class FastEnemy : Enemy
     private int _DownTime;
     public override int downTime => _DownTime;
 
-    private int MAXHEALTH = 3;
+    private int MAXHEALTH = 6;
     private int _RangeSearchSound;
 
     private void Awake()
@@ -50,7 +49,7 @@ public class FastEnemy : Enemy
     private void Start()
     {
         InitState(EnemyStates.PATROL);
-        StartCoroutine(LookingPlayer());
+        StartCoroutine(WaitingAttack());
     }
 
     #region FSM
@@ -70,7 +69,7 @@ public class FastEnemy : Enemy
         _CurrentState = newState;
         _StateTime = 0.0f;
 
-        switch(_CurrentState)
+        switch (_CurrentState)
         {
             case EnemyStates.PATROL:
                 _Detected = false;
@@ -81,17 +80,12 @@ public class FastEnemy : Enemy
                 _SearchSound = true;
                 StartCoroutine(Search(_RangeSearchSound));
                 break;
-            case EnemyStates.CHASE:
-                _NavMeshAgent.speed = 7;
-                break;
             case EnemyStates.ATTACK:
                 _Attack = true;
                 StartCoroutine(AttackPlayer());
                 break;
             case EnemyStates.KNOCKED:
                 StartCoroutine(WakeUp());
-                break;
-            case EnemyStates.STOPPED:
                 break;
         }
     }
@@ -104,19 +98,15 @@ public class FastEnemy : Enemy
         {
             case EnemyStates.PATROL:
             case EnemyStates.SEARCH:
-            case EnemyStates.CHASE:
             case EnemyStates.ATTACK:
-                DetectPlayer();
-                break;
             case EnemyStates.KNOCKED:
-            case EnemyStates.STOPPED:
                 break;
         }
     }
 
     private void ExitState(EnemyStates exitState)
     {
-        switch(exitState)
+        switch (exitState)
         {
             case EnemyStates.PATROL:
                 _Detected = true;
@@ -141,7 +131,7 @@ public class FastEnemy : Enemy
         UpdateState(_CurrentState);
     }
 
-    // Funció per moure l'enemic pel mapa
+    // Funci� per moure l'enemic pel mapa
     IEnumerator Patrol()
     {
         Vector3 coord = Vector3.zero;
@@ -155,7 +145,7 @@ public class FastEnemy : Enemy
                     Debug.DrawRay(coord, Vector3.up, UnityEngine.Color.black, 1.0f);
                 }
 
-                _NavMeshAgent.speed = Random.Range(3.5f, 6);
+                _NavMeshAgent.speed = 4;
                 _NavMeshAgent.SetDestination(new Vector3(coord.x, transform.position.y, coord.z));
                 _Patrolling = true;
             }
@@ -208,65 +198,11 @@ public class FastEnemy : Enemy
         return false;
     }
 
-    private void DetectPlayer()
-    {
-        Collider[] aux = Physics.OverlapSphere(transform.position, 10f, _LayerPlayer);
-        if (aux.Length > 0)
-        {
-            float alphaDocProduct = Vector3.Dot(transform.forward, (_Player.transform.position - this.transform.position).normalized);
-
-            //Fem l'arcos del docProduct per poder comprovar si l'angle és menor a la meitat de l'angle de 
-            //visió dels enemics
-            if (Mathf.Acos(alphaDocProduct) < _BetaDotProduct)
-            {
-                //Raycast amb les layers de paret i player i si tenim la paret no seguim, sinó seguim el jugador
-                if (Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit info, _LayerObjectsAndPlayer))
-                {
-                    if (info.transform.tag == "Player")
-                    {
-                        _SearchSound = false;
-                        _Chase = true;
-                        _Detected = true;
-                        StopCoroutine(StopChase());
-
-                        if(Vector3.Distance(transform.position, info.transform.position) > 2)
-                        {
-                            Debug.Log("Detecto alguna cosa aprop!");
-                            transform.LookAt(info.transform.position);
-                            _NavMeshAgent.SetDestination(_Player.transform.position);
-                            if (_CurrentState != EnemyStates.CHASE)
-                                ChangeState(EnemyStates.CHASE);
-                        }
-                        else
-                        {
-                            transform.LookAt(info.transform.position);
-                            _NavMeshAgent.SetDestination(transform.position);
-                            if(_CurrentState != EnemyStates.ATTACK)
-                                ChangeState(EnemyStates.ATTACK);
-                        }
-                    }
-                }
-            }
-            else if (_Chase)
-            {
-                RandomPoint(_Player.transform.position, 2, out Vector3 point);
-                StartCoroutine(StopChase());
-                _NavMeshAgent.SetDestination(point);
-            }
-        }
-        else
-        {
-            Debug.Log("No detecto res a la meva mirada!");
-            if (_CurrentState == EnemyStates.CHASE)
-                ChangeState(EnemyStates.PATROL);
-        }
-    }
-
     public override void ListenSound(Vector3 pos, int lvlSound)
     {
         _SoundPos = pos;
         RaycastHit[] hits = Physics.RaycastAll(this.transform.position, _SoundPos - this.transform.position, Vector3.Distance(_SoundPos, this.transform.position));
-        
+
         foreach (RaycastHit hit in hits)
         {
             if (hit.collider.TryGetComponent<IAtenuacio>(out IAtenuacio a))
@@ -275,27 +211,27 @@ public class FastEnemy : Enemy
             }
         }
 
-        if(lvlSound > 0 && _CurrentState == EnemyStates.PATROL)
+        if (lvlSound > 0 && _CurrentState == EnemyStates.PATROL)
         {
-            if (lvlSound > 0 && lvlSound <= 2)
+            if (lvlSound > 0 && lvlSound <= 3)
                 _NavMeshAgent.SetDestination(_SoundPos);
-            else if (lvlSound > 2 && lvlSound <= 5)
+            else if (lvlSound > 3 && lvlSound <= 5)
             {
                 RandomPoint(_SoundPos, 2, out _);
                 _RangeSearchSound = 2;
             }
-            else if (lvlSound > 5 && lvlSound <= 9)
+            else if (lvlSound > 5 && lvlSound <= 7)
+            {
+                RandomPoint(_SoundPos, 3, out _);
+                _RangeSearchSound = 3;
+            }
+            else if (lvlSound > 7 && lvlSound <= 15)
             {
                 RandomPoint(_SoundPos, 5, out _);
                 _RangeSearchSound = 5;
             }
-            else if (lvlSound > 9 && lvlSound <= 15)
-            {
-                RandomPoint(_SoundPos, 10, out _);
-                _RangeSearchSound = 10;
-            }
 
-            if(_CurrentState != EnemyStates.SEARCH)
+            if (_CurrentState != EnemyStates.SEARCH)
                 ChangeState(EnemyStates.SEARCH);
         }
     }
@@ -313,7 +249,7 @@ public class FastEnemy : Enemy
     IEnumerator WakeUp()
     {
         yield return new WaitForSeconds(5);
-        Collider[] aux = Physics.OverlapSphere(transform.position, 2f, _LayerPlayer);
+        Collider[] aux = Physics.OverlapSphere(transform.position, 3f, _LayerPlayer);
         if (aux.Length > 0)
         {
             if (Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit info, _LayerObjectsAndPlayer))
@@ -330,7 +266,7 @@ public class FastEnemy : Enemy
 
     IEnumerator AttackPlayer()
     {
-        while(_Attack)
+        while (_Attack)
         {
             //Animation -> attack
             _Player.GetComponent<Player>().TakeDamage(1);
@@ -351,45 +287,25 @@ public class FastEnemy : Enemy
         ChangeState(EnemyStates.PATROL);
     }
 
-    IEnumerator LookingPlayer()
+    IEnumerator WaitingAttack()
     {
-        while(true)
+        while (true)
         {
-            Collider[] aux = Physics.OverlapSphere(transform.position, 15f, _LayerPlayer);
+            Collider[] aux = Physics.OverlapSphere(transform.position, 3f, _LayerPlayer);
             if (aux.Length > 0)
             {
-                transform.LookAt(_Player.transform.position);
-                float alphaDocProduct = Vector3.Dot(transform.forward, (_Player.transform.position - this.transform.position).normalized);
-                float alphaLook = Vector3.Dot(transform.forward, _Player.transform.forward);
-                Debug.Log($"Alpha: {alphaLook}");
-
-                //Fem l'arcos del docProduct per poder comprovar si l'angle és menor a la meitat de l'angle de 
-                //visió dels enemics
-                if (Mathf.Acos(alphaDocProduct) < _BetaDotProduct)
+                if (Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit info, _LayerObjectsAndPlayer))
                 {
-                    //Raycast amb les layers de paret i player i si tenim la paret no seguim, sinó seguim el jugador
-                    if (Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit info, _LayerObjectsAndPlayer))
+                    if (info.transform.tag == "Player")
                     {
-                        if (info.transform.tag == "Player")
-                        {
-                            if (alphaLook < -0.9f)
-                            {
-                                _NavMeshAgent.SetDestination(transform.position);
-                                ChangeState(EnemyStates.STOPPED);
-                            }
-                            else
-                            {
-                                if (Vector3.Distance(transform.position, _Player.transform.position) < 2)
-                                    ChangeState(EnemyStates.ATTACK);
-                                else
-                                    ChangeState(EnemyStates.CHASE);
-                            }
-                        }
+                        transform.LookAt(info.transform.position);
+                        _NavMeshAgent.SetDestination(transform.position);
+                        ChangeState(EnemyStates.ATTACK);
                     }
                 }
             }
-            else if (_CurrentState == EnemyStates.STOPPED)
-                ChangeState(EnemyStates.CHASE);
+            else if (_CurrentState == EnemyStates.ATTACK)
+                ChangeState(EnemyStates.PATROL);
 
             yield return new WaitForSeconds(0.5f);
         }
@@ -398,6 +314,5 @@ public class FastEnemy : Enemy
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(transform.position, 10f);
-        Gizmos.DrawWireSphere(transform.position, 15f);
     }
 }
