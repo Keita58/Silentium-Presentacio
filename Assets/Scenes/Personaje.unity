@@ -2677,7 +2677,7 @@ MonoBehaviour:
     m_Bits: 256
   interactLayerMask:
     serializedVersion: 2
-    m_Bits: 1536
+    m_Bits: 3584
   weaponCamera: {fileID: 636996612}
   interactiveGameObject: {fileID: 0}
   material: {fileID: 2100000, guid: 245be0caa7e11f441a60e9ec2a7f78e5, type: 2}
@@ -3744,7 +3744,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 1911
+    m_Bits: 3959
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -4105,8 +4105,7 @@ GameObject:
   - component: {fileID: 2023090549}
   - component: {fileID: 2023090548}
   - component: {fileID: 2023090547}
-  - component: {fileID: 2023090551}
-  m_Layer: 10
+  m_Layer: 11
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4196,28 +4195,12 @@ Transform:
   m_GameObject: {fileID: 2023090546}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.6556243, z: -0, w: 0.7550874}
-  m_LocalPosition: {x: -2.02, y: 1.5802021, z: -0.43}
+  m_LocalPosition: {x: -3.335, y: 1.5802021, z: -0.244}
   m_LocalScale: {x: 1.3399602, y: 2.6598, z: 0.29508}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -81.934, z: 0}
---- !u!114 &2023090551
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2023090546}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f91d7e66faf9d4b4a934ad25faa43644, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 1
-  rotationAmount: 90
-  forwardDirection: 0
-  isHideSpot: 0
 --- !u!1 &2067948037
 GameObject:
   m_ObjectHideFlags: 0
