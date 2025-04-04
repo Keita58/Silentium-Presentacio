@@ -18,6 +18,7 @@ public class BlindEnemy : Enemy
     private bool _Detected;
     private bool _Patrolling;
     private bool _Wait;
+    private bool _Attack;
 
     private int _Hp;
     public override int hp => _Hp;
@@ -25,7 +26,7 @@ public class BlindEnemy : Enemy
     private int _DownTime;
     public override int downTime => _DownTime;
 
-    private int MAXHEALTH = 6;
+    private int MAXHEALTH = 2;
     private int _RangeSearchSound;
 
     private void Awake()
@@ -37,13 +38,13 @@ public class BlindEnemy : Enemy
         _Detected = false;
         _Patrolling = false;
         _Wait = false;
+        _Attack = false;
         _Hp = MAXHEALTH;
     }
 
     private void Start()
     {
         InitState(EnemyStates.PATROL);
-        StartCoroutine(WaitingAttack());
     }
 
     #region FSM
@@ -71,6 +72,7 @@ public class BlindEnemy : Enemy
                 StartCoroutine(Patrol());
                 break;
             case EnemyStates.ATTACK:
+                AttackPlayer();
                 break;
             case EnemyStates.KNOCKED:
                 StartCoroutine(WakeUp());
@@ -99,6 +101,7 @@ public class BlindEnemy : Enemy
                 _Detected = true;
                 break;
             case EnemyStates.ATTACK:
+                _Attack = false;
                 break;
             case EnemyStates.KNOCKED:
                 _Hp = MAXHEALTH;
@@ -117,7 +120,7 @@ public class BlindEnemy : Enemy
     IEnumerator Patrol()
     {
         Vector3 coord = Vector3.zero;
-        float range = 45.0f;
+        float range = 15.0f;
         while (!_Detected)
         {
             if (!_Patrolling)
@@ -137,26 +140,6 @@ public class BlindEnemy : Enemy
                 _Patrolling = false;
             }
             yield return new WaitForSeconds(2);
-        }
-    }
-
-    IEnumerator Search(int range)
-    {
-        while (_SearchSound)
-        {
-            if (transform.position.x == _NavMeshAgent.destination.x && transform.position.z == _NavMeshAgent.destination.z)
-            {
-                if (!_Wait)
-                {
-                    _Wait = true;
-                    StartCoroutine(WaitChange()); //Temps d'espera per canviar a patrulla (te posat un change a patrulla)
-                }
-                yield return new WaitForSeconds(0.5f);
-                RandomPoint(_SoundPos, range, out Vector3 hit);
-                _NavMeshAgent.destination = hit;
-            }
-            else
-                yield return new WaitForSeconds(1f);
         }
     }
 
@@ -193,26 +176,32 @@ public class BlindEnemy : Enemy
             }
         }
 
+        Debug.Log($"Nivell so: {lvlSound}");
+
         if (lvlSound > 0 && _CurrentState == EnemyStates.PATROL)
         {
             if (lvlSound > 0 && lvlSound <= 2)
             {
                 RandomPoint(_SoundPos, 5, out _);
-                _RangeSearchSound = 5;
             }
             else if (lvlSound > 2 && lvlSound <= 3)
             {
                 RandomPoint(_SoundPos, 3, out _);
-                _RangeSearchSound = 3;
             }
             else if (lvlSound > 3 && lvlSound <= 5)
             {
                 RandomPoint(_SoundPos, 2, out _);
-                _RangeSearchSound = 2;
             }
             else if (lvlSound > 5)
             {
-                _NavMeshAgent.SetDestination(_SoundPos);
+                if (_Attack && Vector3.Distance(_NavMeshAgent.destination, _SoundPos) < 2)
+                    ChangeState(EnemyStates.ATTACK);
+                else
+                {
+                    _NavMeshAgent.SetDestination(_SoundPos);
+                    _Attack = true;
+                    StartCoroutine(RemoveAttackState());
+                }
             }
         }
     }
@@ -236,41 +225,20 @@ public class BlindEnemy : Enemy
     private void AttackPlayer()
     {
         //Animation -> attack
+        _NavMeshAgent.speed = 15;
+        _NavMeshAgent.SetDestination(_SoundPos);
         _Player.GetComponent<Player>().TakeDamage(3);    
     }
 
     IEnumerator WaitChange()
     {
-        yield return new WaitForSeconds(10f);
+        yield return new WaitForSeconds(5f);
         ChangeState(EnemyStates.PATROL);
     }
 
-    IEnumerator WaitingAttack()
+    IEnumerator RemoveAttackState()
     {
-        while (true)
-        {
-            Collider[] aux = Physics.OverlapSphere(transform.position, 3f, _LayerPlayer);
-            if (aux.Length > 0)
-            {
-                if (Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit info, _LayerObjectsAndPlayer))
-                {
-                    if (info.transform.tag == "Player")
-                    {
-                        transform.LookAt(info.transform.position);
-                        _NavMeshAgent.SetDestination(transform.position);
-                        ChangeState(EnemyStates.ATTACK);
-                    }
-                }
-            }
-            else if (_CurrentState == EnemyStates.ATTACK)
-                ChangeState(EnemyStates.PATROL);
-
-            yield return new WaitForSeconds(0.5f);
-        }
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawWireSphere(transform.position, 10f);
+        yield return new WaitForSeconds(1.5f);
+        ChangeState(EnemyStates.PATROL);
     }
 }

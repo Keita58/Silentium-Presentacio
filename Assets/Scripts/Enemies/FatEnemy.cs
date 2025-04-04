@@ -141,7 +141,6 @@ public class FatEnemy : Enemy
                     Debug.DrawRay(coord, Vector3.up, UnityEngine.Color.black, 1.0f);
                 }
 
-                _NavMeshAgent.speed = 4;
                 _NavMeshAgent.SetDestination(new Vector3(coord.x, transform.position.y, coord.z));
                 _Patrolling = true;
             }
@@ -227,7 +226,6 @@ public class FatEnemy : Enemy
             else if (lvlSound > 7)
             {
                 _NavMeshAgent.SetDestination(_SoundPos);
-                
             }
 
             if (_CurrentState != EnemyStates.SEARCH)

@@ -32,6 +32,8 @@ public class FastEnemy : Enemy
     private int MAXHEALTH = 3;
     private int _RangeSearchSound;
 
+    private Coroutine _PatrolCoroutine;
+
     private void Awake()
     {
         _NavMeshAgent = GetComponent<NavMeshAgent>();
@@ -75,7 +77,7 @@ public class FastEnemy : Enemy
             case EnemyStates.PATROL:
                 _Detected = false;
                 _Patrolling = false;
-                StartCoroutine(Patrol());
+                _PatrolCoroutine = StartCoroutine(Patrol());
                 break;
             case EnemyStates.SEARCH:
                 _SearchSound = true;
@@ -119,7 +121,7 @@ public class FastEnemy : Enemy
         switch(exitState)
         {
             case EnemyStates.PATROL:
-                _Detected = true;
+                StopCoroutine(_PatrolCoroutine);
                 break;
             case EnemyStates.SEARCH:
                 _SearchSound = false;
@@ -144,67 +146,73 @@ public class FastEnemy : Enemy
     // Funció per moure l'enemic pel mapa
     IEnumerator Patrol()
     {
-        Vector3 coord = Vector3.zero;
-        float range = 45.0f;
-        while (!_Detected)
+        Vector3 point = Vector3.zero;
+        while (true)
         {
             if (!_Patrolling)
             {
-                if (RandomPoint(transform.position, range, out coord))
-                {
-                    Debug.DrawRay(coord, Vector3.up, UnityEngine.Color.black, 1.0f);
-                }
-
+                RandomPoint(transform.position, 15, out Vector3 coord);
+                point = coord;
                 _NavMeshAgent.speed = Random.Range(3.5f, 6);
-                _NavMeshAgent.SetDestination(new Vector3(coord.x, transform.position.y, coord.z));
+                _NavMeshAgent.SetDestination(new Vector3(point.x, transform.position.y, point.z));
+                Debug.Log(new Vector3(point.x, transform.position.y, point.z));
+                Debug.Log("Em moc");
                 _Patrolling = true;
             }
-
-            if (transform.position == new Vector3(coord.x, transform.position.y, coord.z))
+            
+            if (Vector3.Distance(point, transform.position) < 1.5f)
             {
                 _Patrolling = false;
             }
-            yield return new WaitForSeconds(2);
+            yield return new WaitForSecondsRealtime(0.5f);
         }
     }
 
     IEnumerator Search(int range)
     {
-        while (_SearchSound)
+        if (!_Wait)
         {
-            if (transform.position.x == _NavMeshAgent.destination.x && transform.position.z == _NavMeshAgent.destination.z)
+            _Wait = true;
+            StartCoroutine(WaitChange()); //Temps d'espera per canviar a patrulla (te posat un change a patrulla)
+
+            while (_SearchSound)
             {
-                if (!_Wait)
+                if (transform.position.x == _NavMeshAgent.destination.x && transform.position.z == _NavMeshAgent.destination.z)
                 {
-                    _Wait = true;
-                    StartCoroutine(WaitChange()); //Temps d'espera per canviar a patrulla (te posat un change a patrulla)
+                    yield return new WaitForSeconds(0.5f);
+                    RandomPoint(_SoundPos, range, out Vector3 hit);
+                    _NavMeshAgent.destination = hit;
                 }
-                yield return new WaitForSeconds(0.5f);
-                RandomPoint(_SoundPos, range, out Vector3 hit);
-                _NavMeshAgent.destination = hit;
+                else
+                    yield return new WaitForSeconds(1f);
             }
-            else
-                yield return new WaitForSeconds(1f);
         }
     }
 
     //Busca punt aleatori dins del NavMesh
     private bool RandomPoint(Vector3 center, float range, out Vector3 result)
     {
-        for (int i = 0; i < 30; i++)
+        for(int i = 0; i < 50; i++) 
         {
             //Agafa un punt aleatori dins de l'esfera amb el radi que passem per parametre
-            Vector3 randomPoint = center + UnityEngine.Random.insideUnitSphere * range;
-            NavMeshHit hit;
+            Vector2 randomPoint = new Vector2(center.x, center.z) + Random.insideUnitCircle * range;
+            Vector3 randomPointY = center + Random.insideUnitSphere * (range * 2);
+
+            //Aquí s'haurà de comprovar si la y que hem extret està en algun dels pisos de l'edifici.
+            //Si està aprop la transformem en aquest i ja
+
+            Vector3 point = new Vector3(randomPoint.x, randomPointY.y, randomPoint.y);
+
+            NavMeshHit hit; 
 
             //Comprovem que el punt que hem agafat esta dins del NavMesh
-            if (NavMesh.SamplePosition(randomPoint, out hit, 1.0f, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(point, out hit, 1.0f, NavMesh.AllAreas))
             {
                 result = hit.position;
                 return true;
             }
         }
-        result = Vector3.zero;
+        result = center;
         return false;
     }
 
@@ -226,8 +234,8 @@ public class FastEnemy : Enemy
                     {
                         _SearchSound = false;
                         _Chase = true;
-                        _Detected = true;
-                        StopCoroutine(StopChase());
+                        //StopCoroutine(StopChase());
+                        StopCoroutine(_PatrolCoroutine);
 
                         if(Vector3.Distance(transform.position, info.transform.position) > 2)
                         {
@@ -350,7 +358,7 @@ public class FastEnemy : Enemy
 
     IEnumerator WaitChange()
     {
-        yield return new WaitForSeconds(10f);
+        yield return new WaitForSeconds(5f);
         ChangeState(EnemyStates.PATROL);
     }
 
@@ -364,7 +372,7 @@ public class FastEnemy : Enemy
                 transform.LookAt(_Player.transform.position);
                 float alphaDocProduct = Vector3.Dot(transform.forward, (_Player.transform.position - this.transform.position).normalized);
                 float alphaLook = Vector3.Dot(transform.forward, _Player.transform.forward);
-                Debug.Log($"Alpha: {alphaLook}");
+                //Debug.Log($"Alpha: {alphaLook}");
 
                 //Fem l'arcos del docProduct per poder comprovar si l'angle és menor a la meitat de l'angle de 
                 //visió dels enemics
