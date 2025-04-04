@@ -20,7 +20,7 @@ public class Door : MonoBehaviour
     private void Awake()
     {
         isOpen = false;
-        startRotation = transform.rotation.eulerAngles;
+        startRotation = transform.localRotation.eulerAngles;
     }
 
     public void Open(Vector3 playerPosition)
@@ -37,7 +37,7 @@ public class Door : MonoBehaviour
 
     private IEnumerator DoRotationOpen(float forwardAmount)
     {
-        Quaternion startRotation = transform.parent.rotation;
+        Quaternion startRotation = transform.localRotation;
         Quaternion endRotation;
 
         if (isHideSpot)
@@ -64,7 +64,8 @@ public class Door : MonoBehaviour
         while (time < 1)
         {
             //interpolamos entre el start y el end dado el time.
-            transform.parent.rotation = Quaternion.Slerp(startRotation, endRotation, time);
+            //transform.parent.rotation = Quaternion.Slerp(startRotation, endRotation, time);
+            transform.localRotation = Quaternion.Slerp(startRotation, endRotation, time);
             yield return null;
             time += Time.deltaTime * speed;
         }
@@ -84,15 +85,15 @@ public class Door : MonoBehaviour
 
     private IEnumerator DoRotationClose()
     {
-        Quaternion startRotation = transform.parent.rotation;
-        Quaternion endRotation = Quaternion.Euler(new Vector3(transform.parent.rotation.x, transform.parent.rotation.y, transform.parent.rotation.z));
+        Quaternion startRotation = transform.localRotation;
+        Quaternion endRotation = Quaternion.Euler(new Vector3(transform.localRotation.x, transform.localRotation.y, transform.localRotation.z));
 
         isOpen = false;
 
         float time = 0;
         while (time < 1)
         {
-            transform.parent.rotation = Quaternion.Slerp(startRotation, endRotation, time);
+            transform.localRotation = Quaternion.Slerp(startRotation, endRotation, time);
             yield return null;
             time += Time.deltaTime * speed;
         }
