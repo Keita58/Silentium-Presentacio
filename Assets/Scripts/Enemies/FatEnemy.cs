@@ -176,20 +176,26 @@ public class FatEnemy : Enemy
     //Busca punt aleatori dins del NavMesh
     private bool RandomPoint(Vector3 center, float range, out Vector3 result)
     {
-        for (int i = 0; i < 30; i++)
+        for (int i = 0; i < 50; i++)
         {
             //Agafa un punt aleatori dins de l'esfera amb el radi que passem per parametre
-            Vector3 randomPoint = center + UnityEngine.Random.insideUnitSphere * range;
+            Vector3 randomPoint = new Vector3(center.x, center.y, center.z) + Random.insideUnitSphere * range;
+
+            //Aquí s'haurà de comprovar si la y que hem extret està en algun dels pisos de l'edifici.
+            //Si està aprop la transformem en aquest i ja
+
+            Vector3 point = new Vector3(randomPoint.x, randomPoint.y, randomPoint.z);
+
             NavMeshHit hit;
 
             //Comprovem que el punt que hem agafat esta dins del NavMesh
-            if (NavMesh.SamplePosition(randomPoint, out hit, 1.0f, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(point, out hit, 1.0f, NavMesh.AllAreas) && Vector3.Distance(point, center) > 1.75f)
             {
                 result = hit.position;
                 return true;
             }
         }
-        result = Vector3.zero;
+        result = center;
         return false;
     }
 
