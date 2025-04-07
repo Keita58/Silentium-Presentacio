@@ -25,7 +25,23 @@ public class HealingItem : Item
     [SerializeField] private List<Item> itemsToCombine;
     public override List<Item> combinableItems => itemsToCombine;
 
-    [SerializeField] private Item itemAfterCombine;
+    [SerializeField] private bool stackable;
+    public override bool isStackable => stackable;
+
+    [SerializeField] private ItemTypes itemType;
+    public override ItemTypes ItemType => itemType;
+
+    [SerializeField] private bool usable;
+    public override bool isUsable => usable;
+
+    [SerializeField] private bool equipable;
+    public override bool isEquipable => equipable;
+
+    [SerializeField] private bool combinable;
+    public override bool isCombinable => combinable;
+
+
+    [SerializeField] private Item itemAfterCombineParacetamol;
 
     public override void Use()
     {
@@ -34,9 +50,11 @@ public class HealingItem : Item
 
     public override void Combine(Item item)
     {
-        if (item is ThrowableItem)
+        Debug.Log("Rep aquest item per a combinar: " + item);
+        Debug.Log("Es throwable?"+item is ThrowableItem);
+        if (item.ItemType == ItemTypes.PARACETAMOL && this.itemType==ItemTypes.PARACETAMOL)
         {
-            InventoryManager.instance.AddNewItemAfterCombine(itemAfterCombine);
+            InventoryManager.instance.AddNewItemAfterCombine(itemAfterCombineParacetamol);
         }
     }
 

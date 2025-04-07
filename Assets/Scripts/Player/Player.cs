@@ -199,12 +199,12 @@ public class Player : MonoBehaviour
         {
             Debug.DrawRay(shootPosition.transform.position, -shootPosition.transform.right, Color.magenta, 5f);
             Debug.Log("TIRO DEBUGRAY");
-            if (Physics.Raycast(shootPosition.transform.position, -shootPosition.transform.right, enemyLayerMask))
+            if (Physics.Raycast(shootPosition.transform.position, -shootPosition.transform.right, 5f, enemyLayerMask))
             {
                 //e.RebreMal(5);
                 Debug.Log("Enemy hit");
             }
-            //_Bales--;
+            gunAmmo--;
             //OnDisparar?.Invoke();
         }
     }
@@ -463,4 +463,14 @@ public class Player : MonoBehaviour
         }
     }
     #endregion
+
+    private void OnDestroy()
+    {
+        _inputActions.Player.Shoot.performed -= Shoot;
+        _inputActions.Player.Aim.performed -= Aim;
+        _inputActions.Player.PickUpItem.performed -= PickUpItem;
+        _inputActions.Player.Inventory.performed -= OpenInventory;
+        _inputActions.Player.Crouch.performed += Crouch;
+
+    }
 }

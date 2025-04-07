@@ -53,6 +53,17 @@ public class InventoryManager : MonoBehaviour
         {
             buttonsActionRoot.transform.GetChild(i).gameObject.SetActive(show);
         }
+        OptionsAvailable();
+    }
+
+    private void OptionsAvailable()
+    {
+        if (itemSelected != null)
+        {
+            buttonsActionRoot.transform.GetChild(0).GetComponent<Button>().interactable = itemSelected.isUsable ? true : false;
+            buttonsActionRoot.transform.GetChild(1).GetComponent<Button>().interactable = itemSelected.isEquipable ? true : false;
+            buttonsActionRoot.transform.GetChild(2).GetComponent<Button>().interactable = itemSelected.isCombinable ? true : false;
+        }
     }
 
     private void InitState(ActionStates newState)
@@ -61,10 +72,12 @@ public class InventoryManager : MonoBehaviour
         switch (actionState)
         {
             case ActionStates.NOACTION:
+                isCombining = false;
                 ToggleActionsButtons(false);
                 break;
             case ActionStates.SELECT_ACTION:
                 ToggleActionsButtons(true);
+
                 break;
             case ActionStates.ACTION_USE:
                 itemSelected.Use();
@@ -75,7 +88,8 @@ public class InventoryManager : MonoBehaviour
                 ChangeState(ActionStates.ACTION_COMBINE_SELECT);
                 break;
             case ActionStates.ACTION_COMBINE_SELECT:
-                InhabilitateButtons();
+                isCombining = true;
+                ToggleHabilitateButtons(false);
                 break;
             case ActionStates.ACTION_EQUIP_ITEM:
                 itemSelected.Equip();
@@ -96,23 +110,28 @@ public class InventoryManager : MonoBehaviour
                 break;
             case ActionStates.ACTION_COMBINE:
                 break;
+            case ActionStates.ACTION_COMBINE_SELECT:
+                isCombining = false;
+                ToggleHabilitateButtons(false);
+                break;
             case ActionStates.ACTION_EQUIP_ITEM:
                 break;
         }
     }
     #endregion
 
-    private void InhabilitateButtons()
+    private void ToggleHabilitateButtons(bool interactable)
     {
         foreach (Transform child in buttonsActionRoot.transform)
         {
-            child.GetComponent<Button>().interactable = false;
+            child.GetComponent<Button>().interactable = interactable;
         }
     }
 
     public void SelectItemToCombine(Item item)
     {
         targetItemToCombine=item;
+        itemSelected.Combine(targetItemToCombine);
     }
 
     public void AddNewItemAfterCombine(Item newItem)
@@ -120,11 +139,10 @@ public class InventoryManager : MonoBehaviour
         inventory.UseItem(itemSelected);
         inventory.UseItem(targetItemToCombine);
         inventory.AddItem(newItem);
+        inventoryUI.Show();
         ChangeState(ActionStates.NOACTION);
 
     }
-
-
 
     public void UseItem()
     {

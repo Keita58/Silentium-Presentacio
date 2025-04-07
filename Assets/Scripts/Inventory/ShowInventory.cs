@@ -43,23 +43,34 @@ public class ShowInventory : MonoBehaviour
 
     public void ShowHideItemsToCombine(List<Item> itemsToCombine, Item selfItem)
     {
-        for (int x = 0; x < itemsToCombine.Count; x++)
+        if (itemsToCombine.Count > 0)
         {
-            for (int i = 0; i < inventory.items.Count; i++)
+            for (int x = 0; x < itemsToCombine.Count; x++)
             {
-                if (inventory.items.ElementAt(i).item != itemsToCombine.ElementAt(x) || inventory.items.ElementAt(i).item == selfItem)
+                for (int i = 0; i < inventory.items.Count; i++)
                 {
-                    Transform child = parentGameObject.transform;
-                    if (child.childCount > i)
+                    if (inventory.items.ElementAt(i).item != itemsToCombine.ElementAt(x) || inventory.items.ElementAt(i).item == selfItem)
                     {
-                        Transform innerChild = child.GetChild(i);
-                        if (innerChild.childCount > i)
+                        Transform child = parentGameObject.transform;
+                        if (child.childCount > i)
                         {
-                            innerChild.GetChild(i).GetComponent<Button>().interactable = false;
+                            Transform innerChild = child.GetChild(i);
+                            innerChild.GetChild(0).GetComponent<Button>().interactable=false;
                         }
                     }
                 }
-               
+            }
+        }
+        else
+        {
+            for (int i = 0; i < inventory.items.Count; i++)
+            {
+                Transform child = parentGameObject.transform;
+                if (child.childCount > i)
+                {
+                    Transform innerChild = child.GetChild(i);
+                    innerChild.GetChild(0).GetComponent<Button>().interactable = false;
+                }
             }
         }
     }

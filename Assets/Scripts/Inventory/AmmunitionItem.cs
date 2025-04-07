@@ -18,6 +18,22 @@ public class AmmunitionItem : Item
 
     public override List<Item> combinableItems => throw new System.NotImplementedException();
 
+    [SerializeField] private bool stackable;
+    public override bool isStackable => stackable;
+
+    [SerializeField] private ItemTypes itemType;
+    public override ItemTypes ItemType => itemType;
+
+    [SerializeField] private bool usable;
+    public override bool isUsable => usable;
+
+    [SerializeField] private bool equipable;
+    public override bool isEquipable => equipable;
+
+    [SerializeField] private bool combinable;
+    public override bool isCombinable => combinable;
+
+
     [Header("Specific values")]
     [SerializeField] public int bales;
 
