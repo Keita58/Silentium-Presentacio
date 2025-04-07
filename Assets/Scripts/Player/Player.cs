@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 public class Player : MonoBehaviour
@@ -286,9 +287,9 @@ public class Player : MonoBehaviour
                 }
 
                 _Rigidbody.linearVelocity =
-                (transform.right * movementInput.x +
+                ((transform.right * movementInput.x +
                 transform.forward * movementInput.y)
-                .normalized * _VelocityMove;
+                .normalized * _VelocityMove) + (Vector3.up * _Rigidbody.linearVelocity.y);
                 break;
             case PlayerStates.RUN:
 
