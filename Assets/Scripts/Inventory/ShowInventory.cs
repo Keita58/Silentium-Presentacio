@@ -49,7 +49,7 @@ public class ShowInventory : MonoBehaviour
             {
                 for (int i = 0; i < inventory.items.Count; i++)
                 {
-                    if (inventory.items.ElementAt(i).item != itemsToCombine.ElementAt(x) || inventory.items.ElementAt(i).item == selfItem)
+                    if (inventory.items.ElementAt(i).item != itemsToCombine.ElementAt(x))
                     {
                         Transform child = parentGameObject.transform;
                         if (child.childCount > i)
@@ -81,9 +81,9 @@ public class ShowInventory : MonoBehaviour
         {
             for (int i = 0; i < child.childCount; i++)
             {
-                child.GetChild(i).GetComponent<Image>().color=Color.white;
+                child.GetChild(i).GetComponent<Button>().interactable=true;
+                child.GetChild(i).GetComponent<Image>().color = Color.white;
             }
         }
-
     }
 }

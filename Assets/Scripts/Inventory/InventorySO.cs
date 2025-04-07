@@ -17,7 +17,7 @@ public class InventorySO : ScriptableObject
     public class ItemSlot
     {
         [SerializeField]
-        public PickItem item;
+        public Item item;
         [SerializeField]
         public int amount;
         [SerializeField]
@@ -26,7 +26,7 @@ public class InventorySO : ScriptableObject
 
         public ItemSlot(Item obj)
         {
-            item.item = obj;
+            item = obj;
             amount = 1;
         }
     }

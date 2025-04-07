@@ -16,3 +16,8 @@ MonoBehaviour:
   description: Bonita
   sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
   prefab: {fileID: 8474635125787463359, guid: 46b7d683be7451646ad35bdeeaf63f5f, type: 3}
+  stackable: 0
+  itemType: 4
+  usable: 0
+  equipable: 1
+  combinable: 0

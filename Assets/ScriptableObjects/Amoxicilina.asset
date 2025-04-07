@@ -20,4 +20,7 @@ MonoBehaviour:
   itemsToCombine: []
   stackable: 0
   itemType: 0
+  usable: 1
+  equipable: 0
+  combinable: 0
   itemAfterCombineParacetamol: {fileID: 0}

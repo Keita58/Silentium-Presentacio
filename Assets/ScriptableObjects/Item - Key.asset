@@ -16,3 +16,8 @@ MonoBehaviour:
   description: 
   sprite: {fileID: 0}
   prefab: {fileID: 0}
+  stackable: 0
+  itemType: 5
+  usable: 0
+  equipable: 0
+  combinable: 0

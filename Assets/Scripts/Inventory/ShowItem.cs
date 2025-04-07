@@ -26,12 +26,12 @@ public class ShowItem : MonoBehaviour
             InventoryManager.instance.ChangeSelectedItem();
             InventoryManager.instance.ItemSelected(selectedItem);
             this.GetComponent<Image>().color = Color.magenta;
+            this.GetComponent<Button>().interactable = false;
         }
         else
         {
             InventoryManager.instance.SelectItemToCombine(selectedItem);
         }
-       
     }
 
 
