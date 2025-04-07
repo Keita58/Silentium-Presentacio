@@ -11,11 +11,6 @@ public class ShowItem : MonoBehaviour
     public event Action OnUseItem;
     Item selectedItem;
 
-    private void Awake()
-    {
-        
-    }
-
     public void Load(InventorySO.ItemSlot item)
     {
         this.GetComponent<Image>().sprite=item.item.Sprite;
@@ -25,14 +20,19 @@ public class ShowItem : MonoBehaviour
 
     public void ClickItem()
     {
-        Debug.Log("Clico Item");
-        if (selectedItem != null)
+        if (!InventoryManager.instance.isCombining)
         {
+            Debug.Log("Clico Item");
+            InventoryManager.instance.ChangeSelectedItem();
             InventoryManager.instance.ItemSelected(selectedItem);
-            //selectedItem.Use();
-            //OnUseItem?.Invoke();
+            this.GetComponent<Image>().color = Color.magenta;
+            this.GetComponent<Button>().interactable = false;
+        }
+        else
+        {
+            InventoryManager.instance.SelectItemToCombine(selectedItem);
         }
     }
 
-    
+
 }

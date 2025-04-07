@@ -9,7 +9,7 @@ public class Player : MonoBehaviour
 
     Rigidbody _Rigidbody;
 
-    InputSystem_Actions _inputActions;
+    public InputSystem_Actions _inputActions { get; private set; }
 
     InputAction _MoveAction;
     InputAction _LookAction;
@@ -58,6 +58,11 @@ public class Player : MonoBehaviour
     bool clockPuzzle = false;
     private GameObject clockGameObject;
 
+    private Coroutine coroutineRun;
+    private Coroutine coroutineMove;
+    private Coroutine coroutineCrouch;
+    private Coroutine coroutineInteract;
+
     private void Awake()
     {
         _inputActions = new InputSystem_Actions();
@@ -77,11 +82,11 @@ public class Player : MonoBehaviour
     private void OpenInventory(InputAction.CallbackContext context)
     {
 
-        GameManager.instance.OpenInventory(this.gameObject);
+        InventoryManager.instance.OpenInventory(this.gameObject);
         if (!inventoryOpened)
         {
             Cursor.visible = true;
-            GameManager.instance.OpenInventory(this.gameObject);
+            InventoryManager.instance.OpenInventory(this.gameObject);
             inventoryOpened = true;
             _inputActions.Player.Shoot.Disable();
             _inputActions.Player.Aim.Disable();
@@ -94,7 +99,7 @@ public class Player : MonoBehaviour
         else
         {
             Cursor.visible = false;
-            GameManager.instance.CloseInventory();
+            InventoryManager.instance.CloseInventory();
             inventoryOpened = false;
             _inputActions.Player.Shoot.Enable();
             _inputActions.Player.Aim.Enable();
@@ -108,7 +113,7 @@ public class Player : MonoBehaviour
     void Start()
     {
         Cursor.visible = false;
-        StartCoroutine(InteractuarRaycast());
+        coroutineInteract= StartCoroutine(InteractuarRaycast());
     }
 
     private void Update()
@@ -132,7 +137,7 @@ public class Player : MonoBehaviour
         if (interactiveGameObject != null)
         {
             Debug.Log("ENTRO DEFINITIVAMENTE");
-            GameManager.instance.AddItem(interactiveGameObject.GetComponent<PickItem>().item);
+            InventoryManager.instance.AddItem(interactiveGameObject.GetComponent<PickItem>().item);
             Debug.Log("QUE COJO?" + interactiveGameObject.GetComponent<PickItem>().item);
             interactiveGameObject.gameObject.SetActive(false);
             Debug.Log("Entro Coger item");
@@ -160,11 +165,16 @@ public class Player : MonoBehaviour
             }else if (clockPuzzle)
             {
                 PuzzleManager.instance.InteractClockPuzzle();
-            }
-            
-           
+                StopCoroutine(coroutineInteract);
+                clockPuzzle = false;
+            } 
         }
 
+    }
+
+    public void ResumeInteract()
+    {
+        coroutineInteract = StartCoroutine(InteractuarRaycast());
     }
 
     public void EquipItem(GameObject itemAEquipar)
@@ -189,12 +199,12 @@ public class Player : MonoBehaviour
         {
             Debug.DrawRay(shootPosition.transform.position, -shootPosition.transform.right, Color.magenta, 5f);
             Debug.Log("TIRO DEBUGRAY");
-            if (Physics.Raycast(shootPosition.transform.position, -shootPosition.transform.right, enemyLayerMask))
+            if (Physics.Raycast(shootPosition.transform.position, -shootPosition.transform.right, 5f, enemyLayerMask))
             {
                 //e.RebreMal(5);
                 Debug.Log("Enemy hit");
             }
-            //_Bales--;
+            gunAmmo--;
             //OnDisparar?.Invoke();
         }
     }
@@ -237,12 +247,10 @@ public class Player : MonoBehaviour
                 _Rigidbody.angularVelocity=Vector3.zero;
                 break;
             case PlayerStates.MOVE:
-                StartCoroutine(MakeNoiseMove());
-       
-
+                coroutineMove = StartCoroutine(MakeNoiseMove());
                 break;
             case PlayerStates.RUN:
-                StartCoroutine(MakeNoiseRun());
+                coroutineRun = StartCoroutine(MakeNoiseRun());
                 break;
             case PlayerStates.CROUCH:
                 this.GetComponent<CapsuleCollider>().center = new Vector3(0f, crouchedCenterCollider, 0f);
@@ -250,7 +258,7 @@ public class Player : MonoBehaviour
                 _Camera.transform.localPosition = new Vector3(0f, 0f, -0.198f);
                 cameraShenanigansGameObject.transform.localPosition = Vector3.zero;
                 _VelocityMove /= 2;
-                StartCoroutine(MakeNoiseCrouch());
+                coroutineCrouch = StartCoroutine(MakeNoiseCrouch());
                 break;
             default:
                 break;
@@ -325,13 +333,16 @@ public class Player : MonoBehaviour
         switch (exitState)
         {
             case PlayerStates.MOVE:
-                StopCoroutine(MakeNoiseMove());
+                if (coroutineMove!=null)
+                    StopCoroutine(coroutineMove);
                 break;
             case PlayerStates.RUN:
-                StopCoroutine(MakeNoiseRun());
+                if (coroutineRun!=null)
+                    StopCoroutine(coroutineRun);
                 break;
             case PlayerStates.CROUCH:
-                StopCoroutine(MakeNoiseCrouch());
+                if (coroutineCrouch != null)
+                    StopCoroutine(coroutineCrouch);
                 this.GetComponent<CapsuleCollider>().center = Vector3.zero;
                 this.GetComponent<CapsuleCollider>().height = 2;
                 _Camera.transform.localPosition = cameraPositionBeforeCrouch;
@@ -384,7 +395,7 @@ public class Player : MonoBehaviour
             else if (!Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit2, 10f, interactLayerMask))
             {
                 door=false;
-
+                clockPuzzle = false;
                 if (interactiveGameObject != null)
                 {
                     interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
@@ -414,6 +425,7 @@ public class Player : MonoBehaviour
             Collider[] colliderHits = Physics.OverlapSphere(this.transform.position, 30);
             foreach (Collider collider in colliderHits)
             {
+                Debug.Log("CORUTINAMOVER");
                 if (collider.gameObject.TryGetComponent<Enemy>(out Enemy en))
                 {
                     en.ListenSound(this.transform.position, 2);
@@ -427,6 +439,7 @@ public class Player : MonoBehaviour
     {
         while (true)
         {
+            Debug.Log("CORUTINACORRER");
             Collider[] colliderHits = Physics.OverlapSphere(this.transform.position, 7);
             if (GetComponent<Collider>().gameObject.TryGetComponent<Enemy>(out Enemy en))
             {
@@ -440,6 +453,7 @@ public class Player : MonoBehaviour
     {
         while (true)
         {
+            Debug.Log("CORUTINACROUCH");
             Collider[] colliderHits = Physics.OverlapSphere(this.transform.position, 5);
             if (GetComponent<Collider>().gameObject.TryGetComponent<Enemy>(out Enemy en))
             {
@@ -449,4 +463,14 @@ public class Player : MonoBehaviour
         }
     }
     #endregion
+
+    private void OnDestroy()
+    {
+        _inputActions.Player.Shoot.performed -= Shoot;
+        _inputActions.Player.Aim.performed -= Aim;
+        _inputActions.Player.PickUpItem.performed -= PickUpItem;
+        _inputActions.Player.Inventory.performed -= OpenInventory;
+        _inputActions.Player.Crouch.performed += Crouch;
+
+    }
 }

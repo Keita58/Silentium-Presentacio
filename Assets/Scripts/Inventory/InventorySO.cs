@@ -20,6 +20,9 @@ public class InventorySO : ScriptableObject
         public Item item;
         [SerializeField]
         public int amount;
+        [SerializeField]
+        public bool stackable;
+
 
         public ItemSlot(Item obj)
         {
@@ -43,9 +46,18 @@ public class InventorySO : ScriptableObject
     public void AddItem(Item usedItem)
     {
         ItemSlot item = GetItem(usedItem);
-        if (item == null) items.Add(new ItemSlot(usedItem));
+        if (item == null)
+        {
+            items.Add(new ItemSlot(usedItem));
+        }
+        else if (!usedItem.isStackable)
+        {
+            items.Add(new ItemSlot(usedItem));
+        }
         else
+        {
             item.amount++;
+        }
 
     }
 

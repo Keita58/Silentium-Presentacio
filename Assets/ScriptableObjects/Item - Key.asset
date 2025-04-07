@@ -9,15 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e436e85ea58c7bf489b7004eb0335253, type: 3}
-  m_Name: ThrowableItem
+  m_Script: {fileID: 11500000, guid: 6def871b41b14a243806b2681e8dda7f, type: 3}
+  m_Name: Item - Key
   m_EditorClassIdentifier: 
-  nom: Ampolla
-  description: Bonita
-  sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
-  prefab: {fileID: 8474635125787463359, guid: 46b7d683be7451646ad35bdeeaf63f5f, type: 3}
+  nom: 
+  description: 
+  sprite: {fileID: 0}
+  prefab: {fileID: 0}
   stackable: 0
-  itemType: 4
+  itemType: 5
   usable: 0
-  equipable: 1
+  equipable: 0
   combinable: 0
