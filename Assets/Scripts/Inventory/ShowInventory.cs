@@ -19,6 +19,7 @@ public class ShowInventory : MonoBehaviour
     public void Show()
     {
         Hide();
+        InventoryManager.instance.ShowDiscoveredNotes();
         
         parentGameObject.transform.parent.gameObject.SetActive(true);
         for (int i = 0; i < inventory.items.Count; i++)

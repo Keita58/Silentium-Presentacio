@@ -43,6 +43,7 @@ public class PuzzleManager : MonoBehaviour
         cam_Player.gameObject.SetActive(true);
         cam_Clock.gameObject.SetActive(false);
         cam_Player.transform.parent.GetComponent<Player>()._inputActions.Player.Enable();
+        cam_Player.transform.parent.GetComponent<Player>().ResumeInteract();
         cam_Clock.transform.parent.GetComponent<Clock>().inputActions.Clock.Disable();
     }
     public void ClockSolved()

@@ -56,6 +56,8 @@ public class Player : MonoBehaviour
     [SerializeField] Transform itemSlot;
     bool door=false;
     bool clockPuzzle = false;
+    bool item = false;
+    bool note = false;
     private GameObject clockGameObject;
 
     private Coroutine coroutineRun;
@@ -134,7 +136,7 @@ public class Player : MonoBehaviour
     private void PickUpItem(InputAction.CallbackContext context)
     {
         Debug.Log("ENTRO?");
-        if (interactiveGameObject != null)
+        if (interactiveGameObject != null && item)
         {
             Debug.Log("ENTRO DEFINITIVAMENTE");
             InventoryManager.instance.AddItem(interactiveGameObject.GetComponent<PickItem>().item);
@@ -167,7 +169,15 @@ public class Player : MonoBehaviour
                 PuzzleManager.instance.InteractClockPuzzle();
                 StopCoroutine(coroutineInteract);
                 clockPuzzle = false;
-            } 
+
+            }else if (interactiveGameObject!=null && note)
+            {
+                if (interactiveGameObject.GetComponent<Notes>().note.noteId < 6)
+                {
+                    InventoryManager.instance.DiscoverNote(interactiveGameObject.GetComponent<Notes>().note);
+                    interactiveGameObject.gameObject.SetActive(false);
+                }
+            }
         }
 
     }
@@ -365,7 +375,7 @@ public class Player : MonoBehaviour
             //Lanzar Raycast interactuar con el mundo.
 
             if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask)){
-                if (hit.transform.gameObject.layer== 9 && !hit.collider.gameObject.Equals(interactiveGameObject))
+                if (!hit.collider.gameObject.Equals(interactiveGameObject) && hit.transform.gameObject.layer != 10)
                 {
                     interactiveGameObject = hit.collider.gameObject;
                     baseMaterial = interactiveGameObject.GetComponent<MeshRenderer>().materials[0];
@@ -375,36 +385,34 @@ public class Player : MonoBehaviour
 
                     material
                     };
-                }else if (hit.transform.gameObject.layer == 10)
+                    if (hit.transform.gameObject.layer == 9)
+                    {
+                        item = true;
+                    }else if (hit.transform.gameObject.layer == 12)
+                    {
+                        note= true;
+                    }
+                    else if (hit.transform.gameObject.layer == 11)
+                    {
+                        clockPuzzle = true;
+                    }
+                   
+                }
+                else if (hit.transform.gameObject.layer == 10)
                 {
                     door = true;
-
-                }else if (hit.transform.gameObject.layer == 11)
-                {
-                    clockGameObject = hit.collider.gameObject;
-                    baseMaterial = clockGameObject.GetComponent<MeshRenderer>().materials[0];
-                    clockGameObject.GetComponent<MeshRenderer>().materials = new Material[]
-                    {
-                    clockGameObject.GetComponent<MeshRenderer>().materials[0],
-
-                    material
-                    };
-                    clockPuzzle = true;
                 }
+
             }
             else if (!Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit2, 10f, interactLayerMask))
             {
                 door=false;
+                item = false;
                 clockPuzzle = false;
                 if (interactiveGameObject != null)
                 {
                     interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
                     interactiveGameObject = null;
-                }
-                if(clockGameObject != null)
-                {
-                    clockGameObject.GetComponent<MeshRenderer>().materials = new Material[] { clockGameObject.GetComponent<MeshRenderer>().materials[0] };
-                    clockGameObject = null;
                 }
                 //onNotInteractuable?.Invoke();
             }

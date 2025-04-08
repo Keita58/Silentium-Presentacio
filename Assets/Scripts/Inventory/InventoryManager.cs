@@ -1,4 +1,6 @@
+using System.Linq;
 using System.Linq.Expressions;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,7 +16,9 @@ public class InventoryManager : MonoBehaviour
 
     [SerializeField] Player player;
     [SerializeField] InventorySO inventory;
+    [SerializeField] NoteInventorySO noteInventory;
     [SerializeField] GameObject notesRoot;
+    [SerializeField] GameObject panelNotes;
     public bool isCombining { get; private set; }
     private Item targetItemToCombine;
     private void Awake()
@@ -207,5 +211,32 @@ public class InventoryManager : MonoBehaviour
     public void ChangeSelectedItem()
     {
         inventoryUI.GetComponent<ShowInventory>().ChangeItemSelected();
+    }
+
+    public void OpenNote(NotesSO note)
+    {
+        panelNotes.SetActive(true);
+        panelNotes.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text=note.name;
+        panelNotes.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = note.noteContent;
+    }
+
+    public void DiscoverNote(NotesSO note)
+    {
+        noteInventory.AddNote(note);
+    }
+
+    public void ShowDiscoveredNotes()
+    {
+        for (int i = 0; i < noteInventory.notes.Count; i++)
+        {
+            for (int j = 0; j < notesRoot.transform.childCount; j++)
+            {
+                if (noteInventory.notes.ElementAt(i).noteId == notesRoot.transform.GetChild(j).GetComponent<NotesButton>().id)
+                {
+                    notesRoot.transform.GetChild(j).GetComponent<Button>().interactable = true;
+                    notesRoot.transform.GetChild(j).GetChild(0).GetComponent<TextMeshProUGUI>().text = noteInventory.notes.ElementAt(i).name;
+                }
+            }
+        }
     }
 }
