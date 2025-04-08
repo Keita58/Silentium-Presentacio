@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Item - Throwable", menuName = "Scriptable Objects/Items/Item - Throwable")]
@@ -15,19 +16,36 @@ public class ThrowableItem : Item
     [SerializeField] private GameObject prefab;
     public override GameObject prefabToEquip => prefab;
 
+    [SerializeField] private bool stackable;
+    public override bool isStackable => stackable;
+
+    [SerializeField] private ItemTypes itemType;
+    public override ItemTypes ItemType => itemType;
+
+    public override List<Item> combinableItems => throw new System.NotImplementedException();
+
+    [SerializeField] private bool usable;
+    public override bool isUsable => usable;
+
+    [SerializeField] private bool equipable;
+    public override bool isEquipable => equipable;
+
+    [SerializeField] private bool combinable;
+    public override bool isCombinable => combinable;
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public override void Use()
     {
     }
 
-    public override void Combine()
+    public override void Combine(Item item)
     {
         throw new System.NotImplementedException();
     }
 
     public override void Equip()
     {
-        GameManager.instance.EquipThrowableItem(this, prefab);
+        InventoryManager.instance.EquipThrowableItem(this, prefab);
     }
 }

@@ -10,18 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 93a2625516f24b447be9ad1d9f42861e, type: 3}
-  m_Name: Item - Healing
+  m_Name: Amoxicilina
   m_EditorClassIdentifier: 
-  nom: Healing
-  description: A healign item
-  sprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
-  healing: 3
+  nom: Amoxicilina
+  description: aaaaaa
+  sprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+  healing: 2
   prefab: {fileID: 0}
-  itemsToCombine:
-  - {fileID: 11400000}
-  stackable: 1
-  itemType: 1
+  itemsToCombine: []
+  stackable: 0
+  itemType: 0
   usable: 1
   equipable: 0
-  combinable: 1
-  itemAfterCombineParacetamol: {fileID: 11400000, guid: 4a930a82e1db5ed4db7bb072b980d6c1, type: 2}
+  combinable: 0
+  itemAfterCombineParacetamol: {fileID: 0}
