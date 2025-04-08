@@ -65,7 +65,10 @@ public class FastEnemy : Enemy
         if (newState == _CurrentState)
             return;
 
+        Debug.Log($"---------------------- Sortint de {_CurrentState} a {newState} ------------------------");
         ExitState(_CurrentState);
+
+        Debug.Log($"---------------------- Entrant a {newState} ------------------------");
         InitState(newState);
     }
 
@@ -108,6 +111,10 @@ public class FastEnemy : Enemy
                     StopCoroutine(_SoundCoroutine);
                 if(_StopChaseCoroutine != null)
                     StopCoroutine(_StopChaseCoroutine);
+                if(_DetectPlayerCoroutine != null)
+                    StopCoroutine(_DetectPlayerCoroutine);
+
+                StopAllCoroutines();
                 break;
         }
     }
@@ -133,6 +140,7 @@ public class FastEnemy : Enemy
                 StopCoroutine(_DetectPlayerCoroutine);
                 break;
             case EnemyStates.SEARCH:
+                StopCoroutine(_ChangeToPatrolCoroutine);
                 StopCoroutine(_SoundCoroutine);
                 StopCoroutine(_DetectPlayerCoroutine);
                 break;
@@ -146,6 +154,8 @@ public class FastEnemy : Enemy
                 break;
             case EnemyStates.KNOCKED:
                 _Hp = MAXHEALTH;
+                break;
+            case EnemyStates.STOPPED:
                 break;
         }
     }
@@ -300,7 +310,6 @@ public class FastEnemy : Enemy
 
                         if(Vector3.Distance(transform.position, info.transform.position) > 2)
                         {
-                            _Chase = true;
                             Debug.Log("Veig al jugador lluny");
                             if (_CurrentState != EnemyStates.CHASE)
                                 ChangeState(EnemyStates.CHASE);
@@ -314,17 +323,18 @@ public class FastEnemy : Enemy
                                 ChangeState(EnemyStates.ATTACK);
                         }
                     }
-                    else if(!_Wait)
+                    else
                     {
-                        _Wait = true;
-                        _ChangeToPatrolCoroutine = StartCoroutine(WaitChange());
+                        if (_ChangeToPatrolCoroutine == null)
+                            _ChangeToPatrolCoroutine = StartCoroutine(WaitChange());
                     }
                 }
             }
-            else if (_Chase)
+            else if (_CurrentState == EnemyStates.CHASE)
             {
                 RandomPoint(_Player.transform.position, 2, out Vector3 point);
-                _StopChaseCoroutine = StartCoroutine(StopChase());
+                if(_StopChaseCoroutine == null)
+                    _StopChaseCoroutine = StartCoroutine(StopChase());
                 _NavMeshAgent.SetDestination(point);
             }
         }
@@ -372,7 +382,7 @@ public class FastEnemy : Enemy
     IEnumerator StopChase()
     {
         yield return new WaitForSeconds(5);
-        _Chase = false;
+        ChangeState(EnemyStates.PATROL);
     }
 
     IEnumerator WaitChange()
@@ -386,7 +396,7 @@ public class FastEnemy : Enemy
     {
         while(true)
         {
-            Collider[] aux = Physics.OverlapSphere(transform.position, 10f, _LayerPlayer);
+            Collider[] aux = Physics.OverlapSphere(transform.position, 25f, _LayerPlayer);
             if (aux.Length > 0)
             {
                 float alphaDocProduct = Vector3.Dot(transform.forward, (_Player.transform.position - this.transform.position).normalized);
@@ -413,13 +423,14 @@ public class FastEnemy : Enemy
                                     ChangeState(EnemyStates.ATTACK);
                                 else
                                 {
-                                    _RangeChaseAfterStop = 25;
+                                    _RangeChaseAfterStop = 28;
                                     ChangeState(EnemyStates.CHASE);
                                 }
                             }
                         }
-                        else
+                        else if(!_Wait)
                         {
+                            _Wait = true;
                             _NavMeshAgent.SetDestination(transform.position);
                             _SoundPos = transform.position;
                             ChangeState(EnemyStates.SEARCH);
@@ -429,7 +440,7 @@ public class FastEnemy : Enemy
             }
             else if (_CurrentState == EnemyStates.STOPPED)
             {
-                _RangeChaseAfterStop = 25;
+                _RangeChaseAfterStop = 28;
                 ChangeState(EnemyStates.CHASE);
             }
 
