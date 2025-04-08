@@ -375,6 +375,11 @@ public class Player : MonoBehaviour
             //Lanzar Raycast interactuar con el mundo.
 
             if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask)){
+                if (interactiveGameObject != null)
+                {
+                    interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
+                    interactiveGameObject = null;
+                }
                 if (!hit.collider.gameObject.Equals(interactiveGameObject) && hit.transform.gameObject.layer != 10)
                 {
                     interactiveGameObject = hit.collider.gameObject;
@@ -395,8 +400,7 @@ public class Player : MonoBehaviour
                     else if (hit.transform.gameObject.layer == 11)
                     {
                         clockPuzzle = true;
-                    }
-                   
+                    }  
                 }
                 else if (hit.transform.gameObject.layer == 10)
                 {
