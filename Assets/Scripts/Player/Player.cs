@@ -198,6 +198,13 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void UnequipItem()
+    {
+        itemSlotOccuped = false;
+        Destroy(equipedObject);
+        equipedObject=null;
+    }
+
     private void Crouch(InputAction.CallbackContext context)
     {
         crouched = !crouched;

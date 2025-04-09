@@ -19,7 +19,7 @@ MonoBehaviour:
   prefab: {fileID: 0}
   itemsToCombine:
   - {fileID: 11400000}
-  stackable: 0
+  stackable: 1
   itemType: 1
   usable: 1
   equipable: 0

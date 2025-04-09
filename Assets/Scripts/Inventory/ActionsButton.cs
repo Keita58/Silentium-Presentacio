@@ -17,4 +17,9 @@ public class ActionsButton : MonoBehaviour
     {
         InventoryManager.instance.EquipItem();
     }
+
+    public void ClickUnequipButton()
+    {
+        InventoryManager.instance.UnequipItem();
+    }
 }

@@ -14,6 +14,12 @@ public class ShowInventory : MonoBehaviour
     [SerializeField] InventorySO inventory;
 
     [SerializeField] GameObject itemPrefab;
+    [SerializeField] GameObject itemEquippedSlotPrefab;
+
+    [SerializeField] GameObject equippedItemSlot;
+
+    [SerializeField] Item equippedItem;
+
 
 
     public void Show()
@@ -28,6 +34,13 @@ public class ShowInventory : MonoBehaviour
             displayedItem.GetComponent<ShowItem>().Load(inventory.items[i]);
             displayedItem.GetComponent<ShowItem>().OnUseItem += Show;
         }
+        
+        if (equippedItem!=null)
+        {
+            GameObject usingItem = Instantiate(itemEquippedSlotPrefab, equippedItemSlot.transform);
+            usingItem.GetComponent<ShowEquippedItem>().Load(equippedItem);
+        }
+
     }
 
     public void Hide()
@@ -40,6 +53,11 @@ public class ShowInventory : MonoBehaviour
                 Destroy(child.GetChild(i).gameObject);
             }
         }
+        for (int i = 0; i < equippedItemSlot.transform.childCount; i++)
+        {
+            Destroy(equippedItemSlot.transform.GetChild(i).gameObject);
+        }
+
     }
 
     public void ShowHideItemsToCombine(List<Item> itemsToCombine, Item selfItem)
@@ -86,5 +104,11 @@ public class ShowInventory : MonoBehaviour
                 child.GetChild(i).GetComponent<Image>().color = Color.white;
             }
         }
+    }
+
+    public void SetEquippedItem(Item item)
+    {
+        equippedItem = item;
+        this.Show();
     }
 }
