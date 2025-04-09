@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05fddcd6ae62fb44a8090a13224fa9b4, type: 3}
   m_Name: NotaReloj
   m_EditorClassIdentifier: 
-  Name: Septiembre del 1802
+  Name: 21 de Septiembre del 1802
   noteId: 7
   noteContent: "Napole\xF3n Bonaparte anexa el Piamonte a Francia."

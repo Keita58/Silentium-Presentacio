@@ -15,6 +15,8 @@ public class Door : MonoBehaviour
 
     [SerializeField] private bool isHideSpot = false;
 
+    [SerializeField] private bool isLocked = false;
+
     private Vector3 startRotation;
 
     private void Awake()
@@ -22,16 +24,22 @@ public class Door : MonoBehaviour
         isOpen = false;
         startRotation = transform.localRotation.eulerAngles;
     }
-
+    public void SetLocked(bool locked)
+    {
+        this.isLocked = locked;
+    }
     public void Open(Vector3 playerPosition)
     {
-        if (!isOpen)
+        if (!isLocked)
         {
-            StopAllCoroutines();
-            //dado el forward que le pasamos y el segundo parametro es la direccion al player normalizada que nos devuelve negativo o positivo para saber si esta delante o detras.
-            float dot = Vector3.Dot(this.transform.forward, (playerPosition - transform.position).normalized);
-            Debug.Log("DOT: " + dot);
-            StartCoroutine(DoRotationOpen(dot));
+            if (!isOpen)
+            {
+                StopAllCoroutines();
+                //dado el forward que le pasamos y el segundo parametro es la direccion al player normalizada que nos devuelve negativo o positivo para saber si esta delante o detras.
+                float dot = Vector3.Dot(this.transform.forward, (playerPosition - transform.position).normalized);
+                Debug.Log("DOT: " + dot);
+                StartCoroutine(DoRotationOpen(dot));
+            }
         }
     }
 
@@ -74,12 +82,15 @@ public class Door : MonoBehaviour
 
     public void Close()
     {
-        if (isOpen)
+        if (!isLocked)
         {
-            StopAllCoroutines();
-            //dado el forward que le pasamos y el segundo parametro es la direccion al player normalizada que nos devuelve negativo o positivo para saber si esta delante o detras.
-            //float dot = Vector3.Dot(this.transform.forward, (playerPosition - transform.position).normalized);
-            StartCoroutine(DoRotationClose());
+            if (isOpen)
+            {
+                StopAllCoroutines();
+                //dado el forward que le pasamos y el segundo parametro es la direccion al player normalizada que nos devuelve negativo o positivo para saber si esta delante o detras.
+                //float dot = Vector3.Dot(this.transform.forward, (playerPosition - transform.position).normalized);
+                StartCoroutine(DoRotationClose());
+            }
         }
     }
 

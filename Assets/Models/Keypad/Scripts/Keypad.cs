@@ -3,6 +3,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 namespace NavKeypad
 {
@@ -14,21 +15,12 @@ namespace NavKeypad
         [Header("Combination Code (9 Numbers Max)")]
         [SerializeField] private int keypadCombo = 12345;
 
-        public UnityEvent OnAccessGranted => onAccessGranted;
-        public UnityEvent OnAccessDenied => onAccessDenied;
-
         [Header("Settings")]
         [SerializeField] private string accessGrantedText = "Granted";
         [SerializeField] private string accessDeniedText = "Denied";
 
         [Header("Visuals")]
         [SerializeField] private float displayResultTime = 1f;
-        [Range(0, 5)]
-        [SerializeField] private float screenIntensity = 2.5f;
-        [Header("Colors")]
-        [SerializeField] private Color screenNormalColor = new Color(0.98f, 0.50f, 0.032f, 1f); //orangy
-        [SerializeField] private Color screenDeniedColor = new Color(1f, 0f, 0f, 1f); //red
-        [SerializeField] private Color screenGrantedColor = new Color(0f, 0.62f, 0.07f); //greenish
         [Header("SoundFx")]
         [SerializeField] private AudioClip buttonClickedSfx;
         [SerializeField] private AudioClip accessDeniedSfx;
@@ -38,15 +30,19 @@ namespace NavKeypad
         [SerializeField] private TMP_Text keypadDisplayText;
         [SerializeField] private AudioSource audioSource;
 
-
+        [SerializeField] Door door;
         private string currentInput;
         private bool displayingResult = false;
         private bool accessWasGranted = false;
 
+
+        public InputSystem_Actions inputActions { get; private set; }
         private void Awake()
         {
+            door.SetLocked(true);
+            inputActions = new InputSystem_Actions();
+            inputActions.Hieroglyphic.Exit.started += ExitPuzzle;
             ClearInput();
-            panelMesh.material.SetVector("_EmissionColor", screenNormalColor * screenIntensity);
         }
 
 
@@ -81,10 +77,6 @@ namespace NavKeypad
                     StartCoroutine(DisplayResultRoutine(granted));
                 }
             }
-            else
-            {
-                Debug.LogWarning("Couldn't process input for some reason..");
-            }
 
         }
 
@@ -100,15 +92,12 @@ namespace NavKeypad
             displayingResult = false;
             if (granted) yield break;
             ClearInput();
-            panelMesh.material.SetVector("_EmissionColor", screenNormalColor * screenIntensity);
-
         }
 
         private void AccessDenied()
         {
             keypadDisplayText.text = accessDeniedText;
             onAccessDenied?.Invoke();
-            panelMesh.material.SetVector("_EmissionColor", screenDeniedColor * screenIntensity);
             audioSource.PlayOneShot(accessDeniedSfx);
         }
 
@@ -120,12 +109,15 @@ namespace NavKeypad
 
         private void AccessGranted()
         {
+            door.SetLocked(false);
             accessWasGranted = true;
             keypadDisplayText.text = accessGrantedText;
-            onAccessGranted?.Invoke();
-            panelMesh.material.SetVector("_EmissionColor", screenGrantedColor * screenIntensity);
+            PuzzleManager.instance.HieroglyphicPuzzleExit();
             audioSource.PlayOneShot(accessGrantedSfx);
         }
-
+        private void ExitPuzzle(InputAction.CallbackContext context)
+        {
+            PuzzleManager.instance.HieroglyphicPuzzleExit();
+        }
     }
 }
