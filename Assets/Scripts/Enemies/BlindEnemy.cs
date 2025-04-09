@@ -14,10 +14,8 @@ public class BlindEnemy : Enemy
 
     private NavMeshAgent _NavMeshAgent;
     private Vector3 _SoundPos;
-    private bool _SearchSound;
     private bool _Detected;
     private bool _Patrolling;
-    private bool _Wait;
     private bool _Attack;
 
     private int _Hp;
@@ -26,18 +24,16 @@ public class BlindEnemy : Enemy
     private int _DownTime;
     public override int downTime => _DownTime;
 
+    private float _RangeSearchSound;
     private int MAXHEALTH = 2;
-    private int _RangeSearchSound;
 
     private void Awake()
     {
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
-        _RangeSearchSound = 0;
-        _SearchSound = false;
+        _RangeSearchSound = 5;
         _Detected = false;
         _Patrolling = false;
-        _Wait = false;
         _Attack = false;
         _Hp = MAXHEALTH;
     }
@@ -117,49 +113,52 @@ public class BlindEnemy : Enemy
     }
 
     // Funció per moure l'enemic pel mapa
-    IEnumerator Patrol()
+    IEnumerator Patrol(int range, Vector3 pointOfSearch)
     {
-        Vector3 coord = Vector3.zero;
-        float range = 15.0f;
-        while (!_Detected)
+        Vector3 point = Vector3.zero;
+        while (true)
         {
             if (!_Patrolling)
             {
-                if (RandomPoint(transform.position, range, out coord))
-                {
-                    Debug.DrawRay(coord, Vector3.up, UnityEngine.Color.black, 1.0f);
-                }
-
-                _NavMeshAgent.speed = 4;
-                _NavMeshAgent.SetDestination(new Vector3(coord.x, transform.position.y, coord.z));
+                RandomPoint(pointOfSearch, range, out Vector3 coord);
+                point = coord;
+                _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
                 _Patrolling = true;
             }
 
-            if (transform.position == new Vector3(coord.x, transform.position.y, coord.z))
+            if (Vector3.Distance(point, transform.position) < 3)
             {
                 _Patrolling = false;
+                yield return new WaitForSeconds(2);
             }
-            yield return new WaitForSeconds(2);
+            else
+                yield return new WaitForSeconds(0.5f);
         }
     }
 
     //Busca punt aleatori dins del NavMesh
     private bool RandomPoint(Vector3 center, float range, out Vector3 result)
     {
-        for (int i = 0; i < 30; i++)
+        for (int i = 0; i < 50; i++)
         {
             //Agafa un punt aleatori dins de l'esfera amb el radi que passem per parametre
-            Vector3 randomPoint = center + UnityEngine.Random.insideUnitSphere * range;
+            Vector3 randomPoint = new Vector3(center.x, center.y, center.z) + Random.insideUnitSphere * range;
+
+            //Aquí s'haurà de comprovar si la y que hem extret està en algun dels pisos de l'edifici.
+            //Si està aprop la transformem en aquest i ja
+
+            Vector3 point = new Vector3(randomPoint.x, randomPoint.y, randomPoint.z);
+
             NavMeshHit hit;
 
             //Comprovem que el punt que hem agafat esta dins del NavMesh
-            if (NavMesh.SamplePosition(randomPoint, out hit, 1.0f, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(point, out hit, 1.0f, NavMesh.AllAreas) && Vector3.Distance(point, center) > 1.75f)
             {
                 result = hit.position;
                 return true;
             }
         }
-        result = Vector3.zero;
+        result = center;
         return false;
     }
 
@@ -182,15 +181,15 @@ public class BlindEnemy : Enemy
         {
             if (lvlSound > 0 && lvlSound <= 2)
             {
-                RandomPoint(_SoundPos, 5, out _);
+                _RangeSearchSound = 3;
             }
             else if (lvlSound > 2 && lvlSound <= 3)
             {
-                RandomPoint(_SoundPos, 3, out _);
+                _RangeSearchSound = 1;
             }
             else if (lvlSound > 3 && lvlSound <= 5)
             {
-                RandomPoint(_SoundPos, 2, out _);
+                _RangeSearchSound = 0.3;
             }
             else if (lvlSound > 5)
             {
