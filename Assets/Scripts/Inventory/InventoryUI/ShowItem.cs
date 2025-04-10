@@ -23,10 +23,13 @@ public class ShowItem : MonoBehaviour
         if (!InventoryManager.instance.isCombining)
         {
             Debug.Log("Clico Item");
-            InventoryManager.instance.ChangeSelectedItem();
             InventoryManager.instance.ItemSelected(selectedItem);
             this.GetComponent<Image>().color = Color.magenta;
             this.GetComponent<Button>().interactable = false;
+        }else if (InventoryManager.instance.chestOpened)
+        {
+            this.GetComponent<Button>().interactable = false;
+            InventoryManager.instance.ItemSelected(selectedItem);
         }
         else
         {

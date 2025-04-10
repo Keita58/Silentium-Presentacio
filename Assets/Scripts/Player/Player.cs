@@ -51,12 +51,15 @@ public class Player : MonoBehaviour
     GameObject equippedItem;
     [SerializeField] private Material baseMaterial;
     private GameObject itemEquipped;
-    private bool inventoryOpened;
+    public bool inventoryOpened;
     private bool itemSlotOccuped;
     [SerializeField] private GameObject equipedObject;
     [SerializeField] Transform itemSlot;
     bool door=false;
     bool clockPuzzle = false;
+    bool item = false;
+    bool note = false;
+    bool chest = false;
     private GameObject clockGameObject;
 
     private Coroutine coroutineRun;
@@ -73,10 +76,33 @@ public class Player : MonoBehaviour
         _RunAction = _inputActions.Player.Run;
         _inputActions.Player.Shoot.performed+=Shoot;
         _inputActions.Player.Aim.performed +=Aim;
-        _inputActions.Player.PickUpItem.performed +=PickUpItem;
+        _inputActions.Player.PickUpItem.performed +=Interact;
         _inputActions.Player.Inventory.performed += OpenInventory;
         _Rigidbody= GetComponent<Rigidbody>();
         _inputActions.Player.Enable();
+    }
+
+    public void ToggleInputPlayer(bool enable)
+    {
+        if (!enable)
+        {
+            _inputActions.Player.Shoot.Disable();
+            _inputActions.Player.Aim.Disable();
+            _inputActions.Player.Move.Disable();
+            _inputActions.Player.Look.Disable();
+            _inputActions.Player.Crouch.Disable();
+            _inputActions.Player.PickUpItem.Disable();
+        }
+        else
+        {
+            _inputActions.Player.Shoot.Enable();
+            _inputActions.Player.Aim.Enable();
+            _inputActions.Player.Move.Enable();
+            _inputActions.Player.Look.Enable();
+            _inputActions.Player.Crouch.Enable();
+            _inputActions.Player.PickUpItem.Enable();
+        }
+
     }
 
 
@@ -89,25 +115,14 @@ public class Player : MonoBehaviour
             Cursor.visible = true;
             InventoryManager.instance.OpenInventory(this.gameObject);
             inventoryOpened = true;
-            _inputActions.Player.Shoot.Disable();
-            _inputActions.Player.Aim.Disable();
-            _inputActions.Player.Move.Disable();
-            _inputActions.Player.Look.Disable();
-            _inputActions.Player.Crouch.Disable();
-            _inputActions.Player.PickUpItem.Disable();
-
+            ToggleInputPlayer(false);
         }
         else
         {
             Cursor.visible = false;
             InventoryManager.instance.CloseInventory();
             inventoryOpened = false;
-            _inputActions.Player.Shoot.Enable();
-            _inputActions.Player.Aim.Enable();
-            _inputActions.Player.Move.Enable();
-            _inputActions.Player.Look.Enable();
-            _inputActions.Player.Crouch.Enable();
-            _inputActions.Player.PickUpItem.Enable();
+            ToggleInputPlayer(true);
         }
     }
 
@@ -132,10 +147,10 @@ public class Player : MonoBehaviour
 
     }
 
-    private void PickUpItem(InputAction.CallbackContext context)
+    private void Interact(InputAction.CallbackContext context)
     {
         Debug.Log("ENTRO?");
-        if (interactiveGameObject != null)
+        if (interactiveGameObject != null && item)
         {
             Debug.Log("ENTRO DEFINITIVAMENTE");
             InventoryManager.instance.AddItem(interactiveGameObject.GetComponent<PickItem>().item);
@@ -153,13 +168,37 @@ public class Player : MonoBehaviour
                 {
                     if (hit.collider.TryGetComponent<Door>(out Door door))
                     {
-                        if (door.isOpen)
+                        if (door.isLocked)
                         {
-                            door.Close();
+                            InventorySO.ItemSlot aux = null;
+                            foreach (InventorySO.ItemSlot item in InventoryManager.instance.inventory.items)
+                            {
+                                if (item.item == door.itemNeededToOpen)
+                                {
+                                    door.isLocked = false;
+                                    aux = item;
+                                }
+                            }
+                            InventoryManager.instance.inventory.items.Remove(aux);
+                            if (door.isOpen)
+                            {
+                                door.Close();
+                            }
+                            else
+                            {
+                                door.Open(transform.position);
+                            }
                         }
                         else
                         {
-                            door.Open(transform.position);
+                            if (door.isOpen)
+                            {
+                                door.Close();
+                            }
+                            else
+                            {
+                                door.Open(transform.position);
+                            }
                         }
                     }
                 }
@@ -168,7 +207,20 @@ public class Player : MonoBehaviour
                 PuzzleManager.instance.InteractClockPuzzle();
                 StopCoroutine(coroutineInteract);
                 clockPuzzle = false;
-            } 
+
+            }else if (interactiveGameObject!=null && note)
+            {
+                if (interactiveGameObject.GetComponent<Notes>().note.noteId < 6)
+                {
+                    InventoryManager.instance.DiscoverNote(interactiveGameObject.GetComponent<Notes>().note);
+                    interactiveGameObject.gameObject.SetActive(false);
+                }
+            }
+            else if (chest)
+            {
+                InventoryManager.instance.OpenChest();
+                chest = false;
+            }
         }
 
     }
@@ -187,6 +239,13 @@ public class Player : MonoBehaviour
             itemSlotOccuped = true;
             equipedObject = equip;
         }
+    }
+
+    public void UnequipItem()
+    {
+        itemSlotOccuped = false;
+        Destroy(equipedObject);
+        equipedObject=null;
     }
 
     private void Crouch(InputAction.CallbackContext context)
@@ -366,7 +425,12 @@ public class Player : MonoBehaviour
             //Lanzar Raycast interactuar con el mundo.
 
             if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask)){
-                if (hit.transform.gameObject.layer== 9 && !hit.collider.gameObject.Equals(interactiveGameObject))
+                if (interactiveGameObject != null)
+                {
+                    interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
+                    interactiveGameObject = null;
+                }
+                if (!hit.collider.gameObject.Equals(interactiveGameObject) && hit.transform.gameObject.layer != 10)
                 {
                     interactiveGameObject = hit.collider.gameObject;
                     baseMaterial = interactiveGameObject.GetComponent<MeshRenderer>().materials[0];
@@ -376,36 +440,37 @@ public class Player : MonoBehaviour
 
                     material
                     };
-                }else if (hit.transform.gameObject.layer == 10)
+                    if (hit.transform.gameObject.layer == 9)
+                    {
+                        item = true;
+                    }else if (hit.transform.gameObject.layer == 12)
+                    {
+                        note= true;
+                    }
+                    else if (hit.transform.gameObject.layer == 11)
+                    {
+                        clockPuzzle = true;
+
+                    }else if (hit.transform.gameObject.layer == 13)
+                    {
+                        chest = true;
+                    }  
+                }
+                else if (hit.transform.gameObject.layer == 10)
                 {
                     door = true;
-
-                }else if (hit.transform.gameObject.layer == 11)
-                {
-                    clockGameObject = hit.collider.gameObject;
-                    baseMaterial = clockGameObject.GetComponent<MeshRenderer>().materials[0];
-                    clockGameObject.GetComponent<MeshRenderer>().materials = new Material[]
-                    {
-                    clockGameObject.GetComponent<MeshRenderer>().materials[0],
-
-                    material
-                    };
-                    clockPuzzle = true;
                 }
+
             }
             else if (!Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit2, 10f, interactLayerMask))
             {
                 door=false;
+                item = false;
                 clockPuzzle = false;
                 if (interactiveGameObject != null)
                 {
                     interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
                     interactiveGameObject = null;
-                }
-                if(clockGameObject != null)
-                {
-                    clockGameObject.GetComponent<MeshRenderer>().materials = new Material[] { clockGameObject.GetComponent<MeshRenderer>().materials[0] };
-                    clockGameObject = null;
                 }
                 //onNotInteractuable?.Invoke();
             }
@@ -469,7 +534,7 @@ public class Player : MonoBehaviour
     {
         _inputActions.Player.Shoot.performed -= Shoot;
         _inputActions.Player.Aim.performed -= Aim;
-        _inputActions.Player.PickUpItem.performed -= PickUpItem;
+        _inputActions.Player.PickUpItem.performed -= Interact;
         _inputActions.Player.Inventory.performed -= OpenInventory;
         _inputActions.Player.Crouch.performed += Crouch;
 

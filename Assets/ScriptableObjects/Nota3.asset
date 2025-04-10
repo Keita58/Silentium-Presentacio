@@ -9,10 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5d5eeb7c4299d849a99d23ff99ffa0e, type: 3}
-  m_Name: Inventory
+  m_Script: {fileID: 11500000, guid: 05fddcd6ae62fb44a8090a13224fa9b4, type: 3}
+  m_Name: Nota3
   m_EditorClassIdentifier: 
-  items:
-  - item: {fileID: 11400000, guid: 4a930a82e1db5ed4db7bb072b980d6c1, type: 2}
-    amount: 3
-    stackable: 0
+  Name: 
+  noteId: 2
+  noteContent: 
