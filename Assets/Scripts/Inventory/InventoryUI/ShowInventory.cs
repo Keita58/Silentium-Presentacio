@@ -63,7 +63,6 @@ public class ShowInventory : MonoBehaviour
         }
 
     }
-
     public void Hide()
     {
         parentGameObject.transform.parent.gameObject.SetActive(false);
@@ -139,9 +138,10 @@ public class ShowInventory : MonoBehaviour
         }
     }
 
-    public void SetEquippedItem(Item item)
+    public void SetEquippedItem(Item item, bool show)
     {
         equippedItem = item;
-        this.Show();
+        if (show)
+            this.Show();
     }
 }

@@ -121,7 +121,7 @@ public class InventoryManager : MonoBehaviour
             case ActionStates.SELECT_EQUIPPED:
                 ToggleActionsButtons(false);
                 unequipButton.SetActive(true);
-                inventoryUI.SetEquippedItem(equippedItem);
+                inventoryUI.SetEquippedItem(equippedItem, true);
                 unequipButton.GetComponent<Button>().interactable = true;
                 break;
             case ActionStates.ACTION_UNEQUIP:
@@ -129,8 +129,7 @@ public class InventoryManager : MonoBehaviour
                 {
                     inventory.AddItem(equippedItem);
                     equippedItem = null;
-                    inventoryUI.SetEquippedItem(null);
-                    inventoryUI.Show();
+                    inventoryUI.SetEquippedItem(null, true);
                     ChangeState(ActionStates.NOACTION);
                 }
                 else
@@ -337,6 +336,11 @@ public class InventoryManager : MonoBehaviour
             inventory.AddItem(item);
         }
         inventoryUI.Show();
+    }
 
+    public void UseEquippedItem()
+    {
+        inventoryUI.SetEquippedItem(null, false);
+        unequipButton.SetActive(false);
     }
 }

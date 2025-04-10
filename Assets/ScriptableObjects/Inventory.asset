@@ -12,7 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5d5eeb7c4299d849a99d23ff99ffa0e, type: 3}
   m_Name: Inventory
   m_EditorClassIdentifier: 
-  items:
-  - item: {fileID: 11400000, guid: 4a930a82e1db5ed4db7bb072b980d6c1, type: 2}
-    amount: 3
-    stackable: 0
+  items: []

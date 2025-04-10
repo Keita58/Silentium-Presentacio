@@ -232,11 +232,15 @@ public class Player : MonoBehaviour
             {
                 if (equipedObject != null)
                 {
+                    equipedObject.transform.rotation = Quaternion.identity;
                     equipedObject.transform.parent = null;
                     equipedObject.transform.position = interactiveGameObject.transform.GetChild(0).transform.position;
-                    equipedObject.transform.rotation = new Quaternion (0, 0, 0, 0);
                     equipedObject = null;
                     itemSlotOccuped = false;
+                    InventoryManager.instance.UseEquippedItem();
+                }
+                else
+                {
                 }
             }
         }
@@ -444,10 +448,13 @@ public class Player : MonoBehaviour
             //Lanzar Raycast interactuar con el mundo.
 
             if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask)){
-                if (interactiveGameObject != null && interactiveGameObject.gameObject.layer!=15)
+                if (interactiveGameObject != null)
                 {
-                    interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
-                    interactiveGameObject = null;
+                    if ( interactiveGameObject.transform.gameObject.layer != 15)
+                    {
+                        interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
+                        interactiveGameObject = null;
+                    }
                 }
                 if (!hit.collider.gameObject.Equals(interactiveGameObject) && hit.transform.gameObject.layer != 10)
                 {
@@ -461,6 +468,21 @@ public class Player : MonoBehaviour
 
                     material
                         };
+                    }
+                    else
+                    {
+                        Transform child =interactiveGameObject.transform.GetChild(0);
+                        if (child.childCount > 0)
+                        {
+                            Transform bookChild = child.GetChild(0);
+                            baseMaterial = bookChild.GetComponent<MeshRenderer>().materials[0];
+                            bookChild.GetComponent<MeshRenderer>().materials = new Material[]
+                            {
+                                bookChild.GetComponent<MeshRenderer>().materials[0],
+
+                                material
+                            };
+                        }
                     }
                     if (hit.transform.gameObject.layer == 9)
                     {
@@ -505,15 +527,16 @@ public class Player : MonoBehaviour
                 book=false;
                 item = false;
                 clockPuzzle = false;
-                if (interactiveGameObject != null && interactiveGameObject.gameObject.layer!=15)
+                if (interactiveGameObject != null)
                 {
-                    interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
-                    interactiveGameObject = null;
+                    if (interactiveGameObject.transform.gameObject.layer != 15)
+                    {
+                        interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
+                        interactiveGameObject = null;
+                    }
                 }
                 //onNotInteractuable?.Invoke();
             }
-
-
             // onInteractuable?.Invoke();
 
             yield return new WaitForSeconds(0.1f);
