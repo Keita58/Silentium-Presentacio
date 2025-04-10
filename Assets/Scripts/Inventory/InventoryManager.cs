@@ -14,6 +14,7 @@ public class InventoryManager : MonoBehaviour
 
     [SerializeField] Player player;
     [SerializeField] InventorySO inventory;
+    [SerializeField] GameObject notesRoot;
     public bool isCombining { get; private set; }
     private Item targetItemToCombine;
     private void Awake()
@@ -183,6 +184,7 @@ public class InventoryManager : MonoBehaviour
         //player.hp+=curacion;
         Debug.Log("Player usa item de curacion");
         inventory.UseItem(item);
+        inventoryUI.Show();
     }
 
     public void UseAmmo(int numAmmo, Item item)

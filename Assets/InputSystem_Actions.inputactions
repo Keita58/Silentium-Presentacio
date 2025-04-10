@@ -926,6 +926,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Hieroglyphic",
+            "id": "a3e2e3f8-381f-42f5-981d-330de04b2928",
+            "actions": [
+                {
+                    "name": "Exit",
+                    "type": "Button",
+                    "id": "2609d91b-f19e-4851-b9c9-489415bbdd84",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "2da97bd3-60c9-4437-b248-fcd002456f95",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Exit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [
