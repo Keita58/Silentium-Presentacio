@@ -30,13 +30,15 @@ public class Player : MonoBehaviour
 
     float maxAngle = 45.0f;
     float minAngle = -30.0f;
+    float gravity = 9.8f;
+    float vSpeed = 0f;
 
-    bool crouched=false;
-    bool aim=false;
+    bool crouched = false;
+    bool aim = false;
     float crouchedCenterCollider = -0.5f;
     float crouchedHeightCollider = 1;
     Vector3 cameraPositionBeforeCrouch = new Vector3(0, 0.627f, -0.198f);
-    int gunAmmo =3;
+    int gunAmmo = 3;
     int hp = 5;
 
     [SerializeField] GameObject cameraShenanigansGameObject;
@@ -55,7 +57,7 @@ public class Player : MonoBehaviour
     private bool itemSlotOccuped;
     [SerializeField] private GameObject equipedObject;
     [SerializeField] Transform itemSlot;
-    bool door=false;
+    bool door = false;
     bool clockPuzzle = false;
     bool item = false;
     bool note = false;
@@ -66,6 +68,8 @@ public class Player : MonoBehaviour
     private Coroutine coroutineMove;
     private Coroutine coroutineCrouch;
     private Coroutine coroutineInteract;
+    CharacterController characterController;
+    Vector3 velocity;
 
     private void Awake()
     {
@@ -74,12 +78,13 @@ public class Player : MonoBehaviour
         _MoveAction = _inputActions.Player.Move;
         _LookAction = _inputActions.Player.Look;
         _RunAction = _inputActions.Player.Run;
-        _inputActions.Player.Shoot.performed+=Shoot;
-        _inputActions.Player.Aim.performed +=Aim;
-        _inputActions.Player.PickUpItem.performed +=Interact;
+        _inputActions.Player.Shoot.performed += Shoot;
+        _inputActions.Player.Aim.performed += Aim;
+        _inputActions.Player.PickUpItem.performed += Interact;
         _inputActions.Player.Inventory.performed += OpenInventory;
-        _Rigidbody= GetComponent<Rigidbody>();
+        _Rigidbody = GetComponent<Rigidbody>();
         _inputActions.Player.Enable();
+        characterController = GetComponent<CharacterController>();
     }
 
     public void ToggleInputPlayer(bool enable)
@@ -129,7 +134,7 @@ public class Player : MonoBehaviour
     void Start()
     {
         Cursor.visible = false;
-        coroutineInteract= StartCoroutine(InteractuarRaycast());
+        coroutineInteract = StartCoroutine(InteractuarRaycast());
     }
 
     private void Update()
@@ -202,13 +207,15 @@ public class Player : MonoBehaviour
                         }
                     }
                 }
-            }else if (clockPuzzle)
+            }
+            else if (clockPuzzle)
             {
                 PuzzleManager.instance.InteractClockPuzzle();
                 StopCoroutine(coroutineInteract);
                 clockPuzzle = false;
 
-            }else if (interactiveGameObject!=null && note)
+            }
+            else if (interactiveGameObject != null && note)
             {
                 if (interactiveGameObject.GetComponent<Notes>().note.noteId < 6)
                 {
@@ -245,7 +252,7 @@ public class Player : MonoBehaviour
     {
         itemSlotOccuped = false;
         Destroy(equipedObject);
-        equipedObject=null;
+        equipedObject = null;
     }
 
     private void Crouch(InputAction.CallbackContext context)
@@ -271,20 +278,20 @@ public class Player : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        hp-=damage;
+        hp -= damage;
     }
 
 
     private void Aim(InputAction.CallbackContext context)
     {
-        aim= !aim;
-        gunGameObject.transform.localPosition = aim ? new Vector3 (0.057f, -0.312999994f, 0.391000003f) : new Vector3(0.456f, -0.313f, 0.505f);
-        weaponCamera.transform.localPosition= aim ?  new Vector3 (0f, 0f, -0.28f) : Vector3.zero;
+        aim = !aim;
+        gunGameObject.transform.localPosition = aim ? new Vector3(0.057f, -0.312999994f, 0.391000003f) : new Vector3(0.456f, -0.313f, 0.505f);
+        weaponCamera.transform.localPosition = aim ? new Vector3(0f, 0f, -0.28f) : Vector3.zero;
     }
 
     #region FSM
 
-    enum PlayerStates {IDLE, MOVE, RUN, HURT, RUNMOVE, CROUCH }
+    enum PlayerStates { IDLE, MOVE, RUN, HURT, RUNMOVE, CROUCH }
     [SerializeField] PlayerStates actualState;
     [SerializeField] float stateTime;
 
@@ -304,7 +311,7 @@ public class Player : MonoBehaviour
         {
             case PlayerStates.IDLE:
                 _Rigidbody.linearVelocity = Vector3.zero;
-                _Rigidbody.angularVelocity=Vector3.zero;
+                _Rigidbody.angularVelocity = Vector3.zero;
                 break;
             case PlayerStates.MOVE:
                 coroutineMove = StartCoroutine(MakeNoiseMove());
@@ -327,7 +334,6 @@ public class Player : MonoBehaviour
     private void UpdateState()
     {
         Vector2 movementInput = _MoveAction.ReadValue<Vector2>();
-
         switch (actualState)
         {
 
@@ -335,7 +341,9 @@ public class Player : MonoBehaviour
                 if (movementInput != Vector2.zero && !crouched)
                 {
                     ChangeState(PlayerStates.MOVE);
-                }else if (crouched)
+
+                }
+                else if (crouched)
                 {
                     ChangeState(PlayerStates.CROUCH);
                 }
@@ -343,61 +351,61 @@ public class Player : MonoBehaviour
             case PlayerStates.MOVE:
                 if (movementInput == Vector2.zero)
                     ChangeState(PlayerStates.IDLE);
-                
+
                 if (_RunAction.IsPressed() && !crouched)
                 {
                     ChangeState(PlayerStates.RUN);
-                }else if (crouched)
+                }
+                else if (crouched)
                 {
                     ChangeState(PlayerStates.CROUCH);
                 }
 
-                _Rigidbody.linearVelocity =
-                ((transform.right * movementInput.x +
-                transform.forward * movementInput.y)
-                .normalized * _VelocityMove) + (Vector3.up * _Rigidbody.linearVelocity.y);
+                velocity = (transform.right * movementInput.x +
+                  transform.forward * movementInput.y).normalized * _VelocityMove;
+                vSpeed -= gravity * Time.deltaTime;
+                velocity.y = vSpeed;
+
                 break;
             case PlayerStates.RUN:
-
-                _Rigidbody.linearVelocity =
-                (transform.right * movementInput.x +
-                transform.forward * movementInput.y)
-                .normalized * _VelocityRun;
-
-
+                velocity = (transform.right * movementInput.x +
+                  transform.forward * movementInput.y).normalized * _VelocityRun;
+                vSpeed -= gravity * Time.deltaTime;
+                velocity.y = vSpeed;
                 if (!_RunAction.IsPressed())
                     ChangeState(PlayerStates.MOVE);
                 break;
             case PlayerStates.CROUCH:
-                _Rigidbody.linearVelocity =
-                (transform.right * movementInput.x +
-                transform.forward * movementInput.y)
-                .normalized * _VelocityMove/2;
+                velocity = (transform.right * movementInput.x +
+               transform.forward * movementInput.y).normalized * 1.5f;
+                vSpeed -= gravity * Time.deltaTime;
+                velocity.y = vSpeed;
                 if (!crouched && movementInput == Vector2.zero)
                 {
                     ChangeState(PlayerStates.IDLE);
-                }else if (!crouched)
+                }
+                else if (!crouched)
                 {
                     ChangeState(PlayerStates.MOVE);
                 }
                 break;
             default:
                 break;
-
         }
+        characterController.Move(velocity * Time.deltaTime);
     }
 
 
-        private void ExitState(PlayerStates exitState)
+    private void ExitState(PlayerStates exitState)
     {
         switch (exitState)
         {
             case PlayerStates.MOVE:
-                if (coroutineMove!=null)
+                if (coroutineMove != null)
                     StopCoroutine(coroutineMove);
                 break;
             case PlayerStates.RUN:
-                if (coroutineRun!=null)
+                if (coroutineRun != null)
                     StopCoroutine(coroutineRun);
                 break;
             case PlayerStates.CROUCH:
@@ -424,7 +432,8 @@ public class Player : MonoBehaviour
             Debug.DrawRay(_Camera.transform.position, _Camera.transform.forward, Color.magenta, 5f);
             //Lanzar Raycast interactuar con el mundo.
 
-            if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask)){
+            if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask))
+            {
                 if (interactiveGameObject != null)
                 {
                     interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
@@ -443,18 +452,20 @@ public class Player : MonoBehaviour
                     if (hit.transform.gameObject.layer == 9)
                     {
                         item = true;
-                    }else if (hit.transform.gameObject.layer == 12)
+                    }
+                    else if (hit.transform.gameObject.layer == 12)
                     {
-                        note= true;
+                        note = true;
                     }
                     else if (hit.transform.gameObject.layer == 11)
                     {
                         clockPuzzle = true;
 
-                    }else if (hit.transform.gameObject.layer == 13)
+                    }
+                    else if (hit.transform.gameObject.layer == 13)
                     {
                         chest = true;
-                    }  
+                    }
                 }
                 else if (hit.transform.gameObject.layer == 10)
                 {
@@ -464,7 +475,7 @@ public class Player : MonoBehaviour
             }
             else if (!Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit2, 10f, interactLayerMask))
             {
-                door=false;
+                door = false;
                 item = false;
                 clockPuzzle = false;
                 if (interactiveGameObject != null)
