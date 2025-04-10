@@ -41,7 +41,7 @@ public class FastEnemy : Enemy
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
         _PointOfPatrol = transform.position;
-        _RangeSearchSound = 15;
+        _RangeSearchSound = 50;
         _RangeChaseAfterStop = 25;
         _BetaDotProduct = 60;
         _Patrolling = false;
@@ -231,7 +231,7 @@ public class FastEnemy : Enemy
                 _Patrolling = true;
             }
 
-            if (Vector3.Distance(point, transform.position) < 3)
+            if (_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
             {
                 _Patrolling = false;
                 yield return new WaitForSeconds(2);
@@ -274,7 +274,7 @@ public class FastEnemy : Enemy
     IEnumerator StopChase()
     {
         yield return new WaitForSeconds(5);
-        _RangeSearchSound = 25;
+        _RangeSearchSound = 50;
         _PointOfPatrol = transform.position;
         ChangeState(EnemyStates.PATROL);
     }

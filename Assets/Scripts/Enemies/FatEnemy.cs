@@ -15,7 +15,6 @@ public class FatEnemy : Enemy
     private Vector3 _SoundPos;
     private Vector3 _PointOfPatrol;
     private bool _Patrolling;
-    private bool _Attack;
 
     private int _Hp;
     public override int hp => _Hp;
@@ -26,6 +25,8 @@ public class FatEnemy : Enemy
     private readonly int MAXHEALTH = 6;
     private int _RangeSearchSound;
 
+    private Coroutine _PatrolCoroutine;
+    private Coroutine _AttackCoroutine;
     private Coroutine _ActivateAttackCoroutine;
     private Coroutine _ChangeToPatrolCoroutine;
 
@@ -34,9 +35,8 @@ public class FatEnemy : Enemy
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
         _PointOfPatrol = transform.position;
-        _RangeSearchSound = 10;
+        _RangeSearchSound = 50;
         _Patrolling = false;
-        _Attack = false;
         _Hp = MAXHEALTH;
 
         _DetectionSphere.GetComponent<DetectionSphere>().OnEnter += ActivateAttackCoroutine;
@@ -67,11 +67,10 @@ public class FatEnemy : Enemy
         {
             case EnemyStates.PATROL:
                 _Patrolling = false;
-                StartCoroutine(Patrol(_RangeSearchSound, _PointOfPatrol));
+                _PatrolCoroutine = StartCoroutine(Patrol(_RangeSearchSound, _PointOfPatrol));
                 break;
             case EnemyStates.ATTACK:
-                _Attack = true;
-                StartCoroutine(AttackPlayer());
+                _AttackCoroutine = StartCoroutine(AttackPlayer());
                 break;
             case EnemyStates.KNOCKED:
                 StartCoroutine(WakeUp());
@@ -84,10 +83,11 @@ public class FatEnemy : Enemy
         switch (exitState)
         {
             case EnemyStates.PATROL:
+                StopCoroutine(_PatrolCoroutine);
                 _ChangeToPatrolCoroutine = null;
                 break;
             case EnemyStates.ATTACK:
-                _Attack = false;
+                StopCoroutine(_AttackCoroutine);
                 break;
             case EnemyStates.KNOCKED:
                 _Hp = MAXHEALTH;
@@ -111,10 +111,10 @@ public class FatEnemy : Enemy
                 _Patrolling = true;
             }
 
-            if (Vector3.Distance(point, transform.position) < 3)
+            if (_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
             {
                 _Patrolling = false;
-                yield return new WaitForSeconds(2);
+                yield return new WaitForSeconds(20);
             }
             else
                 yield return new WaitForSeconds(0.5f);
@@ -135,7 +135,7 @@ public class FatEnemy : Enemy
             Vector3 point = new Vector3(randomPoint.x, randomPoint.y, randomPoint.z);
 
             NavMeshHit hit;
-
+            
             //Comprovem que el punt que hem agafat esta dins del NavMesh
             if (NavMesh.SamplePosition(point, out hit, 1.0f, NavMesh.AllAreas) && Vector3.Distance(point, center) > 1.75f)
             {
@@ -218,7 +218,7 @@ public class FatEnemy : Enemy
 
     IEnumerator AttackPlayer()
     {
-        while (_Attack)
+        while (true)
         {
             //Animation -> attack
             _Player.GetComponent<Player>().TakeDamage(1);

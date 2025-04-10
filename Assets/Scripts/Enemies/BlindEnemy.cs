@@ -33,7 +33,7 @@ public class BlindEnemy : Enemy
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
         _PointOfPatrol = transform.position;
-        _RangeSearchSound = 5;
+        _RangeSearchSound = 55;
         _Patrolling = false;
         _Hp = MAXHEALTH;
 
@@ -86,6 +86,7 @@ public class BlindEnemy : Enemy
             case EnemyStates.ATTACK:
                 _PointOfPatrol = transform.position;
                 _ChangeStateToPatrol = null;
+                _RangeSearchSound = 55;
                 break;
             case EnemyStates.KNOCKED:
                 _Hp = MAXHEALTH;
@@ -109,10 +110,10 @@ public class BlindEnemy : Enemy
                 _Patrolling = true;
             }
 
-            if (Vector3.Distance(point, transform.position) < 3)
+            if (_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
             {
                 _Patrolling = false;
-                yield return new WaitForSeconds(2);
+                yield return new WaitForSeconds(15);
             }
             else
                 yield return new WaitForSeconds(0.5f);
