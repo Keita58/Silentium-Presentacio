@@ -62,6 +62,7 @@ public class Player : MonoBehaviour
     bool item = false;
     bool note = false;
     bool chest = false;
+    bool book = false;
     private GameObject clockGameObject;
 
     private Coroutine coroutineRun;
@@ -227,6 +228,16 @@ public class Player : MonoBehaviour
             {
                 InventoryManager.instance.OpenChest();
                 chest = false;
+            }else if (book)
+            {
+                if (equipedObject != null)
+                {
+                    equipedObject.transform.parent = null;
+                    equipedObject.transform.position = interactiveGameObject.transform.GetChild(0).transform.position;
+                    equipedObject.transform.rotation = new Quaternion (0, 0, 0, 0);
+                    equipedObject = null;
+                    itemSlotOccuped = false;
+                }
             }
         }
 
@@ -432,9 +443,8 @@ public class Player : MonoBehaviour
             Debug.DrawRay(_Camera.transform.position, _Camera.transform.forward, Color.magenta, 5f);
             //Lanzar Raycast interactuar con el mundo.
 
-            if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask))
-            {
-                if (interactiveGameObject != null)
+            if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask)){
+                if (interactiveGameObject != null && interactiveGameObject.gameObject.layer!=15)
                 {
                     interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
                     interactiveGameObject = null;
@@ -442,16 +452,28 @@ public class Player : MonoBehaviour
                 if (!hit.collider.gameObject.Equals(interactiveGameObject) && hit.transform.gameObject.layer != 10)
                 {
                     interactiveGameObject = hit.collider.gameObject;
-                    baseMaterial = interactiveGameObject.GetComponent<MeshRenderer>().materials[0];
-                    interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[]
+                    if (hit.transform.gameObject.layer != 15)
                     {
+                        baseMaterial = interactiveGameObject.GetComponent<MeshRenderer>().materials[0];
+                        interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[]
+                        {
                     interactiveGameObject.GetComponent<MeshRenderer>().materials[0],
 
                     material
-                    };
+                        };
+                    }
                     if (hit.transform.gameObject.layer == 9)
                     {
                         item = true;
+                        if (hit.transform.gameObject.GetComponent<PickItem>().item is BookItem)
+                        {
+                            if (hit.transform.gameObject.GetComponent<Book>().placed)
+                            {
+                                hit.transform.gameObject.GetComponent<Book>().placed = false;
+                                hit.transform.gameObject.GetComponent<Book>().collider.enabled = true;
+                                hit.transform.gameObject.GetComponent<Book>().collider = null;
+                            }
+                        }
                     }
                     else if (hit.transform.gameObject.layer == 12)
                     {
@@ -466,6 +488,10 @@ public class Player : MonoBehaviour
                     {
                         chest = true;
                     }
+                    else if (hit.transform.gameObject.layer == 15)
+                    {
+                        book = true;
+                    }
                 }
                 else if (hit.transform.gameObject.layer == 10)
                 {
@@ -475,10 +501,11 @@ public class Player : MonoBehaviour
             }
             else if (!Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit2, 10f, interactLayerMask))
             {
-                door = false;
+                door=false;
+                book=false;
                 item = false;
                 clockPuzzle = false;
-                if (interactiveGameObject != null)
+                if (interactiveGameObject != null && interactiveGameObject.gameObject.layer!=15)
                 {
                     interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
                     interactiveGameObject = null;
