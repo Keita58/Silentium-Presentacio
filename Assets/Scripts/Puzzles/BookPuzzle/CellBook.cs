@@ -11,6 +11,6 @@ public class CellBook : MonoBehaviour
     }
     public Book GetBook()
     {
-        return book; ;
+        return book; 
     }
 }
