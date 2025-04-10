@@ -6,7 +6,6 @@ public class FatEnemy : Enemy
 {
     private enum EnemyStates { PATROL, ATTACK, KNOCKED }
     [SerializeField] private EnemyStates _CurrentState;
-    [SerializeField] private float _StateTime;
     [SerializeField] private GameObject _Player;
     [SerializeField] private LayerMask _LayerPlayer;
     [SerializeField] private LayerMask _LayerObjectsAndPlayer;
@@ -63,8 +62,7 @@ public class FatEnemy : Enemy
     private void InitState(EnemyStates newState)
     {
         _CurrentState = newState;
-        _StateTime = 0.0f;
-
+ 
         switch (_CurrentState)
         {
             case EnemyStates.PATROL:

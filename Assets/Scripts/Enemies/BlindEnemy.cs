@@ -6,17 +6,15 @@ public class BlindEnemy : Enemy
 {
     private enum EnemyStates { PATROL, ATTACK, KNOCKED }
     [SerializeField] private EnemyStates _CurrentState;
-    [SerializeField] private EnemyStates _LastState;
-    [SerializeField] private float _StateTime;
     [SerializeField] private GameObject _Player;
     [SerializeField] private LayerMask _LayerPlayer;
     [SerializeField] private LayerMask _LayerObjectsAndPlayer;
+    [SerializeField] private GameObject _DetectionSphere;
 
     private NavMeshAgent _NavMeshAgent;
     private Vector3 _SoundPos;
-    private bool _Detected;
+    private Vector3 _PointOfPatrol;
     private bool _Patrolling;
-    private bool _Attack;
 
     private int _Hp;
     public override int hp => _Hp;
@@ -27,15 +25,19 @@ public class BlindEnemy : Enemy
     private float _RangeSearchSound;
     private int MAXHEALTH = 2;
 
+    private Coroutine _PatrolCoroutine;
+    private Coroutine _ChangeStateToPatrol;
+
     private void Awake()
     {
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
+        _PointOfPatrol = transform.position;
         _RangeSearchSound = 5;
-        _Detected = false;
         _Patrolling = false;
-        _Attack = false;
         _Hp = MAXHEALTH;
+
+        _DetectionSphere.GetComponent<DetectionSphere>().OnExit += OnExit;
     }
 
     private void Start()
@@ -47,25 +49,23 @@ public class BlindEnemy : Enemy
 
     private void ChangeState(EnemyStates newState)
     {
-        if (newState == _CurrentState)
-            return;
-
+        Debug.Log($"---------------------- Sortint de {_CurrentState} a {newState} ------------------------");
         ExitState(_CurrentState);
+
+        Debug.Log($"---------------------- Entrant a {newState} ------------------------");
         InitState(newState);
     }
 
     private void InitState(EnemyStates newState)
     {
-        _LastState = _CurrentState;
         _CurrentState = newState;
-        _StateTime = 0.0f;
 
         switch (_CurrentState)
         {
             case EnemyStates.PATROL:
-                _Detected = false;
                 _Patrolling = false;
-                StartCoroutine(Patrol());
+                _NavMeshAgent.speed = 4.5f;
+                _PatrolCoroutine = StartCoroutine(Patrol(_RangeSearchSound, _PointOfPatrol));
                 break;
             case EnemyStates.ATTACK:
                 AttackPlayer();
@@ -76,28 +76,16 @@ public class BlindEnemy : Enemy
         }
     }
 
-    private void UpdateState(EnemyStates updateState)
-    {
-        _StateTime += Time.deltaTime;
-
-        switch (updateState)
-        {
-            case EnemyStates.PATROL:
-            case EnemyStates.ATTACK:
-            case EnemyStates.KNOCKED:
-                break;
-        }
-    }
-
     private void ExitState(EnemyStates exitState)
     {
         switch (exitState)
         {
             case EnemyStates.PATROL:
-                _Detected = true;
+                StopCoroutine(_PatrolCoroutine);
                 break;
             case EnemyStates.ATTACK:
-                _Attack = false;
+                _PointOfPatrol = transform.position;
+                _ChangeStateToPatrol = null;
                 break;
             case EnemyStates.KNOCKED:
                 _Hp = MAXHEALTH;
@@ -107,13 +95,8 @@ public class BlindEnemy : Enemy
 
     #endregion 
 
-    private void Update()
-    {
-        UpdateState(_CurrentState);
-    }
-
     // Funció per moure l'enemic pel mapa
-    IEnumerator Patrol(int range, Vector3 pointOfSearch)
+    IEnumerator Patrol(float range, Vector3 pointOfSearch)
     {
         Vector3 point = Vector3.zero;
         while (true)
@@ -189,18 +172,12 @@ public class BlindEnemy : Enemy
             }
             else if (lvlSound > 3 && lvlSound <= 5)
             {
-                _RangeSearchSound = 0.3;
+                _RangeSearchSound = 0.3f;
             }
             else if (lvlSound > 5)
             {
-                if (_Attack && Vector3.Distance(_NavMeshAgent.destination, _SoundPos) < 2)
-                    ChangeState(EnemyStates.ATTACK);
-                else
-                {
-                    _NavMeshAgent.SetDestination(_SoundPos);
-                    _Attack = true;
-                    StartCoroutine(RemoveAttackState());
-                }
+                _PointOfPatrol = pos;
+                ChangeState(EnemyStates.ATTACK);
             }
         }
     }
@@ -224,20 +201,29 @@ public class BlindEnemy : Enemy
     private void AttackPlayer()
     {
         //Animation -> attack
-        _NavMeshAgent.speed = 15;
-        _NavMeshAgent.SetDestination(_SoundPos);
+        transform.LookAt(_Player.transform.position);
+        if(Vector3.Distance(_Player.transform.position, transform.position) > 2)
+        {
+            _NavMeshAgent.speed = 15;
+            _NavMeshAgent.SetDestination(_SoundPos);
+        }
         _Player.GetComponent<Player>().TakeDamage(3);    
-    }
-
-    IEnumerator WaitChange()
-    {
-        yield return new WaitForSeconds(5f);
-        ChangeState(EnemyStates.PATROL);
     }
 
     IEnumerator RemoveAttackState()
     {
         yield return new WaitForSeconds(1.5f);
         ChangeState(EnemyStates.PATROL);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.transform.tag == "Player")
+            ChangeState(EnemyStates.ATTACK); 
+    }
+
+    private void OnExit()
+    {
+        _ChangeStateToPatrol = StartCoroutine(RemoveAttackState());
     }
 }
