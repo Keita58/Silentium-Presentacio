@@ -18,7 +18,7 @@ MonoBehaviour:
   healing: 2
   prefab: {fileID: 0}
   itemsToCombine: []
-  stackable: 0
+  stackable: 1
   itemType: 0
   usable: 1
   equipable: 0

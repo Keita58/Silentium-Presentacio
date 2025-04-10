@@ -22,4 +22,9 @@ public class ActionsButton : MonoBehaviour
     {
         InventoryManager.instance.UnequipItem();
     }
+
+    public void ClickStoreInChest()
+    {
+        InventoryManager.instance.StoreInChest();
+    }
 }

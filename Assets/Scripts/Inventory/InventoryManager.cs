@@ -11,11 +11,13 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private Item itemSelected;
 
     [SerializeField] GameObject buttonsActionRoot;
+    [SerializeField] GameObject saveButton;
 
     [SerializeField] private ShowInventory inventoryUI;
 
     [SerializeField] Player player;
     [SerializeField] InventorySO inventory;
+    [SerializeField] InventorySO chestInventory;
     [SerializeField] NoteInventorySO noteInventory;
     [SerializeField] GameObject notesRoot;
     [SerializeField] GameObject panelNotes;
@@ -23,6 +25,7 @@ public class InventoryManager : MonoBehaviour
     private Item equippedItem;
 
     public bool isCombining { get; private set; }
+    public bool chestOpened { get; private set; }
     private Item targetItemToCombine;
     private void Awake()
     {
@@ -35,24 +38,19 @@ public class InventoryManager : MonoBehaviour
         InitState(ActionStates.NOACTION);
     }
 
-    #region FSM
-    enum ActionStates { NOACTION, SELECT_ACTION, ACTION_USE, ACTION_COMBINE, ACTION_EQUIP_ITEM, ACTION_COMBINE_SELECT, SELECT_EQUIPPED, ACTION_UNEQUIP }
-    [SerializeField] ActionStates actionState;
-    private void ChangeState(ActionStates newState)
-    {
-        Debug.Log($"---------------------- Entering from {actionState} to {newState} ------------------------");
-        ExitState(actionState);
-
-        Debug.Log($"---------------------- Entering to {newState} ------------------------");
-        InitState(newState);
-    }
-
     public void ItemSelected(Item item)
     {
         itemSelected = item;
         ChangeSelectedItem();
-        //inventoryUI.GetComponent<ShowInventory>().ItemSelected(itemSelected);
-        ChangeState(ActionStates.SELECT_ACTION);
+        if (!this.chestOpened)
+        {
+            ChangeState(ActionStates.SELECT_ACTION);
+        }
+        else
+        {
+            ChangeState(ActionStates.ACTION_CHEST_SELECT);
+        }
+        
     }
 
     private void ToggleActionsButtons(bool show)
@@ -74,12 +72,28 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
+    #region FSM
+    enum ActionStates { NOACTION, SELECT_ACTION, ACTION_USE, ACTION_COMBINE, ACTION_EQUIP_ITEM, ACTION_COMBINE_SELECT, SELECT_EQUIPPED, ACTION_UNEQUIP, CHEST_OPENED, ACTION_CHEST_SELECT }
+    [SerializeField] ActionStates actionState;
+    private void ChangeState(ActionStates newState)
+    {
+        Debug.Log($"---------------------- Entering from {actionState} to {newState} ------------------------");
+        ExitState(actionState);
+
+        Debug.Log($"---------------------- Entering to {newState} ------------------------");
+        InitState(newState);
+    }
+
+   
+
     private void InitState(ActionStates newState)
     {
         actionState = newState;
         switch (actionState)
         {
             case ActionStates.NOACTION:
+                saveButton.SetActive(false);
+                chestOpened = false;
                 unequipButton.GetComponent<Button>().interactable = false;
                 isCombining = false;
                 ToggleActionsButtons(false);
@@ -124,6 +138,16 @@ public class InventoryManager : MonoBehaviour
                     Debug.Log("Tienes más objetos de los que puedes tener en el inventario");
                 }
                 break;
+            case ActionStates.CHEST_OPENED:
+                chestOpened = true;
+                ToggleActionsButtons(false);
+                saveButton.SetActive(true);
+                saveButton.GetComponent<Button>().interactable = false;
+                break;
+            case ActionStates.ACTION_CHEST_SELECT:
+                saveButton.GetComponent<Button>().interactable = true;
+                break;
+
         }
 
     }
@@ -281,5 +305,38 @@ public class InventoryManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void OpenChest()
+    {
+        this.OpenInventory(null);
+        this.inventoryUI.ShowChest();
+        player.ToggleInputPlayer(false);
+        player.inventoryOpened = true;
+        ChangeState(ActionStates.CHEST_OPENED);
+    }
+
+    public void StoreInChest()
+    {
+        InventorySO.ItemSlot itemToStore = inventory.GetItem(itemSelected);
+        inventory.items.Remove(itemToStore);
+        for (int i = 0; i < itemToStore.amount; i++)
+        {
+            chestInventory.AddItem(itemSelected);
+        }
+        inventoryUI.Show();
+        ChangeState(ActionStates.CHEST_OPENED);
+    }
+
+    public void SelectChestItem(Item item)
+    {
+        InventorySO.ItemSlot itemToReturn= chestInventory.GetItem(item);
+        chestInventory.items.Remove(itemToReturn);
+        for (int i=0;i< itemToReturn.amount; i++)
+        {
+            inventory.AddItem(item);
+        }
+        inventoryUI.Show();
+
     }
 }

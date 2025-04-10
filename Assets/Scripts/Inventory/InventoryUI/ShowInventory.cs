@@ -10,11 +10,15 @@ public class ShowInventory : MonoBehaviour
     [SerializeField] public GameObject target;
 
     [SerializeField] GameObject parentGameObject;
+    [SerializeField] GameObject chestRootGameObject;
+    [SerializeField] GameObject notesRoot;
 
     [SerializeField] InventorySO inventory;
+    [SerializeField] InventorySO chestInventory;
 
     [SerializeField] GameObject itemPrefab;
     [SerializeField] GameObject itemEquippedSlotPrefab;
+    [SerializeField] GameObject chestSlot;
 
     [SerializeField] GameObject equippedItemSlot;
 
@@ -41,6 +45,23 @@ public class ShowInventory : MonoBehaviour
             usingItem.GetComponent<ShowEquippedItem>().Load(equippedItem);
         }
 
+        if (InventoryManager.instance.chestOpened)
+        {
+            ShowChest();
+        }
+
+    }
+
+    public void ShowChest()
+    {
+        notesRoot.SetActive(false);
+        chestRootGameObject.SetActive(true) ;
+        for (int i=0; i < chestInventory.items.Count; i++)
+        {
+            GameObject displayedItem = Instantiate(chestSlot, chestRootGameObject.transform.GetChild(i).transform);
+            displayedItem.GetComponent<ShowChestItem>().Load(chestInventory.items[i]);
+        }
+
     }
 
     public void Hide()
@@ -53,10 +74,22 @@ public class ShowInventory : MonoBehaviour
                 Destroy(child.GetChild(i).gameObject);
             }
         }
+
         for (int i = 0; i < equippedItemSlot.transform.childCount; i++)
         {
             Destroy(equippedItemSlot.transform.GetChild(i).gameObject);
         }
+
+        foreach (Transform child in chestRootGameObject.transform)
+        {
+            for (int i = 0; i < child.childCount; i++)
+            {
+                Destroy(child.GetChild(i).gameObject);
+            }
+        }
+
+        notesRoot.SetActive(true);
+        chestRootGameObject.SetActive(false);
 
     }
 
