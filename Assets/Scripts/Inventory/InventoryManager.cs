@@ -16,7 +16,7 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private ShowInventory inventoryUI;
 
     [SerializeField] Player player;
-    [SerializeField] InventorySO inventory;
+    [SerializeField] public InventorySO inventory;
     [SerializeField] InventorySO chestInventory;
     [SerializeField] NoteInventorySO noteInventory;
     [SerializeField] GameObject notesRoot;

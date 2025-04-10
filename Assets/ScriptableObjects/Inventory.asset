@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   items:
   - item: {fileID: 11400000, guid: 4a930a82e1db5ed4db7bb072b980d6c1, type: 2}
-    amount: 4
+    amount: 3
     stackable: 0

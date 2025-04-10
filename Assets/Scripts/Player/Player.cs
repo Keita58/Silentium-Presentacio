@@ -168,13 +168,37 @@ public class Player : MonoBehaviour
                 {
                     if (hit.collider.TryGetComponent<Door>(out Door door))
                     {
-                        if (door.isOpen)
+                        if (door.isLocked)
                         {
-                            door.Close();
+                            InventorySO.ItemSlot aux = null;
+                            foreach (InventorySO.ItemSlot item in InventoryManager.instance.inventory.items)
+                            {
+                                if (item.item == door.itemNeededToOpen)
+                                {
+                                    door.isLocked = false;
+                                    aux = item;
+                                }
+                            }
+                            InventoryManager.instance.inventory.items.Remove(aux);
+                            if (door.isOpen)
+                            {
+                                door.Close();
+                            }
+                            else
+                            {
+                                door.Open(transform.position);
+                            }
                         }
                         else
                         {
-                            door.Open(transform.position);
+                            if (door.isOpen)
+                            {
+                                door.Close();
+                            }
+                            else
+                            {
+                                door.Open(transform.position);
+                            }
                         }
                     }
                 }
