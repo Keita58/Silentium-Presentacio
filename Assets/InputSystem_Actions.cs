@@ -949,6 +949,34 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Hieroglyphic"",
+            ""id"": ""a3e2e3f8-381f-42f5-981d-330de04b2928"",
+            ""actions"": [
+                {
+                    ""name"": ""Exit"",
+                    ""type"": ""Button"",
+                    ""id"": ""2609d91b-f19e-4851-b9c9-489415bbdd84"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""2da97bd3-60c9-4437-b248-fcd002456f95"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Exit"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -1042,6 +1070,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Clock_Exit = m_Clock.FindAction("Exit", throwIfNotFound: true);
         m_Clock_MoveClockHandReversed = m_Clock.FindAction("MoveClockHandReversed", throwIfNotFound: true);
         m_Clock_FinishClock = m_Clock.FindAction("FinishClock", throwIfNotFound: true);
+        // Hieroglyphic
+        m_Hieroglyphic = asset.FindActionMap("Hieroglyphic", throwIfNotFound: true);
+        m_Hieroglyphic_Exit = m_Hieroglyphic.FindAction("Exit", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
@@ -1049,6 +1080,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         Debug.Assert(!m_Player.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Player.Disable() has not been called.");
         Debug.Assert(!m_UI.enabled, "This will cause a leak and performance issues, InputSystem_Actions.UI.Disable() has not been called.");
         Debug.Assert(!m_Clock.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Clock.Disable() has not been called.");
+        Debug.Assert(!m_Hieroglyphic.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Hieroglyphic.Disable() has not been called.");
     }
 
     public void Dispose()
@@ -1396,6 +1428,52 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         }
     }
     public ClockActions @Clock => new ClockActions(this);
+
+    // Hieroglyphic
+    private readonly InputActionMap m_Hieroglyphic;
+    private List<IHieroglyphicActions> m_HieroglyphicActionsCallbackInterfaces = new List<IHieroglyphicActions>();
+    private readonly InputAction m_Hieroglyphic_Exit;
+    public struct HieroglyphicActions
+    {
+        private @InputSystem_Actions m_Wrapper;
+        public HieroglyphicActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Exit => m_Wrapper.m_Hieroglyphic_Exit;
+        public InputActionMap Get() { return m_Wrapper.m_Hieroglyphic; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(HieroglyphicActions set) { return set.Get(); }
+        public void AddCallbacks(IHieroglyphicActions instance)
+        {
+            if (instance == null || m_Wrapper.m_HieroglyphicActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_HieroglyphicActionsCallbackInterfaces.Add(instance);
+            @Exit.started += instance.OnExit;
+            @Exit.performed += instance.OnExit;
+            @Exit.canceled += instance.OnExit;
+        }
+
+        private void UnregisterCallbacks(IHieroglyphicActions instance)
+        {
+            @Exit.started -= instance.OnExit;
+            @Exit.performed -= instance.OnExit;
+            @Exit.canceled -= instance.OnExit;
+        }
+
+        public void RemoveCallbacks(IHieroglyphicActions instance)
+        {
+            if (m_Wrapper.m_HieroglyphicActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IHieroglyphicActions instance)
+        {
+            foreach (var item in m_Wrapper.m_HieroglyphicActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_HieroglyphicActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public HieroglyphicActions @Hieroglyphic => new HieroglyphicActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     public InputControlScheme KeyboardMouseScheme
     {
@@ -1471,5 +1549,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         void OnExit(InputAction.CallbackContext context);
         void OnMoveClockHandReversed(InputAction.CallbackContext context);
         void OnFinishClock(InputAction.CallbackContext context);
+    }
+    public interface IHieroglyphicActions
+    {
+        void OnExit(InputAction.CallbackContext context);
     }
 }

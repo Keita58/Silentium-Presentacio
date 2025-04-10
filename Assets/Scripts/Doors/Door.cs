@@ -15,29 +15,37 @@ public class Door : MonoBehaviour
 
     [SerializeField] private bool isHideSpot = false;
 
+    [SerializeField] private bool isLocked = false;
+
     private Vector3 startRotation;
 
     private void Awake()
     {
         isOpen = false;
-        startRotation = transform.rotation.eulerAngles;
+        startRotation = transform.localRotation.eulerAngles;
     }
-
+    public void SetLocked(bool locked)
+    {
+        this.isLocked = locked;
+    }
     public void Open(Vector3 playerPosition)
     {
-        if (!isOpen)
+        if (!isLocked)
         {
-            StopAllCoroutines();
-            //dado el forward que le pasamos y el segundo parametro es la direccion al player normalizada que nos devuelve negativo o positivo para saber si esta delante o detras.
-            float dot = Vector3.Dot(this.transform.forward, (playerPosition - transform.position).normalized);
-            Debug.Log("DOT: " + dot);
-            StartCoroutine(DoRotationOpen(dot));
+            if (!isOpen)
+            {
+                StopAllCoroutines();
+                //dado el forward que le pasamos y el segundo parametro es la direccion al player normalizada que nos devuelve negativo o positivo para saber si esta delante o detras.
+                float dot = Vector3.Dot(this.transform.forward, (playerPosition - transform.position).normalized);
+                Debug.Log("DOT: " + dot);
+                StartCoroutine(DoRotationOpen(dot));
+            }
         }
     }
 
     private IEnumerator DoRotationOpen(float forwardAmount)
     {
-        Quaternion startRotation = transform.parent.rotation;
+        Quaternion startRotation = transform.localRotation;
         Quaternion endRotation;
 
         if (isHideSpot)
@@ -64,7 +72,8 @@ public class Door : MonoBehaviour
         while (time < 1)
         {
             //interpolamos entre el start y el end dado el time.
-            transform.parent.rotation = Quaternion.Slerp(startRotation, endRotation, time);
+            //transform.parent.rotation = Quaternion.Slerp(startRotation, endRotation, time);
+            transform.localRotation = Quaternion.Slerp(startRotation, endRotation, time);
             yield return null;
             time += Time.deltaTime * speed;
         }
@@ -73,26 +82,29 @@ public class Door : MonoBehaviour
 
     public void Close()
     {
-        if (isOpen)
+        if (!isLocked)
         {
-            StopAllCoroutines();
-            //dado el forward que le pasamos y el segundo parametro es la direccion al player normalizada que nos devuelve negativo o positivo para saber si esta delante o detras.
-            //float dot = Vector3.Dot(this.transform.forward, (playerPosition - transform.position).normalized);
-            StartCoroutine(DoRotationClose());
+            if (isOpen)
+            {
+                StopAllCoroutines();
+                //dado el forward que le pasamos y el segundo parametro es la direccion al player normalizada que nos devuelve negativo o positivo para saber si esta delante o detras.
+                //float dot = Vector3.Dot(this.transform.forward, (playerPosition - transform.position).normalized);
+                StartCoroutine(DoRotationClose());
+            }
         }
     }
 
     private IEnumerator DoRotationClose()
     {
-        Quaternion startRotation = transform.parent.rotation;
-        Quaternion endRotation = Quaternion.Euler(new Vector3(transform.parent.rotation.x, transform.parent.rotation.y, transform.parent.rotation.z));
+        Quaternion startRotation = transform.localRotation;
+        Quaternion endRotation = Quaternion.Euler(new Vector3(transform.localRotation.x, transform.localRotation.y, transform.localRotation.z));
 
         isOpen = false;
 
         float time = 0;
         while (time < 1)
         {
-            transform.parent.rotation = Quaternion.Slerp(startRotation, endRotation, time);
+            transform.localRotation = Quaternion.Slerp(startRotation, endRotation, time);
             yield return null;
             time += Time.deltaTime * speed;
         }

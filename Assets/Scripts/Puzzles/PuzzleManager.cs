@@ -1,3 +1,4 @@
+using NavKeypad;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,6 +12,8 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     private Camera cam_Player;
     private InputSystem_Actions inputActionPlayer;
+    [SerializeField]
+    private Camera cam_Hierogliphic;
     private void Awake()
     {
         inputActionPlayer = new InputSystem_Actions();
@@ -21,7 +24,7 @@ public class PuzzleManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -44,11 +47,30 @@ public class PuzzleManager : MonoBehaviour
         cam_Clock.gameObject.SetActive(false);
         cam_Player.transform.parent.GetComponent<Player>()._inputActions.Player.Enable();
         cam_Player.transform.parent.GetComponent<Player>().ResumeInteract();
+        //cam_Player.transform.parent.GetComponent<Player>().ResumeInteract();
         cam_Clock.transform.parent.GetComponent<Clock>().inputActions.Clock.Disable();
     }
     public void ClockSolved()
     {
         ExitClockPuzzle();
         this.KeyClock.SetActive(true);
+    }
+
+    public void InteractHieroglyphicPuzzle()
+    {
+        cam_Player.gameObject.SetActive(false);
+        cam_Hierogliphic.gameObject.SetActive(true);
+        cam_Player.transform.parent.GetComponent<Player>()._inputActions.Player.Disable();
+        cam_Hierogliphic.transform.parent.GetComponent<Keypad>().inputActions.Hieroglyphic.Enable();
+        Cursor.visible = true;
+    }
+
+    public void HieroglyphicPuzzleExit()
+    {
+        cam_Player.transform.parent.GetComponent<Player>()._inputActions.Player.Enable();
+        cam_Hierogliphic.transform.parent.GetComponent<Keypad>().inputActions.Hieroglyphic.Disable();
+        cam_Player.gameObject.SetActive(true);
+        cam_Hierogliphic.gameObject.SetActive(false);
+        Cursor.visible = false;
     }
 }
