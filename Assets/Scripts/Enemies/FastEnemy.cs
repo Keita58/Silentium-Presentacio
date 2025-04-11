@@ -41,7 +41,7 @@ public class FastEnemy : Enemy
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
         _PointOfPatrol = transform.position;
-        _RangeSearchSound = 50;
+        _RangeSearchSound = 30;
         _RangeChaseAfterStop = 25;
         _BetaDotProduct = 60;
         _Patrolling = false;
@@ -151,6 +151,7 @@ public class FastEnemy : Enemy
             Vector3 point = new Vector3(randomPoint.x, randomPoint.y, randomPoint.z);
 
             NavMeshHit hit;
+            print(NavMesh.GetAreaNames().Length);
 
             //Comprovem que el punt que hem agafat esta dins del NavMesh
             if (NavMesh.SamplePosition(point, out hit, 1.0f, NavMesh.AllAreas) && Vector3.Distance(point, center) > 1.75f)

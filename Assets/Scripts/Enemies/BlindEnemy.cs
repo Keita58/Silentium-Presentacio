@@ -86,7 +86,7 @@ public class BlindEnemy : Enemy
             case EnemyStates.ATTACK:
                 _PointOfPatrol = transform.position;
                 _ChangeStateToPatrol = null;
-                _RangeSearchSound = 55;
+                _RangeSearchSound = 25;
                 break;
             case EnemyStates.KNOCKED:
                 _Hp = MAXHEALTH;
@@ -113,7 +113,7 @@ public class BlindEnemy : Enemy
             if (_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
             {
                 _Patrolling = false;
-                yield return new WaitForSeconds(15);
+                yield return new WaitForSeconds(3);
             }
             else
                 yield return new WaitForSeconds(0.5f);
@@ -203,7 +203,8 @@ public class BlindEnemy : Enemy
     {
         //Animation -> attack
         transform.LookAt(_Player.transform.position);
-        if(Vector3.Distance(_Player.transform.position, transform.position) > 2)
+        _NavMeshAgent.SetDestination(transform.position);
+        if (Vector3.Distance(_Player.transform.position, transform.position) > 2)
         {
             _NavMeshAgent.speed = 15;
             _NavMeshAgent.SetDestination(_SoundPos);

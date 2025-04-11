@@ -35,7 +35,7 @@ public class FatEnemy : Enemy
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
         _PointOfPatrol = transform.position;
-        _RangeSearchSound = 50;
+        _RangeSearchSound = 25;
         _Patrolling = false;
         _Hp = MAXHEALTH;
 
@@ -114,7 +114,7 @@ public class FatEnemy : Enemy
             if (_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
             {
                 _Patrolling = false;
-                yield return new WaitForSeconds(20);
+                yield return new WaitForSeconds(3);
             }
             else
                 yield return new WaitForSeconds(0.5f);
