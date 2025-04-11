@@ -47,12 +47,12 @@ public class PuzzleManager : MonoBehaviour
         cam_Clock.gameObject.SetActive(false);
         cam_Player.transform.parent.GetComponent<Player>()._inputActions.Player.Enable();
         cam_Player.transform.parent.GetComponent<Player>().ResumeInteract();
-        //cam_Player.transform.parent.GetComponent<Player>().ResumeInteract();
         cam_Clock.transform.parent.GetComponent<Clock>().inputActions.Clock.Disable();
     }
     public void ClockSolved()
     {
         ExitClockPuzzle();
+        cam_Player.transform.parent.GetComponent<Player>().ResumeInteract();
         this.KeyClock.SetActive(true);
     }
 
