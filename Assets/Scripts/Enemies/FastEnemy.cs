@@ -1,27 +1,25 @@
 ﻿using System.Collections;
+using System.Drawing;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class FastEnemy : Enemy
 {
-    private enum EnemyStates { PATROL, SEARCH, CHASE, ATTACK, KNOCKED, STOPPED }
+    private enum EnemyStates { PATROL, CHASE, ATTACK, KNOCKED, STOPPED }
     [SerializeField] private EnemyStates _CurrentState;
-    [SerializeField] private EnemyStates _LastState;
     [SerializeField] private float _StateTime;
     [SerializeField] private GameObject _Player;
     [SerializeField] private LayerMask _LayerPlayer;
     [SerializeField] private LayerMask _LayerObjectsAndPlayer;
+    [SerializeField] private GameObject _DetectionSphere;
 
     private NavMeshAgent _NavMeshAgent;
     private Vector3 _SoundPos;
+    private Vector3 _PointOfPatrol;
     private float _BetaDotProduct;
-    private bool _Chase;
-    private bool _SearchSound;
-    private bool _Detected;
     private bool _Patrolling;
-    private bool _Wait;
-    private bool _Attack;
 
     private int _Hp;
     public override int hp => _Hp;
@@ -29,28 +27,33 @@ public class FastEnemy : Enemy
     private int _DownTime;
     public override int downTime => _DownTime;
 
-    private int MAXHEALTH = 3;
+    private readonly int MAXHEALTH = 3;
     private int _RangeSearchSound;
+    private int _RangeChaseAfterStop;
+
+    private Coroutine _PatrolCoroutine;
+    private Coroutine _ChangeToPatrolCoroutine;
+    private Coroutine _AttackCoroutine;
+    private Coroutine _ActivateLookingCoroutine;
 
     private void Awake()
     {
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
-        _RangeSearchSound = 0;
+        _PointOfPatrol = transform.position;
+        _RangeSearchSound = 50;
+        _RangeChaseAfterStop = 25;
         _BetaDotProduct = 60;
-        _SearchSound = false;
-        _Detected = false;
         _Patrolling = false;
-        _Chase = false;
-        _Wait = false;
-        _Attack = false;
         _Hp = MAXHEALTH;
+
+        _DetectionSphere.GetComponent<DetectionSphere>().OnEnter += ActivateLookingCoroutine;
+        _DetectionSphere.GetComponent<DetectionSphere>().OnExit += DeactivateLookingCoroutine;
     }
 
     private void Start()
     {
         InitState(EnemyStates.PATROL);
-        StartCoroutine(LookingPlayer());
     }
 
     #region FSM
@@ -60,38 +63,32 @@ public class FastEnemy : Enemy
         if (newState == _CurrentState)
             return;
 
+        Debug.Log($"---------------------- Sortint de {_CurrentState} a {newState} ------------------------");
         ExitState(_CurrentState);
+
+        Debug.Log($"---------------------- Entrant a {newState} ------------------------");
         InitState(newState);
     }
 
     private void InitState(EnemyStates newState)
     {
-        _LastState = _CurrentState;
         _CurrentState = newState;
         _StateTime = 0.0f;
 
         switch(_CurrentState)
         {
             case EnemyStates.PATROL:
-                _Detected = false;
                 _Patrolling = false;
-                StartCoroutine(Patrol());
-                break;
-            case EnemyStates.SEARCH:
-                _SearchSound = true;
-                StartCoroutine(Search(_RangeSearchSound));
+                _PatrolCoroutine = StartCoroutine(Patrol(_RangeSearchSound, _PointOfPatrol));
                 break;
             case EnemyStates.CHASE:
                 _NavMeshAgent.speed = 7;
                 break;
             case EnemyStates.ATTACK:
-                _Attack = true;
-                StartCoroutine(AttackPlayer());
+                _AttackCoroutine = StartCoroutine(AttackPlayer());
                 break;
             case EnemyStates.KNOCKED:
                 StartCoroutine(WakeUp());
-                break;
-            case EnemyStates.STOPPED:
                 break;
         }
     }
@@ -102,14 +99,8 @@ public class FastEnemy : Enemy
 
         switch (updateState)
         {
-            case EnemyStates.PATROL:
-            case EnemyStates.SEARCH:
             case EnemyStates.CHASE:
-            case EnemyStates.ATTACK:
-                DetectPlayer();
-                break;
-            case EnemyStates.KNOCKED:
-            case EnemyStates.STOPPED:
+                ChasePlayer();
                 break;
         }
     }
@@ -119,17 +110,21 @@ public class FastEnemy : Enemy
         switch(exitState)
         {
             case EnemyStates.PATROL:
-                _Detected = true;
+                StopCoroutine(_PatrolCoroutine);
+                _ChangeToPatrolCoroutine = null;
                 break;
-            case EnemyStates.SEARCH:
-                _SearchSound = false;
-                _Wait = false;
+            case EnemyStates.CHASE:
+                _NavMeshAgent.speed = 3.5f;
+                _RangeChaseAfterStop = 25;
                 break;
             case EnemyStates.ATTACK:
-                _Attack = false;
+                StopCoroutine(_AttackCoroutine);
                 break;
             case EnemyStates.KNOCKED:
                 _Hp = MAXHEALTH;
+                break;
+            case EnemyStates.STOPPED:
+                _ChangeToPatrolCoroutine = null;
                 break;
         }
     }
@@ -139,127 +134,38 @@ public class FastEnemy : Enemy
     private void Update()
     {
         UpdateState(_CurrentState);
-    }
-
-    // Funció per moure l'enemic pel mapa
-    IEnumerator Patrol()
-    {
-        Vector3 coord = Vector3.zero;
-        float range = 45.0f;
-        while (!_Detected)
-        {
-            if (!_Patrolling)
-            {
-                if (RandomPoint(transform.position, range, out coord))
-                {
-                    Debug.DrawRay(coord, Vector3.up, UnityEngine.Color.black, 1.0f);
-                }
-
-                _NavMeshAgent.speed = Random.Range(3.5f, 6);
-                _NavMeshAgent.SetDestination(new Vector3(coord.x, transform.position.y, coord.z));
-                _Patrolling = true;
-            }
-
-            if (transform.position == new Vector3(coord.x, transform.position.y, coord.z))
-            {
-                _Patrolling = false;
-            }
-            yield return new WaitForSeconds(2);
-        }
-    }
-
-    IEnumerator Search(int range)
-    {
-        while (_SearchSound)
-        {
-            if (transform.position.x == _NavMeshAgent.destination.x && transform.position.z == _NavMeshAgent.destination.z)
-            {
-                if (!_Wait)
-                {
-                    _Wait = true;
-                    StartCoroutine(WaitChange()); //Temps d'espera per canviar a patrulla (te posat un change a patrulla)
-                }
-                yield return new WaitForSeconds(0.5f);
-                RandomPoint(_SoundPos, range, out Vector3 hit);
-                _NavMeshAgent.destination = hit;
-            }
-            else
-                yield return new WaitForSeconds(1f);
-        }
-    }
+    }  
 
     //Busca punt aleatori dins del NavMesh
     private bool RandomPoint(Vector3 center, float range, out Vector3 result)
     {
-        for (int i = 0; i < 30; i++)
+        for(int i = 0; i < 50; i++) 
         {
             //Agafa un punt aleatori dins de l'esfera amb el radi que passem per parametre
-            Vector3 randomPoint = center + UnityEngine.Random.insideUnitSphere * range;
+            Vector3 randomPoint = new Vector3(center.x, center.y, center.z) + Random.insideUnitSphere * range;
+            Debug.Log($"Punt: {randomPoint}");
+
+            //Aquí s'haurà de comprovar si la y que hem extret està en algun dels pisos de l'edifici.
+            //Si està aprop la transformem en aquest i ja
+
+            Vector3 point = new Vector3(randomPoint.x, randomPoint.y, randomPoint.z);
+
             NavMeshHit hit;
 
             //Comprovem que el punt que hem agafat esta dins del NavMesh
-            if (NavMesh.SamplePosition(randomPoint, out hit, 1.0f, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(point, out hit, 1.0f, NavMesh.AllAreas) && Vector3.Distance(point, center) > 1.75f)
             {
                 result = hit.position;
                 return true;
             }
         }
-        result = Vector3.zero;
+        result = center;
         return false;
     }
 
-    private void DetectPlayer()
+    private void ChasePlayer()
     {
-        Collider[] aux = Physics.OverlapSphere(transform.position, 10f, _LayerPlayer);
-        if (aux.Length > 0)
-        {
-            float alphaDocProduct = Vector3.Dot(transform.forward, (_Player.transform.position - this.transform.position).normalized);
-
-            //Fem l'arcos del docProduct per poder comprovar si l'angle és menor a la meitat de l'angle de 
-            //visió dels enemics
-            if (Mathf.Acos(alphaDocProduct) < _BetaDotProduct)
-            {
-                //Raycast amb les layers de paret i player i si tenim la paret no seguim, sinó seguim el jugador
-                if (Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit info, _LayerObjectsAndPlayer))
-                {
-                    if (info.transform.tag == "Player")
-                    {
-                        _SearchSound = false;
-                        _Chase = true;
-                        _Detected = true;
-                        StopCoroutine(StopChase());
-
-                        if(Vector3.Distance(transform.position, info.transform.position) > 2)
-                        {
-                            Debug.Log("Detecto alguna cosa aprop!");
-                            transform.LookAt(info.transform.position);
-                            _NavMeshAgent.SetDestination(_Player.transform.position);
-                            if (_CurrentState != EnemyStates.CHASE)
-                                ChangeState(EnemyStates.CHASE);
-                        }
-                        else
-                        {
-                            transform.LookAt(info.transform.position);
-                            _NavMeshAgent.SetDestination(transform.position);
-                            if(_CurrentState != EnemyStates.ATTACK)
-                                ChangeState(EnemyStates.ATTACK);
-                        }
-                    }
-                }
-            }
-            else if (_Chase)
-            {
-                RandomPoint(_Player.transform.position, 2, out Vector3 point);
-                StartCoroutine(StopChase());
-                _NavMeshAgent.SetDestination(point);
-            }
-        }
-        else
-        {
-            Debug.Log("No detecto res a la meva mirada!");
-            if (_CurrentState == EnemyStates.CHASE)
-                ChangeState(EnemyStates.PATROL);
-        }
+        _NavMeshAgent.SetDestination(_Player.transform.position);
     }
 
     public override void ListenSound(Vector3 pos, int lvlSound)
@@ -278,25 +184,26 @@ public class FastEnemy : Enemy
         if(lvlSound > 0 && _CurrentState == EnemyStates.PATROL)
         {
             if (lvlSound > 0 && lvlSound <= 2)
-                _NavMeshAgent.SetDestination(_SoundPos);
+            {
+                _RangeSearchSound = 5;
+            }
             else if (lvlSound > 2 && lvlSound <= 5)
             {
-                RandomPoint(_SoundPos, 2, out _);
-                _RangeSearchSound = 2;
+                _RangeSearchSound = 3;
             }
             else if (lvlSound > 5 && lvlSound <= 9)
             {
-                RandomPoint(_SoundPos, 5, out _);
-                _RangeSearchSound = 5;
+                _RangeSearchSound = 1;
             }
-            else if (lvlSound > 9 && lvlSound <= 15)
+            else if (lvlSound > 9)
             {
-                RandomPoint(_SoundPos, 10, out _);
-                _RangeSearchSound = 10;
+                _NavMeshAgent.SetDestination(_SoundPos);
             }
 
-            if(_CurrentState != EnemyStates.SEARCH)
-                ChangeState(EnemyStates.SEARCH);
+            _PointOfPatrol = pos;
+            if (_ChangeToPatrolCoroutine == null)
+                _ChangeToPatrolCoroutine = StartCoroutine(StopChase());
+            ChangeState(EnemyStates.PATROL);
         }
     }
 
@@ -307,6 +214,30 @@ public class FastEnemy : Enemy
             _Hp--;
             if (_Hp == 0)
                 ChangeState(EnemyStates.KNOCKED);
+        }
+    }
+
+    // Funció per moure l'enemic pel mapa
+    IEnumerator Patrol(int range, Vector3 pointOfSearch)
+    {
+        Vector3 point = Vector3.zero;
+        while (true)
+        {
+            if (!_Patrolling)
+            {
+                RandomPoint(pointOfSearch, range, out Vector3 coord);
+                point = coord;
+                _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
+                _Patrolling = true;
+            }
+
+            if (_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
+            {
+                _Patrolling = false;
+                yield return new WaitForSeconds(2);
+            }
+            else
+                yield return new WaitForSeconds(0.5f);
         }
     }
 
@@ -321,6 +252,7 @@ public class FastEnemy : Enemy
                 if (info.transform.tag == "Player")
                 {
                     ChangeState(EnemyStates.ATTACK);
+                    yield break;
                 }
             }
         }
@@ -330,7 +262,7 @@ public class FastEnemy : Enemy
 
     IEnumerator AttackPlayer()
     {
-        while(_Attack)
+        while(true)
         {
             //Animation -> attack
             _Player.GetComponent<Player>().TakeDamage(1);
@@ -342,12 +274,8 @@ public class FastEnemy : Enemy
     IEnumerator StopChase()
     {
         yield return new WaitForSeconds(5);
-        _Chase = false;
-    }
-
-    IEnumerator WaitChange()
-    {
-        yield return new WaitForSeconds(10f);
+        _RangeSearchSound = 50;
+        _PointOfPatrol = transform.position;
         ChangeState(EnemyStates.PATROL);
     }
 
@@ -355,23 +283,24 @@ public class FastEnemy : Enemy
     {
         while(true)
         {
-            Collider[] aux = Physics.OverlapSphere(transform.position, 15f, _LayerPlayer);
+            Collider[] aux = Physics.OverlapSphere(transform.position, _RangeChaseAfterStop, _LayerPlayer);
             if (aux.Length > 0)
             {
-                transform.LookAt(_Player.transform.position);
                 float alphaDocProduct = Vector3.Dot(transform.forward, (_Player.transform.position - this.transform.position).normalized);
                 float alphaLook = Vector3.Dot(transform.forward, _Player.transform.forward);
-                Debug.Log($"Alpha: {alphaLook}");
 
                 //Fem l'arcos del docProduct per poder comprovar si l'angle és menor a la meitat de l'angle de 
                 //visió dels enemics
-                if (Mathf.Acos(alphaDocProduct) < _BetaDotProduct)
+                //Ho hem de convertir a graus perque l'arccos retorna radiants de merda
+                if (Mathf.Acos(alphaDocProduct) * Mathf.Rad2Deg < _BetaDotProduct)
                 {
                     //Raycast amb les layers de paret i player i si tenim la paret no seguim, sinó seguim el jugador
                     if (Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit info, _LayerObjectsAndPlayer))
                     {
                         if (info.transform.tag == "Player")
                         {
+                            transform.LookAt(info.transform.position);
+
                             if (alphaLook < -0.9f)
                             {
                                 _NavMeshAgent.SetDestination(transform.position);
@@ -379,25 +308,60 @@ public class FastEnemy : Enemy
                             }
                             else
                             {
-                                if (Vector3.Distance(transform.position, _Player.transform.position) < 2)
-                                    ChangeState(EnemyStates.ATTACK);
-                                else
-                                    ChangeState(EnemyStates.CHASE);
+                                if (Vector3.Distance(info.transform.position, transform.position) > 2)
+                                {
+                                    Debug.Log("Veig al jugador lluny");
+                                    _RangeChaseAfterStop = 28;
+                                    if (_CurrentState != EnemyStates.CHASE)
+                                    {
+                                        ChangeState(EnemyStates.CHASE);
+                                    }
+                                }
+                                else if (Vector3.Distance(info.transform.position, transform.position) <= 2)
+                                {
+                                    Debug.Log("Tinc al jugador al davant!");
+                                    _NavMeshAgent.SetDestination(transform.position);
+                                    if (_CurrentState != EnemyStates.ATTACK)
+                                    {
+                                        ChangeState(EnemyStates.ATTACK);
+                                    }
+                                }
+                            }
+                        }
+                        else 
+                        {
+                            Debug.Log("No veig al jugador!");
+                            if (_ChangeToPatrolCoroutine == null && _CurrentState != EnemyStates.PATROL)
+                            {
+                                Debug.Log("Activo corutina");
+                                _ChangeToPatrolCoroutine = StartCoroutine(StopChase());
                             }
                         }
                     }
+                    else
+                    {
+                        ChangeState(EnemyStates.PATROL);
+                    }
                 }
             }
-            else if (_CurrentState == EnemyStates.STOPPED)
-                ChangeState(EnemyStates.CHASE);
-
+            
             yield return new WaitForSeconds(0.5f);
         }
     }
 
-    private void OnDrawGizmos()
+    private void ActivateLookingCoroutine()
     {
-        Gizmos.DrawWireSphere(transform.position, 10f);
-        Gizmos.DrawWireSphere(transform.position, 15f);
+        _ActivateLookingCoroutine = StartCoroutine(LookingPlayer());
+    }
+
+    private void DeactivateLookingCoroutine()
+    {
+        StopCoroutine(_ActivateLookingCoroutine);
+
+        if (_CurrentState == EnemyStates.STOPPED)
+        {
+            _RangeChaseAfterStop = 28;
+            ChangeState(EnemyStates.CHASE);
+        }
     }
 }
