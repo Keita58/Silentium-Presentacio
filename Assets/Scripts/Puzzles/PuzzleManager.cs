@@ -69,6 +69,7 @@ public class PuzzleManager : MonoBehaviour
     {
         cam_Player.transform.parent.GetComponent<Player>()._inputActions.Player.Enable();
         cam_Hierogliphic.transform.parent.GetComponent<Keypad>().inputActions.Hieroglyphic.Disable();
+        cam_Player.transform.parent.GetComponent<Player>().ResumeInteract();
         cam_Player.gameObject.SetActive(true);
         cam_Hierogliphic.gameObject.SetActive(false);
         Cursor.visible = false;

@@ -1,3 +1,4 @@
+using NavKeypad;
 using NUnit.Framework;
 using System;
 using System.Collections;
@@ -63,6 +64,7 @@ public class Player : MonoBehaviour
     bool note = false;
     bool chest = false;
     bool book = false;
+    bool keypad = false;
     private GameObject clockGameObject;
 
     private Coroutine coroutineRun;
@@ -239,9 +241,9 @@ public class Player : MonoBehaviour
                     itemSlotOccuped = false;
                     InventoryManager.instance.UseEquippedItem();
                 }
-                else
-                {
-                }
+            }else if (keypad)
+            {
+                PuzzleManager.instance.InteractHieroglyphicPuzzle();
             }
         }
 
@@ -514,6 +516,10 @@ public class Player : MonoBehaviour
                     {
                         book = true;
                     }
+                    else if (hit.transform.gameObject.layer == 14)
+                    {
+                        keypad = true;
+                    }
                 }
                 else if (hit.transform.gameObject.layer == 10)
                 {
@@ -525,6 +531,7 @@ public class Player : MonoBehaviour
             {
                 door=false;
                 book=false;
+                keypad=false;
                 item = false;
                 clockPuzzle = false;
                 if (interactiveGameObject != null)
