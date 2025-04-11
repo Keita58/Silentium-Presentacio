@@ -20,8 +20,9 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] InventorySO chestInventory;
     [SerializeField] NoteInventorySO noteInventory;
     [SerializeField] GameObject notesRoot;
-    [SerializeField] GameObject panelNotes;
+    [SerializeField] GameObject notesDiaryPanel;
     [SerializeField] GameObject unequipButton;
+    [SerializeField] GameObject notesPanel;
     private Item equippedItem;
 
     public bool isCombining { get; private set; }
@@ -281,14 +282,29 @@ public class InventoryManager : MonoBehaviour
 
     public void OpenNote(NotesSO note)
     {
-        panelNotes.SetActive(true);
-        panelNotes.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text=note.name;
-        panelNotes.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = note.noteContent;
+        notesDiaryPanel.SetActive(true);
+        notesDiaryPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text=note.name;
+        notesDiaryPanel.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = note.noteContent;
     }
 
     public void DiscoverNote(NotesSO note)
     {
         noteInventory.AddNote(note);
+    }
+
+    public void ShowNote(NotesSO note)
+    {
+        notesPanel.SetActive(true);
+        notesPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = note.name;
+        notesPanel.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = note.noteContent;
+        player.ToggleInputPlayer(false);
+
+    }
+
+    public void CloseNote()
+    {
+        notesPanel.SetActive(false);
+        player.ToggleInputPlayer(true);
     }
 
     public void ShowDiscoveredNotes()

@@ -1,8 +1,4 @@
-using NavKeypad;
-using NUnit.Framework;
-using System;
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 public class Player : MonoBehaviour
@@ -224,6 +220,10 @@ public class Player : MonoBehaviour
                 {
                     InventoryManager.instance.DiscoverNote(interactiveGameObject.GetComponent<Notes>().note);
                     interactiveGameObject.gameObject.SetActive(false);
+                }
+                else
+                {
+                    InventoryManager.instance.ShowNote(interactiveGameObject.GetComponent<Notes>().note);
                 }
             }
             else if (chest)

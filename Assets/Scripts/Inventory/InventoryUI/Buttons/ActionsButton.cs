@@ -27,4 +27,9 @@ public class ActionsButton : MonoBehaviour
     {
         InventoryManager.instance.StoreInChest();
     }
+
+    public void CloseNote()
+    {
+        InventoryManager.instance.CloseNote();
+    }
 }
