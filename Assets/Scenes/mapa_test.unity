@@ -2465,6 +2465,7 @@ MonoBehaviour:
   forwardDirection: 0
   isHideSpot: 0
   isLocked: 0
+  itemNeededToOpen: {fileID: 0}
 --- !u!1 &121697678
 GameObject:
   m_ObjectHideFlags: 0
@@ -2771,6 +2772,7 @@ MonoBehaviour:
   forwardDirection: 0
   isHideSpot: 0
   isLocked: 0
+  itemNeededToOpen: {fileID: 0}
 --- !u!1 &154461132
 GameObject:
   m_ObjectHideFlags: 0
@@ -3395,6 +3397,7 @@ MonoBehaviour:
   forwardDirection: 0
   isHideSpot: 0
   isLocked: 0
+  itemNeededToOpen: {fileID: 0}
 --- !u!1 &224475822 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1525049159396714, guid: a7f1b7c484b704d4686ba88de29f3a90, type: 3}
@@ -3417,6 +3420,7 @@ MonoBehaviour:
   forwardDirection: 0
   isHideSpot: 0
   isLocked: 0
+  itemNeededToOpen: {fileID: 0}
 --- !u!1 &233969694
 GameObject:
   m_ObjectHideFlags: 0
@@ -6086,6 +6090,7 @@ MonoBehaviour:
   forwardDirection: 0
   isHideSpot: 0
   isLocked: 0
+  itemNeededToOpen: {fileID: 0}
 --- !u!1 &409218593
 GameObject:
   m_ObjectHideFlags: 0
@@ -7240,6 +7245,7 @@ MonoBehaviour:
   forwardDirection: 0
   isHideSpot: 0
   isLocked: 0
+  itemNeededToOpen: {fileID: 0}
 --- !u!64 &514322881
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -8228,6 +8234,7 @@ MonoBehaviour:
   forwardDirection: 0
   isHideSpot: 0
   isLocked: 0
+  itemNeededToOpen: {fileID: 0}
 --- !u!4 &623480490 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4052862252325054, guid: a7f1b7c484b704d4686ba88de29f3a90, type: 3}
@@ -8602,6 +8609,7 @@ MonoBehaviour:
   forwardDirection: 0
   isHideSpot: 1
   isLocked: 0
+  itemNeededToOpen: {fileID: 0}
 --- !u!1 &651498920
 GameObject:
   m_ObjectHideFlags: 0
@@ -9302,6 +9310,7 @@ MonoBehaviour:
   forwardDirection: 0
   isHideSpot: 0
   isLocked: 0
+  itemNeededToOpen: {fileID: 0}
 --- !u!1 &704278620
 GameObject:
   m_ObjectHideFlags: 0
@@ -10557,6 +10566,7 @@ MonoBehaviour:
   forwardDirection: 0
   isHideSpot: 0
   isLocked: 0
+  itemNeededToOpen: {fileID: 0}
 --- !u!1 &809858113
 GameObject:
   m_ObjectHideFlags: 0
@@ -11518,6 +11528,7 @@ MonoBehaviour:
   forwardDirection: 0
   isHideSpot: 0
   isLocked: 0
+  itemNeededToOpen: {fileID: 0}
 --- !u!64 &889080263
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -13587,6 +13598,7 @@ MonoBehaviour:
   forwardDirection: 0
   isHideSpot: 0
   isLocked: 0
+  itemNeededToOpen: {fileID: 0}
 --- !u!1 &1123947663
 GameObject:
   m_ObjectHideFlags: 0
@@ -15161,6 +15173,7 @@ MonoBehaviour:
   forwardDirection: 0
   isHideSpot: 0
   isLocked: 0
+  itemNeededToOpen: {fileID: 0}
 --- !u!1 &1245301448 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1395011792542592, guid: a7f1b7c484b704d4686ba88de29f3a90, type: 3}
@@ -15183,6 +15196,7 @@ MonoBehaviour:
   forwardDirection: 0
   isHideSpot: 1
   isLocked: 0
+  itemNeededToOpen: {fileID: 0}
 --- !u!1 &1252137173 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1002729160182338, guid: a7f1b7c484b704d4686ba88de29f3a90, type: 3}
@@ -15205,6 +15219,7 @@ MonoBehaviour:
   forwardDirection: 0
   isHideSpot: 0
   isLocked: 0
+  itemNeededToOpen: {fileID: 0}
 --- !u!1 &1256043917
 GameObject:
   m_ObjectHideFlags: 0
@@ -19799,6 +19814,7 @@ MonoBehaviour:
   forwardDirection: 0
   isHideSpot: 0
   isLocked: 0
+  itemNeededToOpen: {fileID: 0}
 --- !u!1 &1484883176
 GameObject:
   m_ObjectHideFlags: 0
@@ -21158,6 +21174,7 @@ MonoBehaviour:
   forwardDirection: 0
   isHideSpot: 0
   isLocked: 0
+  itemNeededToOpen: {fileID: 0}
 --- !u!64 &1586154997
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -21471,6 +21488,7 @@ MonoBehaviour:
   forwardDirection: 0
   isHideSpot: 0
   isLocked: 0
+  itemNeededToOpen: {fileID: 0}
 --- !u!1 &1632639305 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: 8fa7deb79d061f04f9fdf3c0091cade4, type: 3}
@@ -21744,6 +21762,7 @@ MonoBehaviour:
   forwardDirection: 0
   isHideSpot: 0
   isLocked: 0
+  itemNeededToOpen: {fileID: 0}
 --- !u!1 &1662957564
 GameObject:
   m_ObjectHideFlags: 0
@@ -23071,6 +23090,7 @@ MonoBehaviour:
   forwardDirection: 0
   isHideSpot: 0
   isLocked: 0
+  itemNeededToOpen: {fileID: 0}
 --- !u!1 &1751380000
 GameObject:
   m_ObjectHideFlags: 0
@@ -23699,6 +23719,7 @@ MonoBehaviour:
   interactiveGameObject: {fileID: 0}
   material: {fileID: 2100000, guid: 245be0caa7e11f441a60e9ec2a7f78e5, type: 2}
   baseMaterial: {fileID: 0}
+  inventoryOpened: 0
   equipedObject: {fileID: 0}
   itemSlot: {fileID: 0}
   actualState: 0
@@ -25797,6 +25818,7 @@ MonoBehaviour:
   forwardDirection: 0
   isHideSpot: 0
   isLocked: 0
+  itemNeededToOpen: {fileID: 0}
 --- !u!1 &1903980261
 GameObject:
   m_ObjectHideFlags: 0
@@ -27360,6 +27382,7 @@ MonoBehaviour:
   forwardDirection: 0
   isHideSpot: 0
   isLocked: 0
+  itemNeededToOpen: {fileID: 0}
 --- !u!1 &2055125025 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1136715510511190, guid: a7f1b7c484b704d4686ba88de29f3a90, type: 3}
@@ -27382,6 +27405,7 @@ MonoBehaviour:
   forwardDirection: 0
   isHideSpot: 0
   isLocked: 0
+  itemNeededToOpen: {fileID: 0}
 --- !u!1001 &2063998037
 PrefabInstance:
   m_ObjectHideFlags: 0

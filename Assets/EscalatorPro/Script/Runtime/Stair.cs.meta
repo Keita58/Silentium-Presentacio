@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 40c96749d313b417983b5b1df83b6b0e
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 135432
+  packageName: EscalatorPro
+  packageVersion: 1.0
+  assetPath: Assets/EscalatorPro/Script/Runtime/Stair.cs
+  uploadId: 283765
