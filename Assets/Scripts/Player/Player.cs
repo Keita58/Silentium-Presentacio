@@ -429,7 +429,7 @@ public class Player : MonoBehaviour
                 Debug.Log("CORUTINAMOVER");
                 if (collider.gameObject.TryGetComponent<Enemy>(out Enemy en))
                 {
-                    en.ListenSound(this.transform.position, 2);
+                    en.ListenSound(this.transform.position, 15);
                 }
             }
             yield return new WaitForSeconds(3);

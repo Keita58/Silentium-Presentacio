@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Drawing;
+using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -32,7 +34,8 @@ public class BlindEnemy : Enemy
     {
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
-        _PointOfPatrol = transform.position;
+        _PointOfPatrol = new Vector3(-35, 7.2f, 0);
+        _NavMeshAgent.SetDestination(_PointOfPatrol);
         _RangeSearchSound = 55;
         _Patrolling = false;
         _Hp = MAXHEALTH;
@@ -104,10 +107,10 @@ public class BlindEnemy : Enemy
         {
             if (!_Patrolling)
             {
-                RandomPoint(pointOfSearch, range, out Vector3 coord);
+                /*RandomPoint(pointOfSearch, range, out Vector3 coord);
                 point = coord;
                 _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
-                _Patrolling = true;
+                _Patrolling = true;*/
             }
 
             if (_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
@@ -207,6 +210,16 @@ public class BlindEnemy : Enemy
         if (Vector3.Distance(_Player.transform.position, transform.position) > 2)
         {
             _NavMeshAgent.speed = 15;
+            GameObject aux = new GameObject();
+            aux.AddComponent<NavMeshLink>();
+            NavMesh.SamplePosition(_SoundPos, out NavMeshHit hit, 1.0f, NavMesh.AllAreas);
+            aux.GetComponent<NavMeshLink>().endPoint = hit.position;
+            NavMesh.SamplePosition(transform.position, out NavMeshHit hit2, 1.0f, NavMesh.AllAreas);
+            aux.GetComponent<NavMeshLink>().startPoint = hit2.position;
+            aux.GetComponent<NavMeshLink>().autoUpdate = true;
+            aux.GetComponent<NavMeshLink>().width = 3;
+            aux.GetComponent<NavMeshLink>().agentTypeID = _NavMeshAgent.agentTypeID;
+            aux.GetComponent<NavMeshLink>().area = 3;
             _NavMeshAgent.SetDestination(_SoundPos);
         }
         _Player.GetComponent<Player>().TakeDamage(3);    
