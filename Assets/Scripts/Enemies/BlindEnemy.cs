@@ -1,5 +1,5 @@
 using System.Collections;
-using System.Drawing;
+using System.Collections.Generic;
 using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
@@ -12,11 +12,13 @@ public class BlindEnemy : Enemy
     [SerializeField] private LayerMask _LayerPlayer;
     [SerializeField] private LayerMask _LayerObjectsAndPlayer;
     [SerializeField] private GameObject _DetectionSphere;
+    [SerializeField] private List<Transform> _Waypoints;
 
     private NavMeshAgent _NavMeshAgent;
     private Vector3 _SoundPos;
     private Vector3 _PointOfPatrol;
     private bool _Patrolling;
+    private bool _Search;
 
     private int _Hp;
     public override int hp => _Hp;
@@ -38,6 +40,7 @@ public class BlindEnemy : Enemy
         _NavMeshAgent.SetDestination(_PointOfPatrol);
         _RangeSearchSound = 55;
         _Patrolling = false;
+        _Search = false;
         _Hp = MAXHEALTH;
 
         _DetectionSphere.GetComponent<DetectionSphere>().OnExit += OnExit;
@@ -69,12 +72,14 @@ public class BlindEnemy : Enemy
                 _Patrolling = false;
                 _NavMeshAgent.speed = 4.5f;
                 _PatrolCoroutine = StartCoroutine(Patrol(_RangeSearchSound, _PointOfPatrol));
+                if (_Search)
+                    _ChangeStateToPatrol = StartCoroutine(WakeUp(15));
                 break;
             case EnemyStates.ATTACK:
                 AttackPlayer();
                 break;
             case EnemyStates.KNOCKED:
-                StartCoroutine(WakeUp());
+                StartCoroutine(WakeUp(5));
                 break;
         }
     }
@@ -85,6 +90,8 @@ public class BlindEnemy : Enemy
         {
             case EnemyStates.PATROL:
                 StopCoroutine(_PatrolCoroutine);
+                if(_ChangeStateToPatrol != null)
+                    StopCoroutine(_ChangeStateToPatrol);
                 break;
             case EnemyStates.ATTACK:
                 _PointOfPatrol = transform.position;
@@ -105,12 +112,25 @@ public class BlindEnemy : Enemy
         Vector3 point = Vector3.zero;
         while (true)
         {
-            if (!_Patrolling)
+            if (_Search)
             {
-                /*RandomPoint(pointOfSearch, range, out Vector3 coord);
-                point = coord;
-                _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
-                _Patrolling = true;*/
+                if (!_Patrolling)
+                {
+                    RandomPoint(pointOfSearch, range, out Vector3 coord);
+                    point = coord;
+                    _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
+                    _Patrolling = true;
+                }
+
+            }
+            else
+            {
+                if (!_Patrolling)
+                {
+                    //Falta posar els waypoints del mapa.
+                    _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
+                    _Patrolling = true;
+                }
             }
 
             if (_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
@@ -123,13 +143,13 @@ public class BlindEnemy : Enemy
         }
     }
 
-    //Busca punt aleatori dins del NavMesh
     private bool RandomPoint(Vector3 center, float range, out Vector3 result)
     {
-        for (int i = 0; i < 50; i++)
+        for(int i = 0; i < 50; i++) 
         {
             //Agafa un punt aleatori dins de l'esfera amb el radi que passem per parametre
             Vector3 randomPoint = new Vector3(center.x, center.y, center.z) + Random.insideUnitSphere * range;
+            Debug.Log($"Punt: {randomPoint}");
 
             //Aquí s'haurà de comprovar si la y que hem extret està en algun dels pisos de l'edifici.
             //Si està aprop la transformem en aquest i ja
@@ -137,6 +157,7 @@ public class BlindEnemy : Enemy
             Vector3 point = new Vector3(randomPoint.x, randomPoint.y, randomPoint.z);
 
             NavMeshHit hit;
+            print(NavMesh.GetAreaNames().Length);
 
             //Comprovem que el punt que hem agafat esta dins del NavMesh
             if (NavMesh.SamplePosition(point, out hit, 1.0f, NavMesh.AllAreas) && Vector3.Distance(point, center) > 1.75f)
@@ -169,14 +190,20 @@ public class BlindEnemy : Enemy
             if (lvlSound > 0 && lvlSound <= 2)
             {
                 _RangeSearchSound = 3;
+                _Search = true;
+                ChangeState(EnemyStates.PATROL);
             }
             else if (lvlSound > 2 && lvlSound <= 3)
             {
                 _RangeSearchSound = 1;
+                _Search = true;
+                ChangeState(EnemyStates.PATROL);
             }
             else if (lvlSound > 3 && lvlSound <= 5)
             {
-                _RangeSearchSound = 0.3f;
+                _RangeSearchSound = 0.5f;
+                _Search = true;
+                ChangeState(EnemyStates.PATROL);
             }
             else if (lvlSound > 5)
             {
@@ -196,9 +223,10 @@ public class BlindEnemy : Enemy
         }
     }
 
-    IEnumerator WakeUp()
+    IEnumerator WakeUp(int time)
     {
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(time);
+        _Search = false;
         ChangeState(EnemyStates.PATROL);
     }
 
@@ -220,6 +248,7 @@ public class BlindEnemy : Enemy
             aux.GetComponent<NavMeshLink>().width = 3;
             aux.GetComponent<NavMeshLink>().agentTypeID = _NavMeshAgent.agentTypeID;
             aux.GetComponent<NavMeshLink>().area = 3;
+
             _NavMeshAgent.SetDestination(_SoundPos);
         }
         _Player.GetComponent<Player>().TakeDamage(3);    

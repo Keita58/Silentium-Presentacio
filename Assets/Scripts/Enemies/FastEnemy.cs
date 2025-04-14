@@ -60,9 +60,6 @@ public class FastEnemy : Enemy
 
     private void ChangeState(EnemyStates newState)
     {
-        if (newState == _CurrentState)
-            return;
-
         Debug.Log($"---------------------- Sortint de {_CurrentState} a {newState} ------------------------");
         ExitState(_CurrentState);
 
