@@ -1,3 +1,4 @@
+using NavKeypad;
 using NUnit.Framework;
 using System;
 using System.Collections;
@@ -30,13 +31,15 @@ public class Player : MonoBehaviour
 
     float maxAngle = 45.0f;
     float minAngle = -30.0f;
+    float gravity = 9.8f;
+    float vSpeed = 0f;
 
-    bool crouched=false;
-    bool aim=false;
+    bool crouched = false;
+    bool aim = false;
     float crouchedCenterCollider = -0.5f;
     float crouchedHeightCollider = 1;
     Vector3 cameraPositionBeforeCrouch = new Vector3(0, 0.627f, -0.198f);
-    int gunAmmo =3;
+    int gunAmmo = 3;
     int hp = 5;
 
     [SerializeField] GameObject cameraShenanigansGameObject;
@@ -51,18 +54,25 @@ public class Player : MonoBehaviour
     GameObject equippedItem;
     [SerializeField] private Material baseMaterial;
     private GameObject itemEquipped;
-    private bool inventoryOpened;
+    public bool inventoryOpened;
     private bool itemSlotOccuped;
     [SerializeField] private GameObject equipedObject;
     [SerializeField] Transform itemSlot;
-    bool door=false;
+    bool door = false;
     bool clockPuzzle = false;
+    bool item = false;
+    bool note = false;
+    bool chest = false;
+    bool book = false;
+    bool keypad = false;
     private GameObject clockGameObject;
 
     private Coroutine coroutineRun;
     private Coroutine coroutineMove;
     private Coroutine coroutineCrouch;
     private Coroutine coroutineInteract;
+    CharacterController characterController;
+    Vector3 velocity;
 
     private void Awake()
     {
@@ -71,12 +81,36 @@ public class Player : MonoBehaviour
         _MoveAction = _inputActions.Player.Move;
         _LookAction = _inputActions.Player.Look;
         _RunAction = _inputActions.Player.Run;
-        _inputActions.Player.Shoot.performed+=Shoot;
-        _inputActions.Player.Aim.performed +=Aim;
-        _inputActions.Player.PickUpItem.performed +=PickUpItem;
+        _inputActions.Player.Shoot.performed += Shoot;
+        _inputActions.Player.Aim.performed += Aim;
+        _inputActions.Player.PickUpItem.performed += Interact;
         _inputActions.Player.Inventory.performed += OpenInventory;
-        _Rigidbody= GetComponent<Rigidbody>();
+        _Rigidbody = GetComponent<Rigidbody>();
         _inputActions.Player.Enable();
+        characterController = GetComponent<CharacterController>();
+    }
+
+    public void ToggleInputPlayer(bool enable)
+    {
+        if (!enable)
+        {
+            _inputActions.Player.Shoot.Disable();
+            _inputActions.Player.Aim.Disable();
+            _inputActions.Player.Move.Disable();
+            _inputActions.Player.Look.Disable();
+            _inputActions.Player.Crouch.Disable();
+            _inputActions.Player.PickUpItem.Disable();
+        }
+        else
+        {
+            _inputActions.Player.Shoot.Enable();
+            _inputActions.Player.Aim.Enable();
+            _inputActions.Player.Move.Enable();
+            _inputActions.Player.Look.Enable();
+            _inputActions.Player.Crouch.Enable();
+            _inputActions.Player.PickUpItem.Enable();
+        }
+
     }
 
 
@@ -89,32 +123,21 @@ public class Player : MonoBehaviour
             Cursor.visible = true;
             InventoryManager.instance.OpenInventory(this.gameObject);
             inventoryOpened = true;
-            _inputActions.Player.Shoot.Disable();
-            _inputActions.Player.Aim.Disable();
-            _inputActions.Player.Move.Disable();
-            _inputActions.Player.Look.Disable();
-            _inputActions.Player.Crouch.Disable();
-            _inputActions.Player.PickUpItem.Disable();
-
+            ToggleInputPlayer(false);
         }
         else
         {
             Cursor.visible = false;
             InventoryManager.instance.CloseInventory();
             inventoryOpened = false;
-            _inputActions.Player.Shoot.Enable();
-            _inputActions.Player.Aim.Enable();
-            _inputActions.Player.Move.Enable();
-            _inputActions.Player.Look.Enable();
-            _inputActions.Player.Crouch.Enable();
-            _inputActions.Player.PickUpItem.Enable();
+            ToggleInputPlayer(true);
         }
     }
 
     void Start()
     {
         Cursor.visible = false;
-        coroutineInteract= StartCoroutine(InteractuarRaycast());
+        coroutineInteract = StartCoroutine(InteractuarRaycast());
     }
 
     private void Update()
@@ -132,10 +155,10 @@ public class Player : MonoBehaviour
 
     }
 
-    private void PickUpItem(InputAction.CallbackContext context)
+    private void Interact(InputAction.CallbackContext context)
     {
         Debug.Log("ENTRO?");
-        if (interactiveGameObject != null)
+        if (interactiveGameObject != null && item)
         {
             Debug.Log("ENTRO DEFINITIVAMENTE");
             InventoryManager.instance.AddItem(interactiveGameObject.GetComponent<PickItem>().item);
@@ -153,22 +176,75 @@ public class Player : MonoBehaviour
                 {
                     if (hit.collider.TryGetComponent<Door>(out Door door))
                     {
-                        if (door.isOpen)
+                        if (door.isLocked)
                         {
-                            door.Close();
+                            InventorySO.ItemSlot aux = null;
+                            foreach (InventorySO.ItemSlot item in InventoryManager.instance.inventory.items)
+                            {
+                                if (item.item == door.itemNeededToOpen)
+                                {
+                                    door.isLocked = false;
+                                    aux = item;
+                                }
+                            }
+                            InventoryManager.instance.inventory.items.Remove(aux);
+                            if (door.isOpen)
+                            {
+                                door.Close();
+                            }
+                            else
+                            {
+                                door.Open(transform.position);
+                            }
                         }
                         else
                         {
-                            door.Open(transform.position);
+                            if (door.isOpen)
+                            {
+                                door.Close();
+                            }
+                            else
+                            {
+                                door.Open(transform.position);
+                            }
                         }
                     }
                 }
-            }else if (clockPuzzle)
+            }
+            else if (clockPuzzle)
             {
                 PuzzleManager.instance.InteractClockPuzzle();
                 StopCoroutine(coroutineInteract);
                 clockPuzzle = false;
-            } 
+
+            }
+            else if (interactiveGameObject != null && note)
+            {
+                if (interactiveGameObject.GetComponent<Notes>().note.noteId < 6)
+                {
+                    InventoryManager.instance.DiscoverNote(interactiveGameObject.GetComponent<Notes>().note);
+                    interactiveGameObject.gameObject.SetActive(false);
+                }
+            }
+            else if (chest)
+            {
+                InventoryManager.instance.OpenChest();
+                chest = false;
+            }else if (book)
+            {
+                if (equipedObject != null)
+                {
+                    equipedObject.transform.rotation = Quaternion.identity;
+                    equipedObject.transform.parent = null;
+                    equipedObject.transform.position = interactiveGameObject.transform.GetChild(0).transform.position;
+                    equipedObject = null;
+                    itemSlotOccuped = false;
+                    InventoryManager.instance.UseEquippedItem();
+                }
+            }else if (keypad)
+            {
+                PuzzleManager.instance.InteractHieroglyphicPuzzle();
+            }
         }
 
     }
@@ -187,6 +263,13 @@ public class Player : MonoBehaviour
             itemSlotOccuped = true;
             equipedObject = equip;
         }
+    }
+
+    public void UnequipItem()
+    {
+        itemSlotOccuped = false;
+        Destroy(equipedObject);
+        equipedObject = null;
     }
 
     private void Crouch(InputAction.CallbackContext context)
@@ -212,20 +295,20 @@ public class Player : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        hp-=damage;
+        hp -= damage;
     }
 
 
     private void Aim(InputAction.CallbackContext context)
     {
-        aim= !aim;
-        gunGameObject.transform.localPosition = aim ? new Vector3 (0.057f, -0.312999994f, 0.391000003f) : new Vector3(0.456f, -0.313f, 0.505f);
-        weaponCamera.transform.localPosition= aim ?  new Vector3 (0f, 0f, -0.28f) : Vector3.zero;
+        aim = !aim;
+        gunGameObject.transform.localPosition = aim ? new Vector3(0.057f, -0.312999994f, 0.391000003f) : new Vector3(0.456f, -0.313f, 0.505f);
+        weaponCamera.transform.localPosition = aim ? new Vector3(0f, 0f, -0.28f) : Vector3.zero;
     }
 
     #region FSM
 
-    enum PlayerStates {IDLE, MOVE, RUN, HURT, RUNMOVE, CROUCH }
+    enum PlayerStates { IDLE, MOVE, RUN, HURT, RUNMOVE, CROUCH }
     [SerializeField] PlayerStates actualState;
     [SerializeField] float stateTime;
 
@@ -245,7 +328,7 @@ public class Player : MonoBehaviour
         {
             case PlayerStates.IDLE:
                 _Rigidbody.linearVelocity = Vector3.zero;
-                _Rigidbody.angularVelocity=Vector3.zero;
+                _Rigidbody.angularVelocity = Vector3.zero;
                 break;
             case PlayerStates.MOVE:
                 coroutineMove = StartCoroutine(MakeNoiseMove());
@@ -268,7 +351,6 @@ public class Player : MonoBehaviour
     private void UpdateState()
     {
         Vector2 movementInput = _MoveAction.ReadValue<Vector2>();
-
         switch (actualState)
         {
 
@@ -276,7 +358,9 @@ public class Player : MonoBehaviour
                 if (movementInput != Vector2.zero && !crouched)
                 {
                     ChangeState(PlayerStates.MOVE);
-                }else if (crouched)
+
+                }
+                else if (crouched)
                 {
                     ChangeState(PlayerStates.CROUCH);
                 }
@@ -284,61 +368,61 @@ public class Player : MonoBehaviour
             case PlayerStates.MOVE:
                 if (movementInput == Vector2.zero)
                     ChangeState(PlayerStates.IDLE);
-                
+
                 if (_RunAction.IsPressed() && !crouched)
                 {
                     ChangeState(PlayerStates.RUN);
-                }else if (crouched)
+                }
+                else if (crouched)
                 {
                     ChangeState(PlayerStates.CROUCH);
                 }
 
-                _Rigidbody.linearVelocity =
-                ((transform.right * movementInput.x +
-                transform.forward * movementInput.y)
-                .normalized * _VelocityMove) + (Vector3.up * _Rigidbody.linearVelocity.y);
+                velocity = (transform.right * movementInput.x +
+                  transform.forward * movementInput.y).normalized * _VelocityMove;
+                vSpeed -= gravity * Time.deltaTime;
+                velocity.y = vSpeed;
+
                 break;
             case PlayerStates.RUN:
-
-                _Rigidbody.linearVelocity =
-                (transform.right * movementInput.x +
-                transform.forward * movementInput.y)
-                .normalized * _VelocityRun;
-
-
+                velocity = (transform.right * movementInput.x +
+                  transform.forward * movementInput.y).normalized * _VelocityRun;
+                vSpeed -= gravity * Time.deltaTime;
+                velocity.y = vSpeed;
                 if (!_RunAction.IsPressed())
                     ChangeState(PlayerStates.MOVE);
                 break;
             case PlayerStates.CROUCH:
-                _Rigidbody.linearVelocity =
-                (transform.right * movementInput.x +
-                transform.forward * movementInput.y)
-                .normalized * _VelocityMove/2;
+                velocity = (transform.right * movementInput.x +
+               transform.forward * movementInput.y).normalized * 1.5f;
+                vSpeed -= gravity * Time.deltaTime;
+                velocity.y = vSpeed;
                 if (!crouched && movementInput == Vector2.zero)
                 {
                     ChangeState(PlayerStates.IDLE);
-                }else if (!crouched)
+                }
+                else if (!crouched)
                 {
                     ChangeState(PlayerStates.MOVE);
                 }
                 break;
             default:
                 break;
-
         }
+        characterController.Move(velocity * Time.deltaTime);
     }
 
 
-        private void ExitState(PlayerStates exitState)
+    private void ExitState(PlayerStates exitState)
     {
         switch (exitState)
         {
             case PlayerStates.MOVE:
-                if (coroutineMove!=null)
+                if (coroutineMove != null)
                     StopCoroutine(coroutineMove);
                 break;
             case PlayerStates.RUN:
-                if (coroutineRun!=null)
+                if (coroutineRun != null)
                     StopCoroutine(coroutineRun);
                 break;
             case PlayerStates.CROUCH:
@@ -366,51 +450,100 @@ public class Player : MonoBehaviour
             //Lanzar Raycast interactuar con el mundo.
 
             if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask)){
-                if (hit.transform.gameObject.layer== 9 && !hit.collider.gameObject.Equals(interactiveGameObject))
+                if (interactiveGameObject != null)
+                {
+                    if ( interactiveGameObject.transform.gameObject.layer != 15)
+                    {
+                        interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
+                        interactiveGameObject = null;
+                    }
+                }
+                if (!hit.collider.gameObject.Equals(interactiveGameObject) && hit.transform.gameObject.layer != 10)
                 {
                     interactiveGameObject = hit.collider.gameObject;
-                    baseMaterial = interactiveGameObject.GetComponent<MeshRenderer>().materials[0];
-                    interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[]
+                    if (hit.transform.gameObject.layer != 15)
                     {
+                        baseMaterial = interactiveGameObject.GetComponent<MeshRenderer>().materials[0];
+                        interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[]
+                        {
                     interactiveGameObject.GetComponent<MeshRenderer>().materials[0],
 
                     material
-                    };
-                }else if (hit.transform.gameObject.layer == 10)
+                        };
+                    }
+                    else
+                    {
+                        Transform child =interactiveGameObject.transform.GetChild(0);
+                        if (child.childCount > 0)
+                        {
+                            Transform bookChild = child.GetChild(0);
+                            baseMaterial = bookChild.GetComponent<MeshRenderer>().materials[0];
+                            bookChild.GetComponent<MeshRenderer>().materials = new Material[]
+                            {
+                                bookChild.GetComponent<MeshRenderer>().materials[0],
+
+                                material
+                            };
+                        }
+                    }
+                    if (hit.transform.gameObject.layer == 9)
+                    {
+                        item = true;
+                        if (hit.transform.gameObject.GetComponent<PickItem>().item is BookItem)
+                        {
+                            if (hit.transform.gameObject.GetComponent<Book>().placed)
+                            {
+                                hit.transform.gameObject.GetComponent<Book>().placed = false;
+                                hit.transform.gameObject.GetComponent<Book>().collider.enabled = true;
+                                hit.transform.gameObject.GetComponent<Book>().collider = null;
+                            }
+                        }
+                    }
+                    else if (hit.transform.gameObject.layer == 12)
+                    {
+                        note = true;
+                    }
+                    else if (hit.transform.gameObject.layer == 11)
+                    {
+                        clockPuzzle = true;
+
+                    }
+                    else if (hit.transform.gameObject.layer == 13)
+                    {
+                        chest = true;
+                    }
+                    else if (hit.transform.gameObject.layer == 15)
+                    {
+                        book = true;
+                    }
+                    else if (hit.transform.gameObject.layer == 14)
+                    {
+                        keypad = true;
+                    }
+                }
+                else if (hit.transform.gameObject.layer == 10)
                 {
                     door = true;
-
-                }else if (hit.transform.gameObject.layer == 11)
-                {
-                    clockGameObject = hit.collider.gameObject;
-                    baseMaterial = clockGameObject.GetComponent<MeshRenderer>().materials[0];
-                    clockGameObject.GetComponent<MeshRenderer>().materials = new Material[]
-                    {
-                    clockGameObject.GetComponent<MeshRenderer>().materials[0],
-
-                    material
-                    };
-                    clockPuzzle = true;
                 }
+
             }
             else if (!Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit2, 10f, interactLayerMask))
             {
                 door=false;
+                book=false;
+                keypad=false;
+                item = false;
                 clockPuzzle = false;
                 if (interactiveGameObject != null)
                 {
-                    interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
-                    interactiveGameObject = null;
-                }
-                if(clockGameObject != null)
-                {
-                    clockGameObject.GetComponent<MeshRenderer>().materials = new Material[] { clockGameObject.GetComponent<MeshRenderer>().materials[0] };
-                    clockGameObject = null;
+                    if (interactiveGameObject.transform.gameObject.layer != 15)
+                    {
+                        interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
+                        interactiveGameObject = null;
+                    }
                 }
                 //onNotInteractuable?.Invoke();
             }
-
-
             // onInteractuable?.Invoke();
 
             yield return new WaitForSeconds(0.1f);
@@ -469,7 +602,7 @@ public class Player : MonoBehaviour
     {
         _inputActions.Player.Shoot.performed -= Shoot;
         _inputActions.Player.Aim.performed -= Aim;
-        _inputActions.Player.PickUpItem.performed -= PickUpItem;
+        _inputActions.Player.PickUpItem.performed -= Interact;
         _inputActions.Player.Inventory.performed -= OpenInventory;
         _inputActions.Player.Crouch.performed += Crouch;
 

@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 3
   tags:
   - Enemy
+  - BadPositionBook
+  - GoodPositionBook
   layers:
   - Default
   - TransparentFX
@@ -18,11 +20,11 @@ TagManager:
   - Item
   - Doors
   - ClockPuzzle
+  - Note
+  - Chest
   - keypad
-  - 
-  - 
-  - 
-  - 
+  - CellBook
+  - Book
   - 
   - 
   - 

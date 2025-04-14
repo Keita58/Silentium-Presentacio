@@ -4,6 +4,6 @@ using UnityEngine;
 public class NotesSO : ScriptableObject
 {
     public string Name;
-    public string noteId;
+    public int noteId;
     public string noteContent;
 }

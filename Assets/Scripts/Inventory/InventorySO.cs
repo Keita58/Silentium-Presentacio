@@ -61,7 +61,7 @@ public class InventorySO : ScriptableObject
 
     }
 
-    private ItemSlot GetItem(Item item)
+    public ItemSlot GetItem(Item item)
     {
         foreach (ItemSlot slot in items)
         {

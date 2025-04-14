@@ -13,9 +13,12 @@ public class Door : MonoBehaviour
 
     [SerializeField] private float forwardDirection = 0;
 
+    [Header("Door states")]
     [SerializeField] private bool isHideSpot = false;
 
-    [SerializeField] private bool isLocked = false;
+    [SerializeField] public bool isLocked = false;
+
+    [SerializeField] public Item itemNeededToOpen;
 
     private Vector3 startRotation;
 
