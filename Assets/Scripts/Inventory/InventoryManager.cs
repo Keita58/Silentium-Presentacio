@@ -22,6 +22,7 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] GameObject notesRoot;
     [SerializeField] GameObject panelNotes;
     [SerializeField] GameObject unequipButton;
+    [SerializeField] GameObject itemDescriptionPanel;
     private Item equippedItem;
 
     public bool isCombining { get; private set; }
@@ -71,6 +72,19 @@ public class InventoryManager : MonoBehaviour
             buttonsActionRoot.transform.GetChild(2).GetComponent<Button>().interactable = itemSelected.isCombinable ? true : false;
         }
     }
+    private void FillClearItemDescriptionPanel(string itemName, string itemDescription, bool clear)
+    {
+        if (clear)
+        {
+            itemDescriptionPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "";
+            itemDescriptionPanel.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
+        }
+        else
+        {
+            itemDescriptionPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = itemName;
+            itemDescriptionPanel.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = itemDescription;
+        }
+    }
 
     #region FSM
     enum ActionStates { NOACTION, SELECT_ACTION, ACTION_USE, ACTION_COMBINE, ACTION_EQUIP_ITEM, ACTION_COMBINE_SELECT, SELECT_EQUIPPED, ACTION_UNEQUIP, CHEST_OPENED, ACTION_CHEST_SELECT }
@@ -84,7 +98,7 @@ public class InventoryManager : MonoBehaviour
         InitState(newState);
     }
 
-   
+ 
 
     private void InitState(ActionStates newState)
     {
@@ -97,10 +111,11 @@ public class InventoryManager : MonoBehaviour
                 unequipButton.GetComponent<Button>().interactable = false;
                 isCombining = false;
                 ToggleActionsButtons(false);
+                FillClearItemDescriptionPanel("", "", true);
                 break;
             case ActionStates.SELECT_ACTION:
                 ToggleActionsButtons(true);
-
+                FillClearItemDescriptionPanel(itemSelected.Name, itemSelected.Description, false);
                 break;
             case ActionStates.ACTION_USE:
                 itemSelected.Use();
@@ -145,6 +160,7 @@ public class InventoryManager : MonoBehaviour
                 break;
             case ActionStates.ACTION_CHEST_SELECT:
                 saveButton.GetComponent<Button>().interactable = true;
+                FillClearItemDescriptionPanel(itemSelected.Name, itemSelected.Description, false);
                 break;
 
         }
