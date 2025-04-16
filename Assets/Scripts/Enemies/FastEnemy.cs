@@ -1,9 +1,8 @@
 ﻿using System.Collections;
-using System.Drawing;
-using Unity.VisualScripting;
-using UnityEditor;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Rendering.HighDefinition;
 
 public class FastEnemy : Enemy
 {
@@ -13,13 +12,16 @@ public class FastEnemy : Enemy
     [SerializeField] private GameObject _Player;
     [SerializeField] private LayerMask _LayerPlayer;
     [SerializeField] private LayerMask _LayerObjectsAndPlayer;
+    [SerializeField] private LayerMask _LayerDoor;
     [SerializeField] private GameObject _DetectionSphere;
+    [SerializeField] private List<Transform> _Waypoints;
 
     private NavMeshAgent _NavMeshAgent;
     private Vector3 _SoundPos;
     private Vector3 _PointOfPatrol;
     private float _BetaDotProduct;
     private bool _Patrolling;
+    private bool _Search;
 
     private int _Hp;
     public override int hp => _Hp;
@@ -49,6 +51,8 @@ public class FastEnemy : Enemy
 
         _DetectionSphere.GetComponent<DetectionSphere>().OnEnter += ActivateLookingCoroutine;
         _DetectionSphere.GetComponent<DetectionSphere>().OnExit += DeactivateLookingCoroutine;
+
+        StartCoroutine(OpenDoors());
     }
 
     private void Start()
@@ -184,14 +188,17 @@ public class FastEnemy : Enemy
             if (lvlSound > 0 && lvlSound <= 2)
             {
                 _RangeSearchSound = 5;
+                _Search = true;
             }
             else if (lvlSound > 2 && lvlSound <= 5)
             {
                 _RangeSearchSound = 3;
+                _Search = true;
             }
             else if (lvlSound > 5 && lvlSound <= 9)
             {
                 _RangeSearchSound = 1;
+                _Search = true;
             }
             else if (lvlSound > 9)
             {
@@ -218,14 +225,26 @@ public class FastEnemy : Enemy
     // Funció per moure l'enemic pel mapa
     IEnumerator Patrol(int range, Vector3 pointOfSearch)
     {
-        Vector3 point = Vector3.zero;
+        Transform point = default;
         while (true)
         {
             if (!_Patrolling)
             {
-                RandomPoint(pointOfSearch, range, out Vector3 coord);
-                point = coord;
-                _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
+                if(!_Search) 
+                {
+                    while(true)
+                    {
+                        point = _Waypoints[Random.Range(0, _Waypoints.Count)];
+                        if (point.position != _NavMeshAgent.destination)
+                            break;
+                    }
+                }
+                else
+                {
+                    RandomPoint(pointOfSearch, range, out Vector3 coord);
+                    point.position = coord;
+                }
+                _NavMeshAgent.SetDestination(new Vector3(point.position.x, point.position.y, point.position.z));
                 _Patrolling = true;
             }
 
@@ -274,7 +293,37 @@ public class FastEnemy : Enemy
         yield return new WaitForSeconds(5);
         _RangeSearchSound = 50;
         _PointOfPatrol = transform.position;
+        _Search = true;
         ChangeState(EnemyStates.PATROL);
+    }
+
+    IEnumerator OpenDoors()
+    {
+        while(true)
+        {
+            if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 3f, _LayerDoor))
+            {
+                if(hit.collider.TryGetComponent<Door>(out Door door) && !door.isLocked)
+                {
+                    if (!door.isOpen)
+                    {
+                        _NavMeshAgent.isStopped = true;
+                        door.Open(transform.position);
+                        yield return new WaitForSeconds(0.4f);
+                        _NavMeshAgent.isStopped = false;
+                        StartCoroutine(CloseDoorAutomatic(door));
+                    }
+                }
+            }
+
+            yield return new WaitForSeconds(0.5f);
+        }
+    }
+
+    IEnumerator CloseDoorAutomatic(Door door)
+    {
+        yield return new WaitForSeconds(1);
+        door.Close();
     }
 
     IEnumerator LookingPlayer()
