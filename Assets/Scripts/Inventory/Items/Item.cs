@@ -40,5 +40,10 @@ public enum ItemTypes
     BOTTLE,
     AMMO, 
     KEY,
-    GUN
+    GUN,
+    BOOK1,
+    BOOK2,
+    BOOK3,
+    BOOK4,
+    BOOK5,
 }

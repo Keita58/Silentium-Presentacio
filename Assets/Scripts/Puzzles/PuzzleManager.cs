@@ -14,6 +14,8 @@ public class PuzzleManager : MonoBehaviour
     private InputSystem_Actions inputActionPlayer;
     [SerializeField]
     private Camera cam_Hierogliphic;
+    [SerializeField]
+    BookPuzzle bookPuzzle;
     private void Awake()
     {
         inputActionPlayer = new InputSystem_Actions();
@@ -73,5 +75,11 @@ public class PuzzleManager : MonoBehaviour
         cam_Player.gameObject.SetActive(true);
         cam_Hierogliphic.gameObject.SetActive(false);
         Cursor.visible = false;
+    }
+
+    public void CheckBookPuzzle()
+    {
+        Debug.Log("CheckBookPuzzle");
+        bookPuzzle.checkBookPosition();
     }
 }
