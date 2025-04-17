@@ -31,7 +31,7 @@ public class Player : MonoBehaviour
     private Vector2 _LookRotation = Vector2.zero;
 
     float maxAngle = 45.0f;
-    float minAngle = -30.0f;
+    float minAngle = -45.0f;
     float gravity = 9.8f;
     float vSpeed = 0f;
 
