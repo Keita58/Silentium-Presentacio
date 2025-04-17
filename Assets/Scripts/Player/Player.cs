@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using NavKeypad;
 using NUnit.Framework;
 using System;
@@ -60,11 +61,15 @@ public class Player : MonoBehaviour
     [SerializeField] Transform itemSlot;
     bool door = false;
     bool clockPuzzle = false;
+    [SerializeField]
     bool item = false;
     bool note = false;
     bool chest = false;
+
+    [SerializeField]
     bool book = false;
     bool keypad = false;
+    [SerializeField]
     bool bookItem= false;
     private GameObject clockGameObject;
 
@@ -165,7 +170,7 @@ public class Player : MonoBehaviour
             Debug.Log("ENTRO DEFINITIVAMENTE");
             InventoryManager.instance.AddItem(interactiveGameObject.GetComponent<PickItem>().item);
             Debug.Log("QUE COJO?" + interactiveGameObject.GetComponent<PickItem>().item);
-            interactiveGameObject.gameObject.SetActive(false);
+
             Debug.Log("Entro Coger item");
             if (bookItem)
             {
@@ -173,10 +178,13 @@ public class Player : MonoBehaviour
                 {
                     interactiveGameObject.GetComponent<Book>().placed = false;
                     interactiveGameObject.GetComponent<Book>().collider.enabled = true;
+                    interactiveGameObject.GetComponent<Book>().collider.transform.GetComponent<CellBook>().SetBook(null);
                     interactiveGameObject.GetComponent<Book>().collider = null;
                     bookItem = false;
+                    item = false;
                 }
-            }
+            }            
+            interactiveGameObject.gameObject.SetActive(false);
             interactiveGameObject = null;
 
         }
@@ -252,6 +260,7 @@ public class Player : MonoBehaviour
                         interactiveGameObject.GetComponent<CellBook>().SetBook(equipedObject.GetComponent<Book>());
                         equipedObject.GetComponent<Book>().collider = interactiveGameObject.GetComponent<CellBook>().GetComponent<BoxCollider>();
                         equipedObject.GetComponent<Book>().placed = true;
+                        PuzzleManager.instance.CheckBookPuzzle();
                         interactiveGameObject.GetComponent<CellBook>().GetComponent<BoxCollider>().enabled = false;
                         equipedObject.transform.rotation = Quaternion.identity;
                         equipedObject.transform.parent = null;
@@ -564,7 +573,7 @@ public class Player : MonoBehaviour
 
             yield return new WaitForSeconds(0.1f);
         }
-    }
+    } 
 
     #region SOUNDS
 
@@ -620,7 +629,7 @@ public class Player : MonoBehaviour
         _inputActions.Player.Aim.performed -= Aim;
         _inputActions.Player.PickUpItem.performed -= Interact;
         _inputActions.Player.Inventory.performed -= OpenInventory;
-        _inputActions.Player.Crouch.performed += Crouch;
+        _inputActions.Player.Crouch.performed -= Crouch;
 
     }
 }
