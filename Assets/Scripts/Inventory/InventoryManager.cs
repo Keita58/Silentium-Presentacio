@@ -311,7 +311,7 @@ public class InventoryManager : MonoBehaviour
     public void ShowNote(NotesSO note)
     {
         notesPanel.SetActive(true);
-        notesPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = note.name;
+        notesPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = note.Name;
         notesPanel.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = note.noteContent;
         player.ToggleInputPlayer(false);
 
