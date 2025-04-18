@@ -11,6 +11,7 @@ public class BlindEnemy : Enemy
     [SerializeField] private GameObject _Player;
     [SerializeField] private LayerMask _LayerPlayer;
     [SerializeField] private LayerMask _LayerObjectsAndPlayer;
+    [SerializeField] private LayerMask _LayerDoor;
     [SerializeField] private GameObject _DetectionSphere;
     [SerializeField] private List<Transform> _Waypoints;
 
@@ -31,6 +32,7 @@ public class BlindEnemy : Enemy
 
     private Coroutine _PatrolCoroutine;
     private Coroutine _ChangeStateToPatrol;
+    private Coroutine _LeaveAttack;
 
     private void Awake()
     {
@@ -43,7 +45,11 @@ public class BlindEnemy : Enemy
         _Search = false;
         _Hp = MAXHEALTH;
 
+        _LeaveAttack = null;
+
         _DetectionSphere.GetComponent<DetectionSphere>().OnExit += OnExit;
+
+        StartCoroutine(OpenDoors());
     }
 
     private void Start()
@@ -109,34 +115,33 @@ public class BlindEnemy : Enemy
     // Funció per moure l'enemic pel mapa
     IEnumerator Patrol(float range, Vector3 pointOfSearch)
     {
-        Vector3 point = Vector3.zero;
+        Transform point = default;
         while (true)
         {
-            if (_Search)
+            if (!_Patrolling)
             {
-                if (!_Patrolling)
+                if (!_Search)
+                {
+                    while (true)
+                    {
+                        point = _Waypoints[Random.Range(0, _Waypoints.Count)];
+                        if (point.position != _NavMeshAgent.destination)
+                            break;
+                    }
+                }
+                else
                 {
                     RandomPoint(pointOfSearch, range, out Vector3 coord);
-                    point = coord;
-                    _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
-                    _Patrolling = true;
+                    point.position = coord;
                 }
-
-            }
-            else
-            {
-                if (!_Patrolling)
-                {
-                    //Falta posar els waypoints del mapa.
-                    _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
-                    _Patrolling = true;
-                }
+                _NavMeshAgent.SetDestination(new Vector3(point.position.x, point.position.y, point.position.z));
+                _Patrolling = true;
             }
 
             if (_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
             {
                 _Patrolling = false;
-                yield return new WaitForSeconds(3);
+                yield return new WaitForSeconds(2);
             }
             else
                 yield return new WaitForSeconds(0.5f);
@@ -234,24 +239,64 @@ public class BlindEnemy : Enemy
     {
         //Animation -> attack
         transform.LookAt(_Player.transform.position);
-        _NavMeshAgent.SetDestination(transform.position);
         if (Vector3.Distance(_Player.transform.position, transform.position) > 2)
         {
             _NavMeshAgent.speed = 15;
             GameObject aux = new GameObject();
-            aux.AddComponent<NavMeshLink>();
+            NavMeshLink link = aux.AddComponent<NavMeshLink>();
             NavMesh.SamplePosition(_SoundPos, out NavMeshHit hit, 1.0f, NavMesh.AllAreas);
-            aux.GetComponent<NavMeshLink>().endPoint = hit.position;
+            link.endPoint = hit.position;
             NavMesh.SamplePosition(transform.position, out NavMeshHit hit2, 1.0f, NavMesh.AllAreas);
-            aux.GetComponent<NavMeshLink>().startPoint = hit2.position;
-            aux.GetComponent<NavMeshLink>().autoUpdate = true;
-            aux.GetComponent<NavMeshLink>().width = 3;
-            aux.GetComponent<NavMeshLink>().agentTypeID = _NavMeshAgent.agentTypeID;
-            aux.GetComponent<NavMeshLink>().area = 3;
+            link.startPoint = hit2.position;
+            link.autoUpdate = true;
+            link.width = 3;
+            link.agentTypeID = _NavMeshAgent.agentTypeID;
+            link.area = 3;
 
             _NavMeshAgent.SetDestination(_SoundPos);
+
+            StartCoroutine(DeleteLink(aux));
         }
-        _Player.GetComponent<Player>().TakeDamage(3);    
+        else
+        {
+            _NavMeshAgent.SetDestination(transform.position);
+            _Player.GetComponent<Player>().TakeDamage(3);    
+        }
+    }
+
+    IEnumerator OpenDoors()
+    {
+        while (true)
+        {
+            if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 3f, _LayerDoor))
+            {
+                if (hit.collider.TryGetComponent<Door>(out Door door) && !door.isLocked)
+                {
+                    if (!door.isOpen)
+                    {
+                        _NavMeshAgent.isStopped = true;
+                        door.Open(transform.position);
+                        yield return new WaitForSeconds(0.4f);
+                        _NavMeshAgent.isStopped = false;
+                        StartCoroutine(CloseDoorAutomatic(door));
+                    }
+                }
+            }
+
+            yield return new WaitForSeconds(0.5f);
+        }
+    }
+
+    IEnumerator CloseDoorAutomatic(Door door)
+    {
+        yield return new WaitForSeconds(1);
+        door.Close();
+    }
+
+    IEnumerator DeleteLink(GameObject go)
+    {
+        yield return new WaitForSeconds(2);
+        Destroy(go);
     }
 
     IEnumerator RemoveAttackState()
@@ -262,12 +307,17 @@ public class BlindEnemy : Enemy
 
     private void OnCollisionEnter(Collision collision)
     {
+        if(_LeaveAttack != null)
+        {
+            StopCoroutine(_LeaveAttack);
+            _LeaveAttack = null;
+        }
         if (collision.transform.tag == "Player")
             ChangeState(EnemyStates.ATTACK); 
     }
 
     private void OnExit()
     {
-        _ChangeStateToPatrol = StartCoroutine(RemoveAttackState());
+        _LeaveAttack = StartCoroutine(RemoveAttackState());
     }
 }

@@ -155,7 +155,7 @@ public class FastEnemy : Enemy
             print(NavMesh.GetAreaNames().Length);
 
             //Comprovem que el punt que hem agafat esta dins del NavMesh
-            if (NavMesh.SamplePosition(point, out hit, 1.0f, NavMesh.AllAreas) && Vector3.Distance(point, center) > 1.75f)
+            if (NavMesh.SamplePosition(point, out hit, 1.0f, 0) && Vector3.Distance(point, center) > 1.75f)
             {
                 result = hit.position;
                 return true;
@@ -293,7 +293,7 @@ public class FastEnemy : Enemy
         yield return new WaitForSeconds(5);
         _RangeSearchSound = 50;
         _PointOfPatrol = transform.position;
-        _Search = true;
+        _Search = false;
         ChangeState(EnemyStates.PATROL);
     }
 
