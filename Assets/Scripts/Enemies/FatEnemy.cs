@@ -46,6 +46,8 @@ public class FatEnemy : Enemy
 
         _DetectionSphere.GetComponent<DetectionSphere>().OnEnter += ActivateAttackCoroutine;
         _DetectionSphere.GetComponent<DetectionSphere>().OnExit += DeactivateAttackCoroutine;
+
+        StartCoroutine(OpenDoors());
     }
 
     private void Start()
@@ -220,7 +222,7 @@ public class FatEnemy : Enemy
     {
         while (true)
         {
-            if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 3f, _LayerDoor))
+            if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 2.5f, _LayerDoor))
             {
                 if (hit.collider.TryGetComponent<Door>(out Door door) && !door.isLocked)
                 {
@@ -241,7 +243,7 @@ public class FatEnemy : Enemy
 
     IEnumerator CloseDoorAutomatic(Door door)
     {
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(3);
         door.Close();
     }
 

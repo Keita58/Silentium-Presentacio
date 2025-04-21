@@ -95,7 +95,8 @@ public class BlindEnemy : Enemy
         switch (exitState)
         {
             case EnemyStates.PATROL:
-                StopCoroutine(_PatrolCoroutine);
+                if(_PatrolCoroutine != null)
+                    StopCoroutine(_PatrolCoroutine);
                 if(_ChangeStateToPatrol != null)
                     StopCoroutine(_ChangeStateToPatrol);
                 break;
@@ -241,7 +242,7 @@ public class BlindEnemy : Enemy
         transform.LookAt(_Player.transform.position);
         if (Vector3.Distance(_Player.transform.position, transform.position) > 2)
         {
-            _NavMeshAgent.speed = 15;
+            _NavMeshAgent.speed = 7;
             GameObject aux = new GameObject();
             NavMeshLink link = aux.AddComponent<NavMeshLink>();
             NavMesh.SamplePosition(_SoundPos, out NavMeshHit hit, 1.0f, NavMesh.AllAreas);
@@ -302,6 +303,9 @@ public class BlindEnemy : Enemy
     IEnumerator RemoveAttackState()
     {
         yield return new WaitForSeconds(1.5f);
+        _Search = true;
+        _RangeSearchSound = 2;
+        _PointOfPatrol = transform.position;
         ChangeState(EnemyStates.PATROL);
     }
 
