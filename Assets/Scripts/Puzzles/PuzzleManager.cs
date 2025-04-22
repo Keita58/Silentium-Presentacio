@@ -1,11 +1,10 @@
 using NavKeypad;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PuzzleManager : MonoBehaviour
 {
     public static PuzzleManager instance { get; private set; }
-    [SerializeField] 
+    [SerializeField]
     private GameObject KeyClock;
     [SerializeField]
     private Camera cam_Clock;
@@ -16,6 +15,12 @@ public class PuzzleManager : MonoBehaviour
     private Camera cam_Hierogliphic;
     [SerializeField]
     BookPuzzle bookPuzzle;
+    [SerializeField]
+    GameObject WallPoem1;
+    [SerializeField]
+    GameObject WallPoem2;
+    [SerializeField]
+    Door DoorPoem3;
     private void Awake()
     {
         inputActionPlayer = new InputSystem_Actions();
@@ -32,7 +37,7 @@ public class PuzzleManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
     public void InteractClockPuzzle()
     {
@@ -82,4 +87,20 @@ public class PuzzleManager : MonoBehaviour
         Debug.Log("CheckBookPuzzle");
         bookPuzzle.checkBookPosition();
     }
+    public void TakePoemPart(Notes poem)
+    {
+        if (poem.note.noteId == 8)
+        {
+            WallPoem1.SetActive(false);
+        }
+        else if (poem.note.noteId == 9)
+        {
+            WallPoem2.SetActive(false);
+        }
+        else if (poem.note.noteId == 10)
+        {
+            DoorPoem3.isLocked = false; ;
+        }
+    }
+
 }

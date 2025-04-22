@@ -247,6 +247,11 @@ public class Player : MonoBehaviour
                 }
                 else
                 {
+                    if(interactiveGameObject.GetComponent<Notes>().note.noteId == 8 || interactiveGameObject.GetComponent<Notes>().note.noteId == 9 || interactiveGameObject.GetComponent<Notes>().note.noteId == 10)
+                    {
+                        PuzzleManager.instance.TakePoemPart(interactiveGameObject.GetComponent<Notes>());
+                        interactiveGameObject.gameObject.SetActive(false);
+                    }
                     InventoryManager.instance.ShowNote(interactiveGameObject.GetComponent<Notes>().note);
                 }
             }
