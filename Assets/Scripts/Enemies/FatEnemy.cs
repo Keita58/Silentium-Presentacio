@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Rendering.HighDefinition;
 
 public class FatEnemy : Enemy
 {
@@ -52,10 +53,10 @@ public class FatEnemy : Enemy
 
     private void ChangeState(EnemyStates newState)
     {
-        Debug.Log($"---------------------- Sortint de {_CurrentState} a {newState} ------------------------");
+      //  Debug.Log($"---------------------- Sortint de {_CurrentState} a {newState} ------------------------");
         ExitState(_CurrentState);
 
-        Debug.Log($"---------------------- Entrant a {newState} ------------------------");
+        //Debug.Log($"---------------------- Entrant a {newState} ------------------------");
         InitState(newState);
     }
 
@@ -152,30 +153,71 @@ public class FatEnemy : Enemy
         _SoundPos = pos;
         RaycastHit[] hits = Physics.RaycastAll(this.transform.position, _SoundPos - this.transform.position, Vector3.Distance(_SoundPos, this.transform.position));
 
-        foreach (RaycastHit hit in hits)
+    /*    foreach (RaycastHit hit in hits)
         {
             if (hit.collider.TryGetComponent<IAtenuacio>(out IAtenuacio a))
             {
                 lvlSound = a.atenuarSo(lvlSound);
             }
+        }*/
+        float dist = Vector3.Distance(this.transform.position, pos);
+        Debug.Log("DISTANCIA: "+dist);
+        if (dist > 10)
+        {
+            Debug.Log("dist>10");
+            while (Mathf.Abs(dist) > 0)
+            {
+                if (dist > 10)
+                {
+                    dist -= 10;
+                    lvlSound -= 1;
+                }
+                else
+                {
+                    dist = 0;
+                }
+
+                if(dist <= 0)
+                {
+                    break;
+                }
+            }
         }
+        else if(Physics.Raycast(this.transform.position, pos, out RaycastHit info))
+        {
+            if (info.collider.TryGetComponent<Player>(out Player player))
+            {
+                Debug.Log("dist<10 y se multiplica");
+                lvlSound *= 4;
+            }
+            else
+            {
+                lvlSound = 8;
+                Debug.Log("dist<10 y se PONE A 8");
+            }
+        }
+        Debug.Log(lvlSound);
 
         if (lvlSound > 0 && _CurrentState == EnemyStates.PATROL)
         {
             if (lvlSound > 0 && lvlSound <= 3)
             {
                 _RangeSearchSound = 7;
+                Debug.Log("El mas bajo");
             }
             else if (lvlSound > 3 && lvlSound <= 7)
             {
+                Debug.Log("El bajo-Medio");
                 _RangeSearchSound = 5;
             }
             else if (lvlSound > 7 && lvlSound <= 10)
             {
+                Debug.Log("El medio-Alto (Aqui entra cuando el 8");
                 _RangeSearchSound = 2;
             }
             else if (lvlSound > 10)
             {
+                Debug.Log("El mas alto");
                 _NavMeshAgent.SetDestination(_SoundPos);
             }
 

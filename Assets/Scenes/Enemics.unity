@@ -478,6 +478,7 @@ GameObject:
   - component: {fileID: 270537901}
   - component: {fileID: 270537900}
   - component: {fileID: 270537899}
+  - component: {fileID: 270537905}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -514,9 +515,13 @@ MonoBehaviour:
   weaponCamera: {fileID: 770238967}
   interactiveGameObject: {fileID: 0}
   material: {fileID: 2100000, guid: 245be0caa7e11f441a60e9ec2a7f78e5, type: 2}
-  baseMaterial: {fileID: 0}
+  baseMaterial: {fileID: 2100000, guid: fabf9618980c1944588bb404d8a10963, type: 2}
+  inventoryOpened: 0
   equipedObject: {fileID: 0}
-  itemSlot: {fileID: 0}
+  itemSlot: {fileID: 9385468}
+  item: 0
+  book: 0
+  bookItem: 0
   actualState: 0
   stateTime: 0
 --- !u!54 &270537900
@@ -639,6 +644,31 @@ Transform:
   - {fileID: 270202391}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!143 &270537905
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 270537898}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &327828137
 GameObject:
   m_ObjectHideFlags: 0

@@ -587,7 +587,7 @@ public class Player : MonoBehaviour
                 Debug.Log("CORUTINAMOVER");
                 if (collider.gameObject.TryGetComponent<Enemy>(out Enemy en))
                 {
-                    en.ListenSound(this.transform.position, 2);
+                    en.ListenSound(this.transform.position, 3);
                 }
             }
             yield return new WaitForSeconds(3);
@@ -599,10 +599,14 @@ public class Player : MonoBehaviour
         while (true)
         {
             Debug.Log("CORUTINACORRER");
-            Collider[] colliderHits = Physics.OverlapSphere(this.transform.position, 7);
-            if (GetComponent<Collider>().gameObject.TryGetComponent<Enemy>(out Enemy en))
+            Collider[] colliderHits = Physics.OverlapSphere(this.transform.position, 37);
+            foreach (Collider collider in colliderHits)
             {
-                en.ListenSound(this.transform.position, 7);
+                if (collider.gameObject.TryGetComponent<Enemy>(out Enemy en))
+                {
+                    Debug.Log("Entro a correr");
+                    en.ListenSound(this.transform.position, 7);
+                }
             }
             yield return new WaitForSeconds(1);
         }
