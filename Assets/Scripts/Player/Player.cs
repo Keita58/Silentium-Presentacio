@@ -618,9 +618,13 @@ public class Player : MonoBehaviour
         {
             Debug.Log("CORUTINACROUCH");
             Collider[] colliderHits = Physics.OverlapSphere(this.transform.position, 5);
-            if (GetComponent<Collider>().gameObject.TryGetComponent<Enemy>(out Enemy en))
+            foreach (Collider collider in colliderHits)
             {
-                en.ListenSound(this.transform.position, 5);
+                if (collider.gameObject.TryGetComponent<Enemy>(out Enemy en))
+                {
+                    Debug.Log("Entro a crouch");
+                    en.ListenSound(this.transform.position, 5);
+                }
             }
             yield return new WaitForSeconds(1);
         }
