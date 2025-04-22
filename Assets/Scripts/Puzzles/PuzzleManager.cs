@@ -20,7 +20,7 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     GameObject WallPoem2;
     [SerializeField]
-    GameObject WallPoem3;
+    Door DoorPoem3;
     private void Awake()
     {
         inputActionPlayer = new InputSystem_Actions();
@@ -99,7 +99,7 @@ public class PuzzleManager : MonoBehaviour
         }
         else if (poem.note.noteId == 10)
         {
-            WallPoem3.SetActive(false);
+            DoorPoem3.isLocked = false; ;
         }
     }
 
