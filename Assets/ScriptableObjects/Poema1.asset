@@ -10,8 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 05fddcd6ae62fb44a8090a13224fa9b4, type: 3}
-  m_Name: Nota4
+  m_Name: Poema1
   m_EditorClassIdentifier: 
-  Name: 
-  noteId: 4
-  noteContent: 
+  Name: Poema1
+  noteId: 8
+  noteContent: Puede que la muerte me atrape, puede que el recuerdo expire, puede
+    que el tiempo me borre, y la nada al fin me admire.
