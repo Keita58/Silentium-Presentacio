@@ -1,13 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.AI.Navigation;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.PlayerLoop;
 
 public class BlindEnemy : Enemy
 {
     private enum EnemyStates { PATROL, ATTACK, KNOCKED }
     [SerializeField] private EnemyStates _CurrentState;
+    [SerializeField] private float _StateTime;
     [SerializeField] private GameObject _Player;
     [SerializeField] private LayerMask _LayerPlayer;
     [SerializeField] private LayerMask _LayerObjectsAndPlayer;
@@ -33,19 +36,21 @@ public class BlindEnemy : Enemy
     private Coroutine _PatrolCoroutine;
     private Coroutine _ChangeStateToPatrol;
     private Coroutine _LeaveAttack;
+    private Coroutine _ChangeState;
+    private Coroutine _AttackCoroutine;
 
     private void Awake()
     {
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
-        _PointOfPatrol = new Vector3(-35, 7.2f, 0);
-        _NavMeshAgent.SetDestination(_PointOfPatrol);
+        _PointOfPatrol = transform.position;
         _RangeSearchSound = 55;
         _Patrolling = false;
         _Search = false;
         _Hp = MAXHEALTH;
 
         _LeaveAttack = null;
+        _ChangeState = null;
 
         _DetectionSphere.GetComponent<DetectionSphere>().OnExit += OnExit;
 
@@ -104,6 +109,7 @@ public class BlindEnemy : Enemy
                 _PointOfPatrol = transform.position;
                 _ChangeStateToPatrol = null;
                 _RangeSearchSound = 25;
+                _LeaveAttack = null;
                 break;
             case EnemyStates.KNOCKED:
                 _Hp = MAXHEALTH;
@@ -116,7 +122,7 @@ public class BlindEnemy : Enemy
     // Funció per moure l'enemic pel mapa
     IEnumerator Patrol(float range, Vector3 pointOfSearch)
     {
-        Transform point = default;
+        Vector3 point = Vector3.zero;
         while (true)
         {
             if (!_Patrolling)
@@ -125,17 +131,17 @@ public class BlindEnemy : Enemy
                 {
                     while (true)
                     {
-                        point = _Waypoints[Random.Range(0, _Waypoints.Count)];
-                        if (point.position != _NavMeshAgent.destination)
+                        point = _Waypoints[Random.Range(0, _Waypoints.Count)].position;
+                        if (point != _NavMeshAgent.destination)
                             break;
                     }
                 }
                 else
                 {
-                    RandomPoint(pointOfSearch, range, out Vector3 coord);
-                    point.position = coord;
+                    RandomPoint(_PointOfPatrol, 25, out Vector3 coord);
+                    point = coord;
                 }
-                _NavMeshAgent.SetDestination(new Vector3(point.position.x, point.position.y, point.position.z));
+                _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
                 _Patrolling = true;
             }
 
@@ -143,6 +149,26 @@ public class BlindEnemy : Enemy
             {
                 _Patrolling = false;
                 yield return new WaitForSeconds(2);
+            }
+            else if (_NavMeshAgent.speed == 0)
+            {
+                GameObject aux = new GameObject();
+                NavMeshLink link = aux.AddComponent<NavMeshLink>();
+
+                Vector3 randomPoint = new Vector3(transform.position.x, transform.position.y, transform.position.z) + Random.insideUnitSphere * 2;
+
+                NavMesh.SamplePosition(randomPoint, out NavMeshHit hit, 1.0f, NavMesh.AllAreas);
+                link.endPoint = hit.position;
+                NavMesh.SamplePosition(transform.position, out NavMeshHit hit2, 1.0f, NavMesh.AllAreas);
+                link.startPoint = hit2.position;
+                link.autoUpdate = true;
+                link.width = 3;
+                link.agentTypeID = _NavMeshAgent.agentTypeID;
+                link.area = 3;
+
+                StartCoroutine(DeleteLink(aux));
+
+                yield return new WaitForSeconds(0.5f);
             }
             else
                 yield return new WaitForSeconds(0.5f);
@@ -191,7 +217,7 @@ public class BlindEnemy : Enemy
 
         Debug.Log($"Nivell so: {lvlSound}");
 
-        if (lvlSound > 0 && _CurrentState == EnemyStates.PATROL)
+        if (lvlSound > 0)
         {
             if (lvlSound > 0 && lvlSound <= 2)
             {
@@ -213,7 +239,7 @@ public class BlindEnemy : Enemy
             }
             else if (lvlSound > 5)
             {
-                _PointOfPatrol = pos;
+                Debug.Log("Entro a l'atac");
                 ChangeState(EnemyStates.ATTACK);
             }
         }
@@ -239,17 +265,27 @@ public class BlindEnemy : Enemy
     private void AttackPlayer()
     {
         //Animation -> attack
-        transform.LookAt(_Player.transform.position);
-        if (Vector3.Distance(_Player.transform.position, transform.position) > 2)
+        bool wall = false;
+        RaycastHit[] hits = Physics.RaycastAll(this.transform.position, _SoundPos - this.transform.position, Vector3.Distance(_SoundPos, this.transform.position));
+
+        foreach (RaycastHit hit in hits)
+        {
+            if (hit.collider.tag == "Wall")
+            {
+                wall = true;
+                break;
+            }
+        }
+
+        if (Vector3.Distance(_SoundPos, transform.position) > 1 && !wall)
         {
             _NavMeshAgent.speed = 7;
             GameObject aux = new GameObject();
             NavMeshLink link = aux.AddComponent<NavMeshLink>();
-            NavMesh.SamplePosition(_SoundPos, out NavMeshHit hit, 1.0f, NavMesh.AllAreas);
+            NavMesh.SamplePosition(_SoundPos, out NavMeshHit hit, 1.5f, NavMesh.AllAreas);
             link.endPoint = hit.position;
-            NavMesh.SamplePosition(transform.position, out NavMeshHit hit2, 1.0f, NavMesh.AllAreas);
+            NavMesh.SamplePosition(transform.position, out NavMeshHit hit2, 1.5f, NavMesh.AllAreas);
             link.startPoint = hit2.position;
-            link.autoUpdate = true;
             link.width = 3;
             link.agentTypeID = _NavMeshAgent.agentTypeID;
             link.area = 3;
@@ -257,11 +293,21 @@ public class BlindEnemy : Enemy
             _NavMeshAgent.SetDestination(_SoundPos);
 
             StartCoroutine(DeleteLink(aux));
+
+            if (_ChangeState == null)
+                _ChangeState = StartCoroutine(ChangeState());
+        }
+        else if (Vector3.Distance(_SoundPos, transform.position) > 1)
+        {
+            _NavMeshAgent.SetDestination(_SoundPos);
+
+            if(_ChangeState == null)
+                _ChangeState = StartCoroutine(ChangeState());
         }
         else
         {
+            transform.LookAt(_SoundPos);
             _NavMeshAgent.SetDestination(transform.position);
-            _Player.GetComponent<Player>().TakeDamage(3);    
         }
     }
 
@@ -300,9 +346,33 @@ public class BlindEnemy : Enemy
         Destroy(go);
     }
 
+    IEnumerator ChangeState()
+    {
+        while(true)
+        {
+            yield return new WaitForSeconds(1);
+
+            if(_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
+            {
+                _LeaveAttack = StartCoroutine(RemoveAttackState());
+                _ChangeState = null;
+                break;
+            }
+        }
+    }
+
+    IEnumerator Attack()
+    {
+        while (true)
+        {
+            _Player.GetComponent<Player>().TakeDamage(3);
+            yield return new WaitForSeconds(1);
+        }
+    }
+
     IEnumerator RemoveAttackState()
     {
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(3f);
         _Search = true;
         _RangeSearchSound = 2;
         _PointOfPatrol = transform.position;
@@ -316,12 +386,17 @@ public class BlindEnemy : Enemy
             StopCoroutine(_LeaveAttack);
             _LeaveAttack = null;
         }
-        if (collision.transform.tag == "Player")
-            ChangeState(EnemyStates.ATTACK); 
+        if (_ChangeState != null)
+        {
+            StopCoroutine(_ChangeState);
+            _ChangeState = null;
+        }
+        _AttackCoroutine = StartCoroutine(Attack());
     }
 
     private void OnExit()
     {
+        StopCoroutine(_AttackCoroutine);
         _LeaveAttack = StartCoroutine(RemoveAttackState());
     }
 }
