@@ -170,15 +170,9 @@ public class FatEnemy : Enemy
         _SoundPos = pos;
         RaycastHit[] hits = Physics.RaycastAll(this.transform.position, _SoundPos - this.transform.position, Vector3.Distance(_SoundPos, this.transform.position));
 
-    /*    foreach (RaycastHit hit in hits)
-        {
-            if (hit.collider.TryGetComponent<IAtenuacio>(out IAtenuacio a))
-            {
-                lvlSound = a.atenuarSo(lvlSound);
-            }
-        }*/
         float dist = Vector3.Distance(this.transform.position, pos);
         Debug.Log("DISTANCIA: "+dist);
+
         if (dist > 10)
         {
             Debug.Log("dist>10");
@@ -213,6 +207,7 @@ public class FatEnemy : Enemy
                 Debug.Log("dist<10 y se PONE A 8");
             }
         }
+
         Debug.Log(lvlSound);
 
         if (lvlSound > 0 && _CurrentState == EnemyStates.PATROL)

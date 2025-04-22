@@ -174,16 +174,45 @@ public class FastEnemy : Enemy
     {
         _SoundPos = pos;
         RaycastHit[] hits = Physics.RaycastAll(this.transform.position, _SoundPos - this.transform.position, Vector3.Distance(_SoundPos, this.transform.position));
-        
-        foreach (RaycastHit hit in hits)
+
+        float dist = Vector3.Distance(this.transform.position, pos);
+        Debug.Log("DISTANCIA: " + dist);
+        if (dist > 10)
         {
-            if (hit.collider.TryGetComponent<IAtenuacio>(out IAtenuacio a))
+            Debug.Log("dist>10");
+            while (Mathf.Abs(dist) > 0)
             {
-                lvlSound = a.atenuarSo(lvlSound);
+                if (dist > 10)
+                {
+                    dist -= 10;
+                    lvlSound -= 1;
+                }
+                else
+                {
+                    dist = 0;
+                }
+
+                if (dist <= 0)
+                {
+                    break;
+                }
+            }
+        }
+        else if (Physics.Raycast(this.transform.position, pos, out RaycastHit info))
+        {
+            if (info.collider.TryGetComponent<Player>(out Player player))
+            {
+                Debug.Log("dist<10 y se multiplica");
+                lvlSound *= 4;
+            }
+            else
+            {
+                lvlSound = 8;
+                Debug.Log("dist<10 y se PONE A 8");
             }
         }
 
-        if(lvlSound > 0 && _CurrentState == EnemyStates.PATROL)
+        if (lvlSound > 0 && _CurrentState == EnemyStates.PATROL)
         {
             if (lvlSound > 0 && lvlSound <= 2)
             {
