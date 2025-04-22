@@ -8,6 +8,7 @@ TagManager:
   - BadPositionBook
   - GoodPositionBook
   - Book
+  - Wall
   layers:
   - Default
   - TransparentFX

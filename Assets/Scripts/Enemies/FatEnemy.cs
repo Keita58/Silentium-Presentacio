@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering.HighDefinition;
@@ -10,12 +11,15 @@ public class FatEnemy : Enemy
     [SerializeField] private GameObject _Player;
     [SerializeField] private LayerMask _LayerPlayer;
     [SerializeField] private LayerMask _LayerObjectsAndPlayer;
+    [SerializeField] private LayerMask _LayerDoor;
     [SerializeField] private GameObject _DetectionSphere;
+    [SerializeField] private List<Transform> _Waypoints;
 
     private NavMeshAgent _NavMeshAgent;
     private Vector3 _SoundPos;
     private Vector3 _PointOfPatrol;
     private bool _Patrolling;
+    private bool _Search;
 
     private int _Hp;
     public override int hp => _Hp;
@@ -36,12 +40,15 @@ public class FatEnemy : Enemy
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
         _PointOfPatrol = transform.position;
-        _RangeSearchSound = 50;
+        _RangeSearchSound = 25;
         _Patrolling = false;
+        _Search = false;
         _Hp = MAXHEALTH;
 
         _DetectionSphere.GetComponent<DetectionSphere>().OnEnter += ActivateAttackCoroutine;
         _DetectionSphere.GetComponent<DetectionSphere>().OnExit += DeactivateAttackCoroutine;
+
+        StartCoroutine(OpenDoors());
     }
 
     private void Start()
@@ -98,24 +105,36 @@ public class FatEnemy : Enemy
 
     #endregion 
 
-    // Funció per moure l'enemic pel mapa
+    // Funciï¿½ per moure l'enemic pel mapa
     IEnumerator Patrol(int range, Vector3 pointOfSearch)
     {
-        Vector3 point = Vector3.zero;
+        Transform point = default;
         while (true)
         {
             if (!_Patrolling)
             {
-                RandomPoint(pointOfSearch, range, out Vector3 coord);
-                point = coord;
-                _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
+                if (!_Search)
+                {
+                    while (true)
+                    {
+                        point = _Waypoints[Random.Range(0, _Waypoints.Count)];
+                        if (point.position != _NavMeshAgent.destination)
+                            break;
+                    }
+                }
+                else
+                {
+                    RandomPoint(pointOfSearch, range, out Vector3 coord);
+                    point.position = coord;
+                }
+                _NavMeshAgent.SetDestination(new Vector3(point.position.x, point.position.y, point.position.z));
                 _Patrolling = true;
             }
 
             if (_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
             {
                 _Patrolling = false;
-                yield return new WaitForSeconds(20);
+                yield return new WaitForSeconds(2);
             }
             else
                 yield return new WaitForSeconds(0.5f);
@@ -130,15 +149,13 @@ public class FatEnemy : Enemy
             //Agafa un punt aleatori dins de l'esfera amb el radi que passem per parametre
             Vector3 randomPoint = new Vector3(center.x, center.y, center.z) + Random.insideUnitSphere * range;
 
-            //Aquí s'haurà de comprovar si la y que hem extret està en algun dels pisos de l'edifici.
-            //Si està aprop la transformem en aquest i ja
+            //Aquï¿½ s'haurï¿½ de comprovar si la y que hem extret estï¿½ en algun dels pisos de l'edifici.
+            //Si estï¿½ aprop la transformem en aquest i ja
 
             Vector3 point = new Vector3(randomPoint.x, randomPoint.y, randomPoint.z);
 
-            NavMeshHit hit;
-            
             //Comprovem que el punt que hem agafat esta dins del NavMesh
-            if (NavMesh.SamplePosition(point, out hit, 1.0f, NavMesh.AllAreas) && Vector3.Distance(point, center) > 1.75f)
+            if (NavMesh.SamplePosition(point, out NavMeshHit hit, 1.0f, 0) && Vector3.Distance(point, center) > 1.75f)
             {
                 result = hit.position;
                 return true;
@@ -204,16 +221,19 @@ public class FatEnemy : Enemy
             {
                 _RangeSearchSound = 7;
                 Debug.Log("El mas bajo");
+                _Search = true;
             }
             else if (lvlSound > 3 && lvlSound <= 7)
             {
                 Debug.Log("El bajo-Medio");
                 _RangeSearchSound = 5;
+                _Search = true;
             }
             else if (lvlSound > 7 && lvlSound <= 10)
             {
                 Debug.Log("El medio-Alto (Aqui entra cuando el 8");
                 _RangeSearchSound = 2;
+                _Search = true;
             }
             else if (lvlSound > 10)
             {
@@ -238,6 +258,35 @@ public class FatEnemy : Enemy
             if (_Hp == 0)
                 ChangeState(EnemyStates.KNOCKED);
         }
+    }
+
+    IEnumerator OpenDoors()
+    {
+        while (true)
+        {
+            if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 2.5f, _LayerDoor))
+            {
+                if (hit.collider.TryGetComponent<Door>(out Door door) && !door.isLocked)
+                {
+                    if (!door.isOpen)
+                    {
+                        _NavMeshAgent.isStopped = true;
+                        door.Open(transform.position);
+                        yield return new WaitForSeconds(0.4f);
+                        _NavMeshAgent.isStopped = false;
+                        StartCoroutine(CloseDoorAutomatic(door));
+                    }
+                }
+            }
+
+            yield return new WaitForSeconds(0.5f);
+        }
+    }
+
+    IEnumerator CloseDoorAutomatic(Door door)
+    {
+        yield return new WaitForSeconds(3);
+        door.Close();
     }
 
     IEnumerator WakeUp()
@@ -271,6 +320,7 @@ public class FatEnemy : Enemy
     IEnumerator ChangeToPatrol()
     {
         yield return new WaitForSeconds(10f);
+        _Search = false;
         _PointOfPatrol = transform.position;
         ChangeState(EnemyStates.PATROL);
     }
