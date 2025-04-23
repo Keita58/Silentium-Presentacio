@@ -1,4 +1,6 @@
 using NavKeypad;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PuzzleManager : MonoBehaviour
@@ -16,9 +18,9 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     BookPuzzle bookPuzzle;
     [SerializeField]
-    GameObject WallPoem1;
+    private List<Picture> pictureList;
     [SerializeField]
-    GameObject WallPoem2;
+    public List<Picture> picturesClicked;
     [SerializeField]
     Door DoorPoem3;
     private void Awake()
@@ -87,20 +89,24 @@ public class PuzzleManager : MonoBehaviour
         Debug.Log("CheckBookPuzzle");
         bookPuzzle.checkBookPosition();
     }
-    public void TakePoemPart(Notes poem)
+    public void TakePoemPart()
     {
-        if (poem.note.noteId == 8)
-        {
-            WallPoem1.SetActive(false);
-        }
-        else if (poem.note.noteId == 9)
-        {
-            WallPoem2.SetActive(false);
-        }
-        else if (poem.note.noteId == 10)
-        {
-            DoorPoem3.isLocked = false; ;
+        for (int i = 0; i < picturesClicked.Count; i++) {
+            if (picturesClicked.ElementAt(i) == pictureList.ElementAt(i))
+            {
+                if(i == pictureList.Count - 1)
+                {
+                    for (int x = 0; x < picturesClicked.Count; x++)
+                    {
+                        pictureList.ElementAt(x).gameObject.layer = 0;
+                    }
+                        DoorPoem3.isLocked = false;
+                }            
+            }
+            else
+            {
+                picturesClicked.Clear();
+            }
         }
     }
-
 }

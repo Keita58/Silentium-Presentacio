@@ -70,6 +70,7 @@ public class Player : MonoBehaviour
     bool keypad = false;
     [SerializeField]
     bool bookItem= false;
+    bool picture = false;
     private GameObject clockGameObject;
 
     private Coroutine coroutineRun;
@@ -238,6 +239,14 @@ public class Player : MonoBehaviour
                 clockPuzzle = false;
 
             }
+            else if (picture)
+            {
+                Debug.Log("Entro en interact picture");
+                PuzzleManager.instance.picturesClicked.Add(interactiveGameObject.GetComponent<Picture>());
+                PuzzleManager.instance.TakePoemPart();
+                picture = false;
+
+            }
             else if (interactiveGameObject != null && note)
             {
                 if (interactiveGameObject.GetComponent<Notes>().note.noteId < 6)
@@ -247,11 +256,6 @@ public class Player : MonoBehaviour
                 }
                 else
                 {
-                    if(interactiveGameObject.GetComponent<Notes>().note.noteId == 8 || interactiveGameObject.GetComponent<Notes>().note.noteId == 9 || interactiveGameObject.GetComponent<Notes>().note.noteId == 10)
-                    {
-                        PuzzleManager.instance.TakePoemPart(interactiveGameObject.GetComponent<Notes>());
-                        interactiveGameObject.gameObject.SetActive(false);
-                    }
                     InventoryManager.instance.ShowNote(interactiveGameObject.GetComponent<Notes>().note);
                 }
             }
@@ -549,6 +553,11 @@ public class Player : MonoBehaviour
                     {
                         keypad = true;
                     }
+                    else if (hit.transform.gameObject.layer == 17)
+                    {
+                        Debug.Log("Entro en la layer de picture");
+                        picture = true;
+                    }
                 }
                 else if (hit.transform.gameObject.layer == 10)
                 {
@@ -564,6 +573,7 @@ public class Player : MonoBehaviour
                 item = false;
                 clockPuzzle = false;
                 bookItem = false;
+                picture = false;
                 if (interactiveGameObject != null)
                 {
                     if (interactiveGameObject.transform.gameObject.layer != 15)
