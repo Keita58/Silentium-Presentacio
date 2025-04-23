@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93a2625516f24b447be9ad1d9f42861e, type: 3}
+  m_Name: Paracetamol
+  m_EditorClassIdentifier: 
+  nom: Healing
+  description: A healign item
+  sprite: {fileID: 21300000, guid: fc301c0a06484a94c85499d3e0d6a6e1, type: 3}
+  healing: 3
+  prefab: {fileID: 0}
+  itemsToCombine:
+  - {fileID: 11400000}
+  stackable: 1
+  itemType: 1
+  usable: 1
+  equipable: 0
+  combinable: 1
+  itemAfterCombineParacetamol: {fileID: 11400000, guid: 4a930a82e1db5ed4db7bb072b980d6c1, type: 2}
