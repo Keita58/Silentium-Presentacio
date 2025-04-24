@@ -256,7 +256,10 @@ public class Player : MonoBehaviour
                 }
                 else
                 {
-                    InventoryManager.instance.ShowNote(interactiveGameObject.GetComponent<Notes>().note);
+                    if(interactiveGameObject.GetComponent<Notes>().note.noteId!=10)
+                        InventoryManager.instance.ShowNote(interactiveGameObject.GetComponent<Notes>().note);
+                    else
+                        InventoryManager.instance.ShowNoteScroll(interactiveGameObject.GetComponent<Notes>().note);
                 }
             }
             else if (chest)

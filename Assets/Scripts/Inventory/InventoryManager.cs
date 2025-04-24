@@ -24,6 +24,7 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] GameObject unequipButton;
     [SerializeField] GameObject itemDescriptionPanel;
     [SerializeField] GameObject notesPanel;
+    [SerializeField] GameObject notesPanelScroll;
     private Item equippedItem;
 
     public bool isCombining { get; private set; }
@@ -308,6 +309,14 @@ public class InventoryManager : MonoBehaviour
         noteInventory.AddNote(note);
     }
 
+    public void ShowNoteScroll(NotesSO note)
+    {
+        notesPanelScroll.SetActive(true);
+        notesPanelScroll.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = note.Name;
+        notesPanelScroll.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = note.noteContent;
+        player.ToggleInputPlayer(false);
+
+    }    
     public void ShowNote(NotesSO note)
     {
         notesPanel.SetActive(true);
@@ -321,6 +330,11 @@ public class InventoryManager : MonoBehaviour
     {
         notesPanel.SetActive(false);
         player.ToggleInputPlayer(true);
+    }    
+    public void CloseNoteScroll()
+    {
+        notesPanelScroll.SetActive(false);
+        player.ToggleInputPlayer(true);
     }
 
     public void ShowDiscoveredNotes()
@@ -332,11 +346,11 @@ public class InventoryManager : MonoBehaviour
                 if (noteInventory.notes.ElementAt(i).noteId == notesRoot.transform.GetChild(j).GetComponent<NotesButton>().id)
                 {
                     notesRoot.transform.GetChild(j).GetComponent<Button>().interactable = true;
-                    notesRoot.transform.GetChild(j).GetChild(0).GetComponent<TextMeshProUGUI>().text = noteInventory.notes.ElementAt(i).name;
+                    notesRoot.transform.GetChild(j).GetComponent<TextMeshProUGUI>().text = noteInventory.notes.ElementAt(i).name;
                 }
             }
         }
-    }
+    }    
 
     public void OpenChest()
     {
