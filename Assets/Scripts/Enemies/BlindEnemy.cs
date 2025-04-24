@@ -21,8 +21,8 @@ public class BlindEnemy : Enemy
     private NavMeshAgent _NavMeshAgent;
     private Vector3 _SoundPos;
     private Vector3 _PointOfPatrol;
-    private bool _Patrolling;
-    private bool _Search;
+    [SerializeField] private bool _Patrolling;
+    [SerializeField] private bool _Search;
     private bool _OnRadius;
 
     private int _Hp;
@@ -88,8 +88,8 @@ public class BlindEnemy : Enemy
                 _Patrolling = false;
                 _NavMeshAgent.speed = 4.5f;
                 _PatrolCoroutine = StartCoroutine(Patrol(_RangeSearchSound, _PointOfPatrol));
-                if (_Search)
-                    _ChangeStateToPatrol = StartCoroutine(WakeUp(15));
+                /*if (_Search)
+                    _ChangeStateToPatrol = StartCoroutine(WakeUp(15));*/
                 break;
             case EnemyStates.ATTACK:
                 break;
@@ -142,38 +142,20 @@ public class BlindEnemy : Enemy
                 }
                 else
                 { 
-                    RandomPoint(_PointOfPatrol, _RangeSearchSound, out Vector3 coord);
+                    RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
                     point = coord;
                 }
-                _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
                 _Patrolling = true;
+                _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
             }
 
             if (_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
             {
+                if(_Search && _ChangeStateToPatrol == null)
+                    _ChangeStateToPatrol = StartCoroutine(WakeUp(10));
                 _Patrolling = false;
                 yield return new WaitForSeconds(2);
             }
-            /*else if (_NavMeshAgent.speed == 0)
-            {
-                GameObject aux = new GameObject();
-                NavMeshLink link = aux.AddComponent<NavMeshLink>();
-
-                Vector3 randomPoint = new Vector3(transform.position.x, transform.position.y, transform.position.z) + Random.insideUnitSphere * 2;
-
-                NavMesh.SamplePosition(randomPoint, out NavMeshHit hit, 1.0f, NavMesh.AllAreas);
-                link.endPoint = hit.position;
-                NavMesh.SamplePosition(transform.position, out NavMeshHit hit2, 1.0f, NavMesh.AllAreas);
-                link.startPoint = hit2.position;
-                link.autoUpdate = true;
-                link.width = 3;
-                link.agentTypeID = _NavMeshAgent.agentTypeID;
-                link.area = 3;
-
-                StartCoroutine(DeleteLink(aux));
-
-                yield return new WaitForSeconds(0.5f);
-            }*/
             else
                 yield return new WaitForSeconds(0.5f);
         }
@@ -323,6 +305,7 @@ public class BlindEnemy : Enemy
     {
         yield return new WaitForSeconds(time);
         _Search = false;
+        _ChangeStateToPatrol = null;
         ChangeState(EnemyStates.PATROL);
     }
 
@@ -406,6 +389,11 @@ public class BlindEnemy : Enemy
         {
             StopCoroutine(_ChangeState);
             _ChangeState = null;
+        }
+        if(_ChangeStateToPatrol != null)
+        {
+            StopCoroutine(_ChangeStateToPatrol);
+            _ChangeStateToPatrol = null;
         }
         _OnRadius = true;
         _NavMeshAgent.SetDestination(transform.position);
