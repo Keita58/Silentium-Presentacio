@@ -51,7 +51,7 @@ namespace NavKeypad
         };
 
 
-public InputSystem_Actions inputActions { get; private set; }
+    public InputSystem_Actions inputActions { get; private set; }
         private void Awake()
         {
             door.SetLocked(true);
