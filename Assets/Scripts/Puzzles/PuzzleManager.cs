@@ -21,23 +21,17 @@ public class PuzzleManager : MonoBehaviour
     GameObject WallPoem2;
     [SerializeField]
     Door DoorPoem3;
+    [SerializeField]
+    Player player;
+    [SerializeField]
+    private Camera cam_morse;
+    [SerializeField]
+    MorseKeypad morseKeypad;
     private void Awake()
     {
         inputActionPlayer = new InputSystem_Actions();
         if (instance == null)
             instance = this;
-    }
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
     public void InteractClockPuzzle()
     {
@@ -45,21 +39,21 @@ public class PuzzleManager : MonoBehaviour
         cam_Clock.gameObject.SetActive(true);
         cam_Player.transform.parent.position = new Vector3(-32.8191757f, 6.21000004f, -32.4704895f);
         cam_Player.transform.parent.rotation = new Quaternion(0, -0.608760536f, 0, 0.793354094f);
-        cam_Player.transform.parent.GetComponent<Player>()._inputActions.Player.Disable();
+        player._inputActions.Player.Disable();
         cam_Clock.transform.parent.GetComponent<Clock>().inputActions.Clock.Enable();
     }
     public void ExitClockPuzzle()
     {
         cam_Player.gameObject.SetActive(true);
         cam_Clock.gameObject.SetActive(false);
-        cam_Player.transform.parent.GetComponent<Player>()._inputActions.Player.Enable();
-        cam_Player.transform.parent.GetComponent<Player>().ResumeInteract();
+        player._inputActions.Player.Enable();
+        player.ResumeInteract();
         cam_Clock.transform.parent.GetComponent<Clock>().inputActions.Clock.Disable();
     }
     public void ClockSolved()
     {
         ExitClockPuzzle();
-        cam_Player.transform.parent.GetComponent<Player>().ResumeInteract();
+        player.ResumeInteract();
         this.KeyClock.SetActive(true);
     }
 
@@ -67,19 +61,38 @@ public class PuzzleManager : MonoBehaviour
     {
         cam_Player.gameObject.SetActive(false);
         cam_Hierogliphic.gameObject.SetActive(true);
-        cam_Player.transform.parent.GetComponent<Player>()._inputActions.Player.Disable();
+        player._inputActions.Player.Disable();
         cam_Hierogliphic.transform.parent.GetComponent<Keypad>().inputActions.Hieroglyphic.Enable();
         Cursor.visible = true;
     }
 
     public void HieroglyphicPuzzleExit()
     {
-        cam_Player.transform.parent.GetComponent<Player>()._inputActions.Player.Enable();
+        player._inputActions.Player.Enable();
         cam_Hierogliphic.transform.parent.GetComponent<Keypad>().inputActions.Hieroglyphic.Disable();
-        cam_Player.transform.parent.GetComponent<Player>().ResumeInteract();
+        player.ResumeInteract();
         cam_Player.gameObject.SetActive(true);
         cam_Hierogliphic.gameObject.SetActive(false);
         Cursor.visible = false;
+    }
+
+    public void ExitMorsePuzzle()
+    {
+        player._inputActions.Player.Enable();
+        morseKeypad.inputActions.Morse.Disable();
+        player.ResumeInteract();
+        cam_Player.gameObject.SetActive(true);
+        cam_morse.gameObject.SetActive(false);
+        Cursor.visible = false;
+    }
+
+    public void InteractMorsePuzzle()
+    {
+        cam_Player.gameObject.SetActive(false);
+        cam_morse.gameObject.SetActive(true);
+        player._inputActions.Player.Disable();
+        morseKeypad.inputActions.Morse.Enable();
+        Cursor.visible= true;
     }
 
     public void CheckBookPuzzle()

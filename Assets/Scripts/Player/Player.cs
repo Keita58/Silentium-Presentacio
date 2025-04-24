@@ -1,7 +1,3 @@
-using JetBrains.Annotations;
-using NavKeypad;
-using NUnit.Framework;
-using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -60,18 +56,21 @@ public class Player : MonoBehaviour
     [SerializeField] Transform itemSlot;
     bool door = false;
     bool clockPuzzle = false;
+
+    //interactive booleans
     [SerializeField]
     bool item = false;
     bool note = false;
     bool chest = false;
-
     [SerializeField]
     bool book = false;
     bool keypad = false;
     [SerializeField]
     bool bookItem= false;
+    bool morse = false;
     private GameObject clockGameObject;
 
+    //Coroutines
     private Coroutine coroutineRun;
     private Coroutine coroutineMove;
     private Coroutine coroutineCrouch;
@@ -117,7 +116,6 @@ public class Player : MonoBehaviour
         }
 
     }
-
 
     private void OpenInventory(InputAction.CallbackContext context)
     {
@@ -281,6 +279,9 @@ public class Player : MonoBehaviour
             }else if (keypad)
             {
                 PuzzleManager.instance.InteractHieroglyphicPuzzle();
+            }else if (morse)
+            {
+                PuzzleManager.instance.InteractMorsePuzzle();
             }
         }
 
@@ -480,7 +481,6 @@ public class Player : MonoBehaviour
 
     public IEnumerator InteractuarRaycast()
     {
-        //Interactuar con todo y mirar que me devuelve;
         while (true)
         {
             Debug.DrawRay(_Camera.transform.position, _Camera.transform.forward, Color.magenta, 5f);
@@ -548,6 +548,9 @@ public class Player : MonoBehaviour
                     else if (hit.transform.gameObject.layer == 14)
                     {
                         keypad = true;
+                    }else if (hit.transform.gameObject.layer == 17)
+                    {
+                        morse = true;
                     }
                 }
                 else if (hit.transform.gameObject.layer == 10)
@@ -562,6 +565,7 @@ public class Player : MonoBehaviour
                 book=false;
                 keypad=false;
                 item = false;
+                morse=false;
                 clockPuzzle = false;
                 bookItem = false;
                 if (interactiveGameObject != null)

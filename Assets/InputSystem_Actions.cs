@@ -977,6 +977,34 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Morse"",
+            ""id"": ""107a682d-1f69-4e6c-993d-f2333e6c3916"",
+            ""actions"": [
+                {
+                    ""name"": ""Exit"",
+                    ""type"": ""Button"",
+                    ""id"": ""e40233fd-e14e-461f-b4ba-a87b78dfc3fb"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""45082f49-4cac-4de3-82ba-a164e3ddc545"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Exit"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -1073,6 +1101,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         // Hieroglyphic
         m_Hieroglyphic = asset.FindActionMap("Hieroglyphic", throwIfNotFound: true);
         m_Hieroglyphic_Exit = m_Hieroglyphic.FindAction("Exit", throwIfNotFound: true);
+        // Morse
+        m_Morse = asset.FindActionMap("Morse", throwIfNotFound: true);
+        m_Morse_Exit = m_Morse.FindAction("Exit", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
@@ -1081,6 +1112,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         Debug.Assert(!m_UI.enabled, "This will cause a leak and performance issues, InputSystem_Actions.UI.Disable() has not been called.");
         Debug.Assert(!m_Clock.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Clock.Disable() has not been called.");
         Debug.Assert(!m_Hieroglyphic.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Hieroglyphic.Disable() has not been called.");
+        Debug.Assert(!m_Morse.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Morse.Disable() has not been called.");
     }
 
     public void Dispose()
@@ -1474,6 +1506,52 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         }
     }
     public HieroglyphicActions @Hieroglyphic => new HieroglyphicActions(this);
+
+    // Morse
+    private readonly InputActionMap m_Morse;
+    private List<IMorseActions> m_MorseActionsCallbackInterfaces = new List<IMorseActions>();
+    private readonly InputAction m_Morse_Exit;
+    public struct MorseActions
+    {
+        private @InputSystem_Actions m_Wrapper;
+        public MorseActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Exit => m_Wrapper.m_Morse_Exit;
+        public InputActionMap Get() { return m_Wrapper.m_Morse; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(MorseActions set) { return set.Get(); }
+        public void AddCallbacks(IMorseActions instance)
+        {
+            if (instance == null || m_Wrapper.m_MorseActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_MorseActionsCallbackInterfaces.Add(instance);
+            @Exit.started += instance.OnExit;
+            @Exit.performed += instance.OnExit;
+            @Exit.canceled += instance.OnExit;
+        }
+
+        private void UnregisterCallbacks(IMorseActions instance)
+        {
+            @Exit.started -= instance.OnExit;
+            @Exit.performed -= instance.OnExit;
+            @Exit.canceled -= instance.OnExit;
+        }
+
+        public void RemoveCallbacks(IMorseActions instance)
+        {
+            if (m_Wrapper.m_MorseActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IMorseActions instance)
+        {
+            foreach (var item in m_Wrapper.m_MorseActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_MorseActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public MorseActions @Morse => new MorseActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     public InputControlScheme KeyboardMouseScheme
     {
@@ -1551,6 +1629,10 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         void OnFinishClock(InputAction.CallbackContext context);
     }
     public interface IHieroglyphicActions
+    {
+        void OnExit(InputAction.CallbackContext context);
+    }
+    public interface IMorseActions
     {
         void OnExit(InputAction.CallbackContext context);
     }
