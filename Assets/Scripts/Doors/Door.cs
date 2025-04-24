@@ -17,7 +17,6 @@ public class Door : MonoBehaviour
     [SerializeField] private bool isHideSpot = false;
 
     [SerializeField] public bool isLocked = false;
-    [SerializeField] public bool isSafeBox = false;
 
     [SerializeField] public Item itemNeededToOpen;
 
@@ -55,10 +54,6 @@ public class Door : MonoBehaviour
         if (isHideSpot)
         {
             endRotation = Quaternion.Euler(new Vector3(0, startRotation.y + rotationAmount, 0));
-        }
-        if (isSafeBox)
-        {
-            endRotation = Quaternion.Euler(new Vector3(0, startRotation.z + rotationAmount, 0));
         }
         else
         {

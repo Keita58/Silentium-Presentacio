@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -98,6 +99,17 @@ namespace NavKeypad
                     else if (input == "/")
                     {
                         currentInput += " ";
+                    }else if (input == "delete")
+                    {
+                        char[] aux= currentInput.ToCharArray();
+                        currentInput = "";
+                        for (int i = 0; i < aux.Length; i++)
+                        {
+                            if (i < aux.Length - 1)
+                            {
+                                currentInput += aux[i];
+                            }
+                        }
                     }
 
                     keypadDisplayText.text = currentInput;
