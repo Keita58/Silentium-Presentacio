@@ -190,7 +190,9 @@ public class Player : MonoBehaviour
             }
             else
             {
-                interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
+                //if (!book && !door)
+                //    interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
+
                 if (clockPuzzle)
                 {
                     PuzzleManager.instance.InteractClockPuzzle();
@@ -207,18 +209,13 @@ public class Player : MonoBehaviour
                     }
                     else
                     {
-                        if (interactiveGameObject.GetComponent<Notes>().note.noteId == 8 || interactiveGameObject.GetComponent<Notes>().note.noteId == 9 || interactiveGameObject.GetComponent<Notes>().note.noteId == 10)
+                        if (interactiveGameObject.GetComponent<Notes>().note.noteId == 10)
                         {
-                            PuzzleManager.instance.TakePoemPart();
+                            InventoryManager.instance.ShowNoteScroll(interactiveGameObject.GetComponent<Notes>().note);
                             interactiveGameObject.gameObject.SetActive(false);
-                        }
-                        InventoryManager.instance.ShowNote(interactiveGameObject.GetComponent<Notes>().note);
+                        }else
+                            InventoryManager.instance.ShowNote(interactiveGameObject.GetComponent<Notes>().note);
                     }
-                }
-                else if (chest)
-                {
-                    InventoryManager.instance.OpenChest();
-                    chest = false;
                 }
                 else if (book)
                 {
@@ -247,6 +244,19 @@ public class Player : MonoBehaviour
                 else if (morse)
                 {
                     PuzzleManager.instance.InteractMorsePuzzle();
+                }
+                else if (picture)
+                {
+                    Debug.Log("Entro en interact picture");
+                    PuzzleManager.instance.picturesClicked.Add(interactiveGameObject.GetComponent<Picture>());
+                    PuzzleManager.instance.TakePoemPart();
+                    picture = false;
+
+                }
+                else if (chest)
+                {
+                    InventoryManager.instance.OpenChest();
+                    chest = false;
                 }
             }
 
@@ -296,63 +306,7 @@ public class Player : MonoBehaviour
                     }
                 }
             }
-            else if (clockPuzzle)
-            {
-                PuzzleManager.instance.InteractClockPuzzle();
-                StopCoroutine(coroutineInteract);
-                clockPuzzle = false;
-
-            }
-            else if (picture)
-            {
-                Debug.Log("Entro en interact picture");
-                PuzzleManager.instance.picturesClicked.Add(interactiveGameObject.GetComponent<Picture>());
-                PuzzleManager.instance.TakePoemPart();
-                picture = false;
-
-            }
-            else if (interactiveGameObject != null && note)
-            {
-                if (interactiveGameObject.GetComponent<Notes>().note.noteId < 6)
-                {
-                    InventoryManager.instance.DiscoverNote(interactiveGameObject.GetComponent<Notes>().note);
-                    interactiveGameObject.gameObject.SetActive(false);
-                }
-                else
-                {
-                    if(interactiveGameObject.GetComponent<Notes>().note.noteId!=10)
-                        InventoryManager.instance.ShowNote(interactiveGameObject.GetComponent<Notes>().note);
-                    else
-                        InventoryManager.instance.ShowNoteScroll(interactiveGameObject.GetComponent<Notes>().note);
-                }
-            }
-            else if (chest)
-            {
-                InventoryManager.instance.OpenChest();
-                chest = false;
-            }else if (book)
-            {
-                if (equipedObject != null)
-                {
-                    if (equipedObject.GetComponent<PickItem>().item is BookItem)
-                    {
-                        interactiveGameObject.GetComponent<CellBook>().SetBook(equipedObject.GetComponent<Book>());
-                        equipedObject.GetComponent<Book>().collider = interactiveGameObject.GetComponent<CellBook>().GetComponent<BoxCollider>();
-                        equipedObject.GetComponent<Book>().placed = true;
-                        PuzzleManager.instance.CheckBookPuzzle();
-                        interactiveGameObject.GetComponent<CellBook>().GetComponent<BoxCollider>().enabled = false;
-                        equipedObject.transform.rotation = Quaternion.identity;
-                        equipedObject.transform.parent = null;
-                        equipedObject.transform.position = interactiveGameObject.transform.GetChild(0).transform.position;
-                        equipedObject = null;
-                        itemSlotOccuped = false;
-                        InventoryManager.instance.UseEquippedItem();
-                    }
-                }
-            }else if (keypad)
-            {
-                PuzzleManager.instance.InteractHieroglyphicPuzzle();
-            }
+            
         }
         
 
@@ -617,7 +571,7 @@ public class Player : MonoBehaviour
                     else if (hit.transform.gameObject.layer == 14)
                     {
                         keypad = true;
-                    }else if (hit.transform.gameObject.layer == 17)
+                    }else if (hit.transform.gameObject.layer == 18)
                     {
                         morse = true;
                         door = false;
