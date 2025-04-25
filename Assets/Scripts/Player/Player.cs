@@ -190,7 +190,9 @@ public class Player : MonoBehaviour
             }
             else
             {
-                interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
+                //if (!book && !door)
+                //    interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
+
                 if (clockPuzzle)
                 {
                     PuzzleManager.instance.InteractClockPuzzle();
