@@ -13,7 +13,7 @@ public class FatEnemy : Enemy
     [SerializeField] private LayerMask _LayerObjectsAndPlayer;
     [SerializeField] private LayerMask _LayerDoor;
     [SerializeField] private GameObject _DetectionSphere;
-    [SerializeField] private List<Transform> _Waypoints;
+    [SerializeField] private List<Vector3> _Waypoints;
 
     private NavMeshAgent _NavMeshAgent;
     private Vector3 _SoundPos;
@@ -108,7 +108,7 @@ public class FatEnemy : Enemy
     // Funci� per moure l'enemic pel mapa
     IEnumerator Patrol(int range, Vector3 pointOfSearch)
     {
-        Transform point = default;
+        Vector3 point;
         while (true)
         {
             if (!_Patrolling)
@@ -118,16 +118,16 @@ public class FatEnemy : Enemy
                     while (true)
                     {
                         point = _Waypoints[Random.Range(0, _Waypoints.Count)];
-                        if (point.position != _NavMeshAgent.destination)
+                        if (point != _NavMeshAgent.destination)
                             break;
                     }
                 }
                 else
                 {
-                    RandomPoint(pointOfSearch, range, out Vector3 coord);
-                    point.position = coord;
+                    RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
+                    point = coord;
                 }
-                _NavMeshAgent.SetDestination(new Vector3(point.position.x, point.position.y, point.position.z));
+                _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
                 _Patrolling = true;
             }
 
@@ -334,7 +334,10 @@ public class FatEnemy : Enemy
                         transform.LookAt(info.transform.position);
                         _NavMeshAgent.SetDestination(transform.position);
                         if(_CurrentState != EnemyStates.ATTACK)
+                        {
                             ChangeState(EnemyStates.ATTACK);
+                            yield break;
+                        }
                     }
                 }
             }

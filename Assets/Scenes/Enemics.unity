@@ -1203,7 +1203,7 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.16666667
+  m_VoxelSize: 0.1
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: ceb1dc8519599be42a1925b3eb46504c, type: 2}
   m_BuildHeightMesh: 0
@@ -1228,14 +1228,14 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   m_UseGeometry: 1
-  m_DefaultArea: 3
+  m_DefaultArea: 5
   m_GenerateLinks: 1
   m_IgnoreNavMeshAgent: 1
   m_IgnoreNavMeshObstacle: 1
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.16666667
+  m_VoxelSize: 0.1
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: 45bfb9340f152ea4c9c380a23a9c1aad, type: 2}
   m_BuildHeightMesh: 0
@@ -1731,14 +1731,14 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   m_UseGeometry: 0
-  m_DefaultArea: 3
+  m_DefaultArea: 4
   m_GenerateLinks: 0
   m_IgnoreNavMeshAgent: 1
   m_IgnoreNavMeshObstacle: 1
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.16666667
+  m_VoxelSize: 0.1
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: 134fddadd8711364e884daf0265a9e53, type: 2}
   m_BuildHeightMesh: 0
@@ -1912,7 +1912,11 @@ MonoBehaviour:
   _LayerObjectsAndPlayer:
     serializedVersion: 2
     m_Bits: 1600
+  _LayerDoor:
+    serializedVersion: 2
+    m_Bits: 0
   _DetectionSphere: {fileID: 1225468032}
+  _Waypoints: []
 --- !u!1 &1073508167
 GameObject:
   m_ObjectHideFlags: 0
@@ -1955,7 +1959,11 @@ MonoBehaviour:
   _LayerObjectsAndPlayer:
     serializedVersion: 2
     m_Bits: 1600
+  _LayerDoor:
+    serializedVersion: 2
+    m_Bits: 0
   _DetectionSphere: {fileID: 1273411998}
+  _Waypoints: []
 --- !u!195 &1073508169
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -2720,14 +2728,14 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   m_UseGeometry: 0
-  m_DefaultArea: 3
+  m_DefaultArea: 4
   m_GenerateLinks: 0
   m_IgnoreNavMeshAgent: 1
   m_IgnoreNavMeshObstacle: 1
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.16666667
+  m_VoxelSize: 0.1
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: 4edefe8918548924f830738ef40a0fe6, type: 2}
   m_BuildHeightMesh: 0
@@ -2780,6 +2788,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _CurrentState: 0
+  _StateTime: 0
   _Player: {fileID: 270537898}
   _LayerPlayer:
     serializedVersion: 2
@@ -2787,7 +2796,13 @@ MonoBehaviour:
   _LayerObjectsAndPlayer:
     serializedVersion: 2
     m_Bits: 1600
+  _LayerDoor:
+    serializedVersion: 2
+    m_Bits: 0
   _DetectionSphere: {fileID: 208271135}
+  _Waypoints: []
+  _Patrolling: 0
+  _Search: 0
 --- !u!195 &1868768553
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -2940,14 +2955,14 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   m_UseGeometry: 0
-  m_DefaultArea: 3
+  m_DefaultArea: 4
   m_GenerateLinks: 0
   m_IgnoreNavMeshAgent: 1
   m_IgnoreNavMeshObstacle: 1
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.16666667
+  m_VoxelSize: 0.1
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: 950b924e3ae61c64bb159df7cd0524f5, type: 2}
   m_BuildHeightMesh: 0
@@ -3004,14 +3019,14 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   m_UseGeometry: 0
-  m_DefaultArea: 3
+  m_DefaultArea: 4
   m_GenerateLinks: 0
   m_IgnoreNavMeshAgent: 1
   m_IgnoreNavMeshObstacle: 1
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.16666667
+  m_VoxelSize: 0.1
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: 1fb2765c5399ff9499cf1708cb52c6cf, type: 2}
   m_BuildHeightMesh: 0
@@ -3156,7 +3171,6 @@ SceneRoots:
   - {fileID: 270537904}
   - {fileID: 497738837}
   - {fileID: 891824665}
-  - {fileID: 294570406}
   - {fileID: 261238452}
   - {fileID: 1205761342}
   - {fileID: 861051353}
@@ -3167,5 +3181,4 @@ SceneRoots:
   - {fileID: 1875354640}
   - {fileID: 1616049056}
   - {fileID: 2052242354}
-  - {fileID: 270882512}
   - {fileID: 822668010}

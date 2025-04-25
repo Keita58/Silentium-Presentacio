@@ -14,7 +14,7 @@ public class FastEnemy : Enemy
     [SerializeField] private LayerMask _LayerObjectsAndPlayer;
     [SerializeField] private LayerMask _LayerDoor;
     [SerializeField] private GameObject _DetectionSphere;
-    [SerializeField] private List<Transform> _Waypoints;
+    [SerializeField] private List<Vector3> _Waypoints;
 
     private NavMeshAgent _NavMeshAgent;
     private Vector3 _SoundPos;
@@ -254,7 +254,7 @@ public class FastEnemy : Enemy
     // Funció per moure l'enemic pel mapa
     IEnumerator Patrol(int range, Vector3 pointOfSearch)
     {
-        Transform point = default;
+        Vector3 point = Vector3.zero;
         while (true)
         {
             if (!_Patrolling)
@@ -264,17 +264,17 @@ public class FastEnemy : Enemy
                     while(true)
                     {
                         point = _Waypoints[Random.Range(0, _Waypoints.Count)];
-                        if (point.position != _NavMeshAgent.destination)
+                        if (point != _NavMeshAgent.destination)
                             break;
                     }
                 }
                 else
                 {
-                    RandomPoint(pointOfSearch, range, out Vector3 coord);
-                    point.position = coord;
+                    RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
+                    point = coord;
                 }
-                _NavMeshAgent.SetDestination(new Vector3(point.position.x, point.position.y, point.position.z));
                 _Patrolling = true;
+                _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
             }
 
             if (_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
