@@ -16,6 +16,8 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     private Camera cam_Hierogliphic;
     [SerializeField]
+    private Camera cam_WeaponPuzzle;
+    [SerializeField]
     BookPuzzle bookPuzzle;
     [SerializeField]
     private List<Picture> pictureList;
@@ -108,5 +110,23 @@ public class PuzzleManager : MonoBehaviour
                 picturesClicked.Clear();
             }
         }
+    }
+    public void InteractWeaponPuzzle()
+    {
+        cam_Player.gameObject.SetActive(false);
+        cam_WeaponPuzzle.gameObject.SetActive(true);
+        cam_Player.transform.parent.position = new Vector3(-32.8191757f, 6.21000004f, -32.4704895f);
+        cam_Player.transform.parent.rotation = new Quaternion(0, -0.608760536f, 0, 0.793354094f);
+        cam_Player.transform.parent.GetComponent<Player>()._inputActions.Player.Disable();
+        cam_WeaponPuzzle.transform.parent.GetComponent<WeaponPuzzle>().inputActions.WeaponPuzzle.Enable();
+    }
+    public void ExitWeaponPuzzle()
+    {
+        cam_Player.gameObject.SetActive(true);
+        cam_WeaponPuzzle.gameObject.SetActive(false);
+        cam_Player.transform.parent.position = new Vector3(-32.8191757f, 6.21000004f, -32.4704895f);
+        cam_Player.transform.parent.rotation = new Quaternion(0, -0.608760536f, 0, 0.793354094f);
+        cam_Player.transform.parent.GetComponent<Player>()._inputActions.Player.Enable();
+        cam_WeaponPuzzle.transform.parent.GetComponent<WeaponPuzzle>().inputActions.WeaponPuzzle.Disable();
     }
 }

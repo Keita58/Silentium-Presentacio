@@ -954,6 +954,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "WeaponPuzzle",
+            "id": "a4685a8a-ec1f-41fe-bf07-3499621325b0",
+            "actions": [
+                {
+                    "name": "Unmount",
+                    "type": "Button",
+                    "id": "e94fa947-8831-4eea-b67e-c2ad1db7dff2",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "48fb6154-2d34-4f85-b018-c9acc1e1f3b8",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Unmount",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [

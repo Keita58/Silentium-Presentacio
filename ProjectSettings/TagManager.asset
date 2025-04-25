@@ -9,6 +9,11 @@ TagManager:
   - GoodPositionBook
   - Book
   - Wall
+  - FrontTop
+  - FrontDown
+  - WeaponMiddle
+  - WeaponTopRight
+  - WeaponDownRight
   layers:
   - Default
   - TransparentFX
@@ -28,7 +33,7 @@ TagManager:
   - CellBook
   - Book
   - Picture
-  - 
+  - AKM
   - 
   - 
   - 
