@@ -1,10 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.AI.Navigation;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.PlayerLoop;
 
 public class BlindEnemy : Enemy
 {
@@ -88,8 +86,8 @@ public class BlindEnemy : Enemy
                 _Patrolling = false;
                 _NavMeshAgent.speed = 4.5f;
                 _PatrolCoroutine = StartCoroutine(Patrol(_RangeSearchSound, _PointOfPatrol));
-                /*if (_Search)
-                    _ChangeStateToPatrol = StartCoroutine(WakeUp(15));*/
+                if (_Search)
+                    _ChangeStateToPatrol = StartCoroutine(WakeUp(7));
                 break;
             case EnemyStates.ATTACK:
                 break;
@@ -123,7 +121,7 @@ public class BlindEnemy : Enemy
 
     #endregion 
 
-    // Funció per moure l'enemic pel mapa
+    // Funciï¿½ per moure l'enemic pel mapa
     IEnumerator Patrol(float range, Vector3 pointOfSearch)
     {
         Vector3 point = Vector3.zero;
@@ -169,8 +167,8 @@ public class BlindEnemy : Enemy
             Vector3 randomPoint = new Vector3(center.x, center.y, center.z) + Random.insideUnitSphere * range;
             Debug.Log($"Punt: {randomPoint}");
 
-            //Aquí s'haurà de comprovar si la y que hem extret està en algun dels pisos de l'edifici.
-            //Si està aprop la transformem en aquest i ja
+            //Aquï¿½ s'haurï¿½ de comprovar si la y que hem extret estï¿½ en algun dels pisos de l'edifici.
+            //Si estï¿½ aprop la transformem en aquest i ja
 
             Vector3 point = new Vector3(randomPoint.x, randomPoint.y, randomPoint.z);
 
@@ -278,6 +276,7 @@ public class BlindEnemy : Enemy
                     link.width = 3;
                     link.agentTypeID = _NavMeshAgent.agentTypeID;
                     link.area = 3;
+                    link.bidirectional = false;
 
                     _NavMeshAgent.SetDestination(_SoundPos);
 
@@ -306,7 +305,8 @@ public class BlindEnemy : Enemy
         yield return new WaitForSeconds(time);
         _Search = false;
         _ChangeStateToPatrol = null;
-        ChangeState(EnemyStates.PATROL);
+        if(_CurrentState != EnemyStates.PATROL)
+            ChangeState(EnemyStates.PATROL);
     }
 
     IEnumerator OpenDoors()
