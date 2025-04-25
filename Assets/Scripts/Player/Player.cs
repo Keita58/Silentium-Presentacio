@@ -436,8 +436,6 @@ public class Player : MonoBehaviour
         switch (actualState)
         {
             case PlayerStates.IDLE:
-                _Rigidbody.linearVelocity = Vector3.zero;
-                _Rigidbody.angularVelocity = Vector3.zero;
                 break;
             case PlayerStates.MOVE:
                 coroutineMove = StartCoroutine(MakeNoiseMove());
@@ -446,8 +444,8 @@ public class Player : MonoBehaviour
                 coroutineRun = StartCoroutine(MakeNoiseRun());
                 break;
             case PlayerStates.CROUCH:
-                this.GetComponent<CapsuleCollider>().center = new Vector3(0f, crouchedCenterCollider, 0f);
-                this.GetComponent<CapsuleCollider>().height = crouchedHeightCollider;
+                this.GetComponent<CharacterController>().center = new Vector3(0f, crouchedCenterCollider, 0f);
+                this.GetComponent<CharacterController>().height = crouchedHeightCollider;
                 _Camera.transform.localPosition = new Vector3(0f, 0f, -0.198f);
                 cameraShenanigansGameObject.transform.localPosition = Vector3.zero;
                 _VelocityMove /= 2;
@@ -537,8 +535,8 @@ public class Player : MonoBehaviour
             case PlayerStates.CROUCH:
                 if (coroutineCrouch != null)
                     StopCoroutine(coroutineCrouch);
-                this.GetComponent<CapsuleCollider>().center = Vector3.zero;
-                this.GetComponent<CapsuleCollider>().height = 2;
+                this.GetComponent<CharacterController>().center = Vector3.zero;
+                this.GetComponent<CharacterController>().height = 2;
                 _Camera.transform.localPosition = cameraPositionBeforeCrouch;
                 cameraShenanigansGameObject.transform.localPosition = new Vector3(0f, _Camera.transform.localPosition.y, 0f);
                 _VelocityMove *= 2;

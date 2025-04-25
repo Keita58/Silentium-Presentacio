@@ -9,6 +9,7 @@ public class DetectMorseEntry : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log("Entro collider:" + other.name);
         if (other.transform.gameObject.layer==6) onMorseRoomEnter?.Invoke();
     }
 

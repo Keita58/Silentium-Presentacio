@@ -7,10 +7,10 @@ public class MorsePuzzle : MonoBehaviour
     private Light morseLight;
 
     //Morse durations
-    private float dotDuration = 0.2f;
-    private float dashDuration = 0.6f;
-    private float spaceDuration = 0.2f;
-    private float letterSpace = 0.6f;
+    private float dotDuration = 0.3f;
+    private float dashDuration = 0.9f;
+    private float spaceDuration = 0.3f;
+    private float letterSpace = 2.1f;
     private string message = "Despierta papa";
 
     [SerializeField] DetectMorseEntry detectMorseEntry;
@@ -37,7 +37,8 @@ public class MorsePuzzle : MonoBehaviour
 
     private void StartMorse()
     {
-        morseCoroutine = StartCoroutine(PlayMorse(message.ToUpper()));
+        if (morseCoroutine == null)
+            morseCoroutine = StartCoroutine(PlayMorse(message.ToUpper()));
     }
 
     private void EndMorse()
@@ -50,16 +51,21 @@ public class MorsePuzzle : MonoBehaviour
     {
         while (true)
         {
+            morseLight.enabled = false;
+            yield return new WaitForSeconds(5f);
+            Debug.Log("Empiezo morse");
 
             foreach (char c in message)
             {
+                //agafem el codi en morse segons el caràcter
                 string code = morseCode[c];
 
                 if (code == " ")
                 {
-                    yield return new WaitForSeconds(letterSpace * 2); //espai entre paraula
+                    yield return new WaitForSeconds(letterSpace); //espai entre paraula
                     continue;
                 }
+                //Recorrem cada caràcter 
                 foreach (char symbol in code)
                 {
                     morseLight.enabled = true;
@@ -80,9 +86,7 @@ public class MorsePuzzle : MonoBehaviour
 
                 yield return new WaitForSeconds(letterSpace); //espai entre lletres
             }
-
-            morseLight.enabled = false;
-            yield return new WaitForSeconds(10f);
+            Debug.Log("Acabo morse");
         }
 
     }
