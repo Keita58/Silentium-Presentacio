@@ -12,6 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05fddcd6ae62fb44a8090a13224fa9b4, type: 3}
   m_Name: NotaReloj
   m_EditorClassIdentifier: 
-  Name: 21 de Septiembre del 1802
+  Name: 21 de Septiembre del 2000
   noteId: 7
-  noteContent: "Napole\xF3n Bonaparte anexa el Piamonte a Francia."
+  noteContent: "Otra vez se ha descoordinado ese dichoso reloj. Menos mal que conozco
+    un m\xE9todo para que vuelva a funcionar. Tan solo debo poner una hora concreta
+    en el reloj... Pero no recuerdo cual era... Deber\xEDa pedirle a Avril que me
+    vuelva a poner bien el reloj."
