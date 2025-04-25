@@ -54,7 +54,6 @@ public class Door : MonoBehaviour
         if (isHideSpot)
         {
             endRotation = Quaternion.Euler(new Vector3(0, startRotation.y + rotationAmount, 0));
-
         }
         else
         {

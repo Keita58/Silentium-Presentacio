@@ -954,6 +954,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Morse",
+            "id": "107a682d-1f69-4e6c-993d-f2333e6c3916",
+            "actions": [
+                {
+                    "name": "Exit",
+                    "type": "Button",
+                    "id": "e40233fd-e14e-461f-b4ba-a87b78dfc3fb",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "45082f49-4cac-4de3-82ba-a164e3ddc545",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Exit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [

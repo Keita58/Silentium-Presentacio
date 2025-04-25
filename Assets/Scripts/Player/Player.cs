@@ -1,7 +1,3 @@
-using JetBrains.Annotations;
-using NavKeypad;
-using NUnit.Framework;
-using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -58,21 +54,26 @@ public class Player : MonoBehaviour
     private bool itemSlotOccuped;
     [SerializeField] private GameObject equipedObject;
     [SerializeField] Transform itemSlot;
+    [SerializeField]
     bool door = false;
     bool clockPuzzle = false;
+
+    //interactive booleans
     [SerializeField]
     bool item = false;
     bool note = false;
     bool chest = false;
-
     [SerializeField]
     bool book = false;
     bool keypad = false;
     [SerializeField]
     bool bookItem= false;
     bool picture = false;
+    [SerializeField]
+    bool morse = false;
     private GameObject clockGameObject;
 
+    //Coroutines
     private Coroutine coroutineRun;
     private Coroutine coroutineMove;
     private Coroutine coroutineCrouch;
@@ -119,7 +120,6 @@ public class Player : MonoBehaviour
 
     }
 
-
     private void OpenInventory(InputAction.CallbackContext context)
     {
 
@@ -164,28 +164,92 @@ public class Player : MonoBehaviour
     private void Interact(InputAction.CallbackContext context)
     {
         Debug.Log("ENTRO?");
-        if (interactiveGameObject != null && item)
+        if (interactiveGameObject != null)
         {
-            
-            Debug.Log("ENTRO DEFINITIVAMENTE");
-            InventoryManager.instance.AddItem(interactiveGameObject.GetComponent<PickItem>().item);
-            Debug.Log("QUE COJO?" + interactiveGameObject.GetComponent<PickItem>().item);
-
-            Debug.Log("Entro Coger item");
-            if (bookItem)
+            if (item)
             {
-                if (interactiveGameObject.GetComponent<Book>().placed)
+                Debug.Log("ENTRO DEFINITIVAMENTE");
+                InventoryManager.instance.AddItem(interactiveGameObject.GetComponent<PickItem>().item);
+                Debug.Log("QUE COJO?" + interactiveGameObject.GetComponent<PickItem>().item);
+
+                Debug.Log("Entro Coger item");
+                if (bookItem)
                 {
-                    interactiveGameObject.GetComponent<Book>().placed = false;
-                    interactiveGameObject.GetComponent<Book>().collider.enabled = true;
-                    interactiveGameObject.GetComponent<Book>().collider.transform.GetComponent<CellBook>().SetBook(null);
-                    interactiveGameObject.GetComponent<Book>().collider = null;
-                    bookItem = false;
-                    item = false;
+                    if (interactiveGameObject.GetComponent<Book>().placed)
+                    {
+                        interactiveGameObject.GetComponent<Book>().placed = false;
+                        interactiveGameObject.GetComponent<Book>().collider.enabled = true;
+                        interactiveGameObject.GetComponent<Book>().collider.transform.GetComponent<CellBook>().SetBook(null);
+                        interactiveGameObject.GetComponent<Book>().collider = null;
+                        bookItem = false;
+                        item = false;
+                    }
                 }
-            }            
-            interactiveGameObject.gameObject.SetActive(false);
-            interactiveGameObject = null;
+                interactiveGameObject.gameObject.SetActive(false);
+                interactiveGameObject = null;
+            }
+            else
+            {
+                interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
+                if (clockPuzzle)
+                {
+                    PuzzleManager.instance.InteractClockPuzzle();
+                    StopCoroutine(coroutineInteract);
+                    clockPuzzle = false;
+
+                }
+                else if (note)
+                {
+                    if (interactiveGameObject.GetComponent<Notes>().note.noteId < 6)
+                    {
+                        InventoryManager.instance.DiscoverNote(interactiveGameObject.GetComponent<Notes>().note);
+                        interactiveGameObject.gameObject.SetActive(false);
+                    }
+                    else
+                    {
+                        if (interactiveGameObject.GetComponent<Notes>().note.noteId == 8 || interactiveGameObject.GetComponent<Notes>().note.noteId == 9 || interactiveGameObject.GetComponent<Notes>().note.noteId == 10)
+                        {
+                            PuzzleManager.instance.TakePoemPart(interactiveGameObject.GetComponent<Notes>());
+                            interactiveGameObject.gameObject.SetActive(false);
+                        }
+                        InventoryManager.instance.ShowNote(interactiveGameObject.GetComponent<Notes>().note);
+                    }
+                }
+                else if (chest)
+                {
+                    InventoryManager.instance.OpenChest();
+                    chest = false;
+                }
+                else if (book)
+                {
+                    if (equipedObject != null)
+                    {
+                        if (equipedObject.GetComponent<PickItem>().item is BookItem)
+                        {
+                            interactiveGameObject.GetComponent<CellBook>().SetBook(equipedObject.GetComponent<Book>());
+                            equipedObject.GetComponent<Book>().collider = interactiveGameObject.GetComponent<CellBook>().GetComponent<BoxCollider>();
+                            equipedObject.GetComponent<Book>().placed = true;
+                            PuzzleManager.instance.CheckBookPuzzle();
+                            interactiveGameObject.GetComponent<CellBook>().GetComponent<BoxCollider>().enabled = false;
+                            equipedObject.transform.rotation = Quaternion.identity;
+                            equipedObject.transform.parent = null;
+                            equipedObject.transform.position = interactiveGameObject.transform.GetChild(0).transform.position;
+                            equipedObject = null;
+                            itemSlotOccuped = false;
+                            InventoryManager.instance.UseEquippedItem();
+                        }
+                    }
+                }
+                else if (keypad)
+                {
+                    PuzzleManager.instance.InteractHieroglyphicPuzzle();
+                }
+                else if (morse)
+                {
+                    PuzzleManager.instance.InteractMorsePuzzle();
+                }
+            }
+
 
         }
         else
@@ -290,6 +354,7 @@ public class Player : MonoBehaviour
                 PuzzleManager.instance.InteractHieroglyphicPuzzle();
             }
         }
+        
 
     }
 
@@ -487,7 +552,6 @@ public class Player : MonoBehaviour
 
     public IEnumerator InteractuarRaycast()
     {
-        //Interactuar con todo y mirar que me devuelve;
         while (true)
         {
             Debug.DrawRay(_Camera.transform.position, _Camera.transform.forward, Color.magenta, 5f);
@@ -555,6 +619,10 @@ public class Player : MonoBehaviour
                     else if (hit.transform.gameObject.layer == 14)
                     {
                         keypad = true;
+                    }else if (hit.transform.gameObject.layer == 17)
+                    {
+                        morse = true;
+                        door = false;
                     }
                     else if (hit.transform.gameObject.layer == 17)
                     {
@@ -564,7 +632,8 @@ public class Player : MonoBehaviour
                 }
                 else if (hit.transform.gameObject.layer == 10)
                 {
-                    door = true;
+                    if (!morse)
+                        door = true;
                 }
 
             }
@@ -574,6 +643,7 @@ public class Player : MonoBehaviour
                 book=false;
                 keypad=false;
                 item = false;
+                morse=false;
                 clockPuzzle = false;
                 bookItem = false;
                 picture = false;
