@@ -11,6 +11,7 @@ public class NotesSO : ScriptableObject
         Image,
         Scroll,
         Normal,
+        Book
     }
     public NoteType noteType;
 }

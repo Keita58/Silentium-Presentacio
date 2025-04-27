@@ -97,7 +97,7 @@ public class Player : MonoBehaviour
         characterController = GetComponent<CharacterController>();
     }
 
-    public void ToggleInputPlayer(bool enable)
+    public void ToggleInputPlayer(bool enable, bool enableInventory)
     {
         if (!enable)
         {
@@ -117,6 +117,8 @@ public class Player : MonoBehaviour
             _inputActions.Player.Crouch.Enable();
             _inputActions.Player.PickUpItem.Enable();
         }
+        if (enableInventory) _inputActions.Player.Inventory.Enable();
+        else _inputActions.Player.Inventory.Disable();
 
     }
 
@@ -129,14 +131,14 @@ public class Player : MonoBehaviour
             Cursor.visible = true;
             InventoryManager.instance.OpenInventory(this.gameObject);
             inventoryOpened = true;
-            ToggleInputPlayer(false);
+            ToggleInputPlayer(false, true);
         }
         else
         {
             Cursor.visible = false;
             InventoryManager.instance.CloseInventory();
             inventoryOpened = false;
-            ToggleInputPlayer(true);
+            ToggleInputPlayer(true, true);
         }
     }
 
@@ -190,8 +192,8 @@ public class Player : MonoBehaviour
             }
             else
             {
-                //if (!book && !door)
-                //    interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
+                if (!book && !door)
+                    interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
 
                 if (clockPuzzle)
                 {
@@ -202,23 +204,28 @@ public class Player : MonoBehaviour
                 }
                 else if (note)
                 {
-                    if (interactiveGameObject.GetComponent<Notes>().note.noteId < 6)
+                    NotesSO note = interactiveGameObject.GetComponent<Notes>().note;
+                    if (note.noteId < 6)
                     {
-                        InventoryManager.instance.DiscoverNote(interactiveGameObject.GetComponent<Notes>().note);
+                        InventoryManager.instance.DiscoverNote(note);
                         interactiveGameObject.gameObject.SetActive(false);
                     }
                     else
                     {
-                        if (interactiveGameObject.GetComponent<Notes>().note.noteId == 10)
+                        if (note.noteId == 10)
                         {
-                            InventoryManager.instance.ShowNoteScroll(interactiveGameObject.GetComponent<Notes>().note);
+                            InventoryManager.instance.ShowNoteScroll(note);
                             interactiveGameObject.gameObject.SetActive(false);
-                        }else if (interactiveGameObject.GetComponent<Notes>().note.noteType == NotesSO.NoteType.Image)
+                        }else if (note.noteType == NotesSO.NoteType.Image)
                         {
-                            InventoryManager.instance.ShowImageNote(interactiveGameObject.GetComponent<Notes>().note.noteContent);
+                            InventoryManager.instance.ShowImageNote(note.noteContent);
+
+                        }else if (note.noteType == NotesSO.NoteType.Book)
+                        {
+                            InventoryManager.instance.ShowBookNote(note.noteContent);
                         }
                         else
-                            InventoryManager.instance.ShowNote(interactiveGameObject.GetComponent<Notes>().note);
+                            InventoryManager.instance.ShowNote(note);
                     }
                 }
                 else if (book)
@@ -603,6 +610,7 @@ public class Player : MonoBehaviour
                 clockPuzzle = false;
                 bookItem = false;
                 picture = false;
+                note = false;
                 if (interactiveGameObject != null)
                 {
                     if (interactiveGameObject.transform.gameObject.layer != 15)

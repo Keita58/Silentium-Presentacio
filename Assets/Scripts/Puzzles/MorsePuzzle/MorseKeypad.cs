@@ -159,12 +159,13 @@ namespace NavKeypad
             door.Open(new Vector3(0,0,0));
             accessWasGranted = true;
             keypadDisplayText.text = accessGrantedText;
-            PuzzleManager.instance.ExitMorsePuzzle();
+            PuzzleManager.instance.ExitMorsePuzzleAnimation();
             audioSource.PlayOneShot(accessGrantedSfx);
+
         }
         private void ExitPuzzle(InputAction.CallbackContext context)
         {
-            PuzzleManager.instance.ExitMorsePuzzle();
+            PuzzleManager.instance.ExitMorsePuzzle(false);
         }
     }
 }

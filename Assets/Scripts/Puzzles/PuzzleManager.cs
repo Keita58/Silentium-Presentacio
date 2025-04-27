@@ -1,4 +1,5 @@
 using NavKeypad;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -29,6 +30,14 @@ public class PuzzleManager : MonoBehaviour
     private Camera cam_morse;
     [SerializeField]
     MorseKeypad morseKeypad;
+    [SerializeField]
+    private GameObject cam_doorsMorseAnimation;
+    [SerializeField]
+    private AnimationClip doorsMorseAnimation;
+    [SerializeField]
+    private Animator animator;
+    float animationTime = 0f;
+    bool isMorseCompleted = false;
     private void Awake()
     {
         inputActionPlayer = new InputSystem_Actions();
@@ -78,14 +87,43 @@ public class PuzzleManager : MonoBehaviour
         Cursor.visible = false;
     }
 
-    public void ExitMorsePuzzle()
+    public void ExitMorsePuzzleAnimation()
     {
+        cam_morse.gameObject.SetActive(false);
+        cam_doorsMorseAnimation.SetActive(true);
+        animator.Play("FinalDoor");
+        animationTime = 0f;
+        isMorseCompleted = true;
+    }
+
+    private void Update()
+    {
+        if (isMorseCompleted)
+        {
+            animationTime += Time.deltaTime;
+            if (animationTime >= 2.4f)
+            {
+                ExitMorsePuzzle(true);
+                animationTime = 0f;
+                isMorseCompleted = false;
+            }
+        }
+        
+    }
+
+    public void ExitMorsePuzzle(bool isCompleted)
+    {
+        if (isCompleted)
+            cam_doorsMorseAnimation.SetActive(false);
+        else
+            cam_morse.gameObject.SetActive(false);
+
         player._inputActions.Player.Enable();
         morseKeypad.inputActions.Morse.Disable();
         player.ResumeInteract();
         cam_Player.gameObject.SetActive(true);
-        cam_morse.gameObject.SetActive(false);
         Cursor.visible = false;
+
     }
 
     public void InteractMorsePuzzle()
