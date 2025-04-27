@@ -36,4 +36,9 @@ public class ActionsButton : MonoBehaviour
     {
         InventoryManager.instance.CloseNoteScroll();
     }
+
+    public void CloseImageNote()
+    {
+        InventoryManager.instance.CloseImageNote();
+    }
 }

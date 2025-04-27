@@ -25,6 +25,8 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] GameObject itemDescriptionPanel;
     [SerializeField] GameObject notesPanel;
     [SerializeField] GameObject notesPanelScroll;
+    [SerializeField] private GameObject imagePanel;
+
     private Item equippedItem;
 
     public bool isCombining { get; private set; }
@@ -326,6 +328,13 @@ public class InventoryManager : MonoBehaviour
 
     }
 
+    public void ShowImageNote(string content)
+    {
+        imagePanel.SetActive(true);
+        imagePanel.transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = content;
+        player.ToggleInputPlayer(false);
+    }
+
     public void CloseNote()
     {
         notesPanel.SetActive(false);
@@ -334,6 +343,12 @@ public class InventoryManager : MonoBehaviour
     public void CloseNoteScroll()
     {
         notesPanelScroll.SetActive(false);
+        player.ToggleInputPlayer(true);
+    }
+
+    public void CloseImageNote()
+    {
+        imagePanel.SetActive(false);
         player.ToggleInputPlayer(true);
     }
 

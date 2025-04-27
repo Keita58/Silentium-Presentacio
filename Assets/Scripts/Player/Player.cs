@@ -213,7 +213,11 @@ public class Player : MonoBehaviour
                         {
                             InventoryManager.instance.ShowNoteScroll(interactiveGameObject.GetComponent<Notes>().note);
                             interactiveGameObject.gameObject.SetActive(false);
-                        }else
+                        }else if (interactiveGameObject.GetComponent<Notes>().note.noteType == NotesSO.NoteType.Image)
+                        {
+                            InventoryManager.instance.ShowImageNote(interactiveGameObject.GetComponent<Notes>().note.noteContent);
+                        }
+                        else
                             InventoryManager.instance.ShowNote(interactiveGameObject.GetComponent<Notes>().note);
                     }
                 }
