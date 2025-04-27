@@ -49,6 +49,8 @@ public class BlindEnemy : Enemy
         _DetectionSphere.GetComponent<DetectionSphere>().OnExit += OnExit;
 
         StartCoroutine(OpenDoors());
+
+        _AttackCoroutine = null;
     }
 
     private void Start()
@@ -76,10 +78,11 @@ public class BlindEnemy : Enemy
         switch (_CurrentState)
         {
             case EnemyStates.PATROL:
-                _NavMeshAgent.speed = 4.5f;
+                _NavMeshAgent.speed = 3f;
                 _PatrolCoroutine = StartCoroutine(Patrol(_RangeSearchSound, _PointOfPatrol));
                 break;
             case EnemyStates.ATTACK:
+                _NavMeshAgent.isStopped = true;
                 break;
             case EnemyStates.KNOCKED:
                 StartCoroutine(WakeUp(5));
@@ -101,6 +104,7 @@ public class BlindEnemy : Enemy
             case EnemyStates.ATTACK:
                 _PointOfPatrol = transform.position;
                 _RangeSearchSound = 25;
+                _NavMeshAgent.isStopped = false;
                 break;
             case EnemyStates.KNOCKED:
                 _Hp = MAXHEALTH;
@@ -336,12 +340,6 @@ public class BlindEnemy : Enemy
 
     IEnumerator Attack()
     {
-        if(_NavMeshAgent.isOnOffMeshLink)
-        {
-            _NavMeshAgent.CompleteOffMeshLink();
-            yield return new WaitForSeconds(0.5f);
-        }
-        _NavMeshAgent.SetDestination(transform.position);
         while (true)
         {
             _Player.GetComponent<Player>().TakeDamage(3);
@@ -358,13 +356,17 @@ public class BlindEnemy : Enemy
             _ChangeStateToPatrol = null;
         }
         ChangeState(EnemyStates.ATTACK);
-        _AttackCoroutine = StartCoroutine(Attack());
+        if(_AttackCoroutine != null) 
+            _AttackCoroutine = StartCoroutine(Attack());
     }
 
     private void OnExit()
     {
         if(_AttackCoroutine != null)
+        {
             StopCoroutine(_AttackCoroutine);
+            _AttackCoroutine = null;
+        }
 
         _Search = true;
         _RangeSearchSound = 0.5f;

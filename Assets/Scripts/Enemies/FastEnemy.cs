@@ -114,7 +114,7 @@ public class FastEnemy : Enemy
                 _ChangeToPatrolCoroutine = null;
                 break;
             case EnemyStates.CHASE:
-                _NavMeshAgent.speed = 3.5f;
+                _NavMeshAgent.speed = 4f;
                 _RangeChaseAfterStop = 25;
                 break;
             case EnemyStates.ATTACK:
