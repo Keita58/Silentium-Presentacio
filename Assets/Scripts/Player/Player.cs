@@ -72,7 +72,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     bool morse = false;
     private GameObject clockGameObject;
-
+    private bool weaponPuzzle;
     //Coroutines
     private Coroutine coroutineRun;
     private Coroutine coroutineMove;
@@ -192,7 +192,7 @@ public class Player : MonoBehaviour
             }
             else
             {
-                if (!book && !door)
+                if (!book && !door && !weaponPuzzle)
                     interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
 
                 if (clockPuzzle)
@@ -201,6 +201,11 @@ public class Player : MonoBehaviour
                     StopCoroutine(coroutineInteract);
                     clockPuzzle = false;
 
+                }else if (weaponPuzzle)
+                {
+                    PuzzleManager.instance.InteractWeaponPuzzle();
+                    StopCoroutine(coroutineInteract);
+                    weaponPuzzle = false;
                 }
                 else if (note)
                 {
@@ -528,7 +533,7 @@ public class Player : MonoBehaviour
                         interactiveGameObject = null;
                     }
                     interactiveGameObject = hit.collider.gameObject;
-                    if (hit.transform.gameObject.layer != 15)
+                    if (hit.transform.gameObject.layer != 15 && hit.transform.gameObject.layer != 18)
                     {
                         baseMaterial = interactiveGameObject.GetComponent<MeshRenderer>().materials[0];
                         interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[]
@@ -583,6 +588,9 @@ public class Player : MonoBehaviour
                         keypad = true;
                     }else if (hit.transform.gameObject.layer == 18)
                     {
+                        weaponPuzzle = true;
+                    }else if (hit.transform.gameObject.layer == 20)
+                    {
                         morse = true;
                         door = false;
                     }
@@ -610,6 +618,7 @@ public class Player : MonoBehaviour
                 bookItem = false;
                 picture = false;
                 note = false;
+                weaponPuzzle = false;
                 if (interactiveGameObject != null)
                 {
                     if (interactiveGameObject.transform.gameObject.layer != 15)

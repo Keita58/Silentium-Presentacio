@@ -2,6 +2,7 @@ using NavKeypad;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PuzzleManager : MonoBehaviour
 {
@@ -19,8 +20,14 @@ public class PuzzleManager : MonoBehaviour
     private Camera cam_Hierogliphic;
     [SerializeField]
     private Camera cam_WeaponPuzzle;
-    [Header("Book Puzzle")]
+    [SerializeField]
+    private AnimationClip doorsHieroglyphic;   
+    [SerializeField]
+    private Animator hieroglyphicAnimator;
+    [SerializeField]
     private Camera cam_HieroglyphicAnimation;
+
+    [Header("Book Puzzle")]
     [SerializeField]
     BookPuzzle bookPuzzle;
     [Header("Poem Puzzle")]
@@ -42,15 +49,19 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     private AnimationClip doorsMorseAnimation;
     [SerializeField]
-    private Animator animator;
+    private Animator animator;   
+    [SerializeField]
+    private Animator morseAnimator;
     [Header("Weapon Puzzle")]
     [SerializeField]
     private GameObject TopLeftPiece;
-    private AnimationClip doorsHieroglyphic;
     [SerializeField]
-    private Animator morseAnimator;
+    private GameObject DownLeftPiece;
     [SerializeField]
-    private Animator hieroglyphicAnimator;
+    private GameObject TopRightPiece;
+    [SerializeField]
+    private GameObject DownRightPiece;
+
     float animationTime = 0f;
     bool isMorseCompleted = false;
     [SerializeField]
@@ -180,19 +191,18 @@ public class PuzzleManager : MonoBehaviour
     {
         cam_Player.gameObject.SetActive(false);
         cam_WeaponPuzzle.gameObject.SetActive(true);
-        cam_Player.transform.parent.position = new Vector3(-32.8191757f, 6.21000004f, -32.4704895f);
-        cam_Player.transform.parent.rotation = new Quaternion(0, -0.608760536f, 0, 0.793354094f);
         cam_Player.transform.parent.GetComponent<Player>()._inputActions.Player.Disable();
-        cam_WeaponPuzzle.transform.parent.GetComponent<WeaponPuzzle>().inputActions.WeaponPuzzle.Enable();
+        TopLeftPiece.GetComponent<BoxCollider>().enabled = true;
+        TopRightPiece.GetComponent<BoxCollider>().enabled = true;
+        Cursor.visible = true;
     }
     public void ExitWeaponPuzzle()
     {
         cam_Player.gameObject.SetActive(true);
         cam_WeaponPuzzle.gameObject.SetActive(false);
-        cam_Player.transform.parent.position = new Vector3(-32.8191757f, 6.21000004f, -32.4704895f);
-        cam_Player.transform.parent.rotation = new Quaternion(0, -0.608760536f, 0, 0.793354094f);
         cam_Player.transform.parent.GetComponent<Player>()._inputActions.Player.Enable();
-        cam_WeaponPuzzle.transform.parent.GetComponent<WeaponPuzzle>().inputActions.WeaponPuzzle.Disable();
+        Cursor.visible = false;
+    }
 
     private void Update()
     {
