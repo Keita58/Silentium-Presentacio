@@ -7,6 +7,7 @@ using UnityEngine;
 public class PuzzleManager : MonoBehaviour
 {
     public static PuzzleManager instance { get; private set; }
+    [Header("Clock Puzzle")]
     [SerializeField]
     private GameObject KeyClock;
     [SerializeField]
@@ -14,18 +15,22 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     private Camera cam_Player;
     private InputSystem_Actions inputActionPlayer;
+    [Header("Hieroglytphic Puzzle")]
     [SerializeField]
     private Camera cam_Hierogliphic;
     [SerializeField]
     private Camera cam_WeaponPuzzle;
+    [Header("Book Puzzle")]
     [SerializeField]
     BookPuzzle bookPuzzle;
+    [Header("Poem Puzzle")]
     [SerializeField]
     private List<Picture> pictureList;
     [SerializeField]
     public List<Picture> picturesClicked;
     [SerializeField]
     Door DoorPoem3;
+    [Header("Morse Puzzle")]
     [SerializeField]
     Player player;
     [SerializeField]
@@ -38,6 +43,9 @@ public class PuzzleManager : MonoBehaviour
     private AnimationClip doorsMorseAnimation;
     [SerializeField]
     private Animator animator;
+    [Header("Weapon Puzzle")]
+    [SerializeField]
+    private GameObject TopLeftPiece;
     float animationTime = 0f;
     bool isMorseCompleted = false;
     private void Awake()
