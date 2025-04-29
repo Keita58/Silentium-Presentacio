@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05fddcd6ae62fb44a8090a13224fa9b4, type: 3}
+  m_Name: NotesSO
+  m_EditorClassIdentifier: 
+  Name: Foto
+  noteId: 50
+  noteContent: "Es una fotograf\xEDa de un hombre con sus tres hijos. En el reverso
+    de la foto parece haber un texto: \"Te queremos pap\xE1.\""
+  noteType: 0

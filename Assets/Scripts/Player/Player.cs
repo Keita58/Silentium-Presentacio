@@ -1,7 +1,3 @@
-using JetBrains.Annotations;
-using NavKeypad;
-using NUnit.Framework;
-using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -58,21 +54,26 @@ public class Player : MonoBehaviour
     private bool itemSlotOccuped;
     [SerializeField] private GameObject equipedObject;
     [SerializeField] Transform itemSlot;
+    [SerializeField]
     bool door = false;
     bool clockPuzzle = false;
+
+    //interactive booleans
     [SerializeField]
     bool item = false;
     bool note = false;
     bool chest = false;
-
     [SerializeField]
     bool book = false;
     bool keypad = false;
     [SerializeField]
     bool bookItem= false;
     bool picture = false;
+    [SerializeField]
+    bool morse = false;
     private GameObject clockGameObject;
 
+    //Coroutines
     private Coroutine coroutineRun;
     private Coroutine coroutineMove;
     private Coroutine coroutineCrouch;
@@ -96,7 +97,7 @@ public class Player : MonoBehaviour
         characterController = GetComponent<CharacterController>();
     }
 
-    public void ToggleInputPlayer(bool enable)
+    public void ToggleInputPlayer(bool enable, bool enableInventory)
     {
         if (!enable)
         {
@@ -116,9 +117,10 @@ public class Player : MonoBehaviour
             _inputActions.Player.Crouch.Enable();
             _inputActions.Player.PickUpItem.Enable();
         }
+        if (enableInventory) _inputActions.Player.Inventory.Enable();
+        else _inputActions.Player.Inventory.Disable();
 
     }
-
 
     private void OpenInventory(InputAction.CallbackContext context)
     {
@@ -129,14 +131,14 @@ public class Player : MonoBehaviour
             Cursor.visible = true;
             InventoryManager.instance.OpenInventory(this.gameObject);
             inventoryOpened = true;
-            ToggleInputPlayer(false);
+            ToggleInputPlayer(false, true);
         }
         else
         {
             Cursor.visible = false;
             InventoryManager.instance.CloseInventory();
             inventoryOpened = false;
-            ToggleInputPlayer(true);
+            ToggleInputPlayer(true, true);
         }
     }
 
@@ -164,28 +166,111 @@ public class Player : MonoBehaviour
     private void Interact(InputAction.CallbackContext context)
     {
         Debug.Log("ENTRO?");
-        if (interactiveGameObject != null && item)
+        if (interactiveGameObject != null)
         {
-            
-            Debug.Log("ENTRO DEFINITIVAMENTE");
-            InventoryManager.instance.AddItem(interactiveGameObject.GetComponent<PickItem>().item);
-            Debug.Log("QUE COJO?" + interactiveGameObject.GetComponent<PickItem>().item);
-
-            Debug.Log("Entro Coger item");
-            if (bookItem)
+            if (item)
             {
-                if (interactiveGameObject.GetComponent<Book>().placed)
+                Debug.Log("ENTRO DEFINITIVAMENTE");
+                InventoryManager.instance.AddItem(interactiveGameObject.GetComponent<PickItem>().item);
+                Debug.Log("QUE COJO?" + interactiveGameObject.GetComponent<PickItem>().item);
+
+                Debug.Log("Entro Coger item");
+                if (bookItem)
                 {
-                    interactiveGameObject.GetComponent<Book>().placed = false;
-                    interactiveGameObject.GetComponent<Book>().collider.enabled = true;
-                    interactiveGameObject.GetComponent<Book>().collider.transform.GetComponent<CellBook>().SetBook(null);
-                    interactiveGameObject.GetComponent<Book>().collider = null;
-                    bookItem = false;
-                    item = false;
+                    if (interactiveGameObject.GetComponent<Book>().placed)
+                    {
+                        interactiveGameObject.GetComponent<Book>().placed = false;
+                        interactiveGameObject.GetComponent<Book>().collider.enabled = true;
+                        interactiveGameObject.GetComponent<Book>().collider.transform.GetComponent<CellBook>().SetBook(null);
+                        interactiveGameObject.GetComponent<Book>().collider = null;
+                        bookItem = false;
+                        item = false;
+                    }
                 }
-            }            
-            interactiveGameObject.gameObject.SetActive(false);
-            interactiveGameObject = null;
+                interactiveGameObject.gameObject.SetActive(false);
+                interactiveGameObject = null;
+            }
+            else
+            {
+                if (!book && !door)
+                    interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
+
+                if (clockPuzzle)
+                {
+                    PuzzleManager.instance.InteractClockPuzzle();
+                    StopCoroutine(coroutineInteract);
+                    clockPuzzle = false;
+
+                }
+                else if (note)
+                {
+                    NotesSO note = interactiveGameObject.GetComponent<Notes>().note;
+                    if (note.noteId < 6)
+                    {
+                        InventoryManager.instance.DiscoverNote(note);
+                        interactiveGameObject.gameObject.SetActive(false);
+                    }
+                    else
+                    {
+                        if (note.noteId == 10)
+                        {
+                            InventoryManager.instance.ShowNoteScroll(note);
+                            interactiveGameObject.gameObject.SetActive(false);
+                        }else if (note.noteType == NotesSO.NoteType.Image)
+                        {
+                            InventoryManager.instance.ShowImageNote(note.noteContent);
+
+                        }else if (note.noteType == NotesSO.NoteType.Book)
+                        {
+                            InventoryManager.instance.ShowBookNote(note.noteContent);
+                        }
+                        else
+                            InventoryManager.instance.ShowNote(note);
+                    }
+                }
+                else if (book)
+                {
+                    if (equipedObject != null)
+                    {
+                        if (equipedObject.GetComponent<PickItem>().item is BookItem)
+                        {
+                            interactiveGameObject.GetComponent<CellBook>().SetBook(equipedObject.GetComponent<Book>());
+                            equipedObject.GetComponent<Book>().collider = interactiveGameObject.GetComponent<CellBook>().GetComponent<BoxCollider>();
+                            equipedObject.GetComponent<Book>().placed = true;
+                            PuzzleManager.instance.CheckBookPuzzle();
+                            interactiveGameObject.GetComponent<CellBook>().GetComponent<BoxCollider>().enabled = false;
+                            equipedObject.transform.rotation = Quaternion.identity;
+                            equipedObject.transform.parent = null;
+                            equipedObject.transform.position = interactiveGameObject.transform.GetChild(0).transform.position;
+                            equipedObject = null;
+                            itemSlotOccuped = false;
+                            InventoryManager.instance.UseEquippedItem();
+                        }
+                    }
+                }
+                else if (keypad)
+                {
+                    PuzzleManager.instance.InteractHieroglyphicPuzzle();
+                }
+                else if (morse)
+                {
+                    PuzzleManager.instance.InteractMorsePuzzle();
+                }
+                else if (picture)
+                {
+                    Debug.Log("Entro en interact picture");
+                    PuzzleManager.instance.picturesClicked.Add(interactiveGameObject.GetComponent<Picture>());
+                    PuzzleManager.instance.TakePoemPart();
+                    picture = false;
+
+                }
+                else if (chest)
+                {
+                    InventoryManager.instance.OpenChest();
+                    chest = false;
+                }
+            }
+
 
         }
         else
@@ -232,64 +317,9 @@ public class Player : MonoBehaviour
                     }
                 }
             }
-            else if (clockPuzzle)
-            {
-                PuzzleManager.instance.InteractClockPuzzle();
-                StopCoroutine(coroutineInteract);
-                clockPuzzle = false;
-
-            }
-            else if (picture)
-            {
-                Debug.Log("Entro en interact picture");
-                PuzzleManager.instance.picturesClicked.Add(interactiveGameObject.GetComponent<Picture>());
-                PuzzleManager.instance.TakePoemPart();
-                picture = false;
-
-            }
-            else if (interactiveGameObject != null && note)
-            {
-                if (interactiveGameObject.GetComponent<Notes>().note.noteId < 6)
-                {
-                    InventoryManager.instance.DiscoverNote(interactiveGameObject.GetComponent<Notes>().note);
-                    interactiveGameObject.gameObject.SetActive(false);
-                }
-                else
-                {
-                    if(interactiveGameObject.GetComponent<Notes>().note.noteId!=10)
-                        InventoryManager.instance.ShowNote(interactiveGameObject.GetComponent<Notes>().note);
-                    else
-                        InventoryManager.instance.ShowNoteScroll(interactiveGameObject.GetComponent<Notes>().note);
-                }
-            }
-            else if (chest)
-            {
-                InventoryManager.instance.OpenChest();
-                chest = false;
-            }else if (book)
-            {
-                if (equipedObject != null)
-                {
-                    if (equipedObject.GetComponent<PickItem>().item is BookItem)
-                    {
-                        interactiveGameObject.GetComponent<CellBook>().SetBook(equipedObject.GetComponent<Book>());
-                        equipedObject.GetComponent<Book>().collider = interactiveGameObject.GetComponent<CellBook>().GetComponent<BoxCollider>();
-                        equipedObject.GetComponent<Book>().placed = true;
-                        PuzzleManager.instance.CheckBookPuzzle();
-                        interactiveGameObject.GetComponent<CellBook>().GetComponent<BoxCollider>().enabled = false;
-                        equipedObject.transform.rotation = Quaternion.identity;
-                        equipedObject.transform.parent = null;
-                        equipedObject.transform.position = interactiveGameObject.transform.GetChild(0).transform.position;
-                        equipedObject = null;
-                        itemSlotOccuped = false;
-                        InventoryManager.instance.UseEquippedItem();
-                    }
-                }
-            }else if (keypad)
-            {
-                PuzzleManager.instance.InteractHieroglyphicPuzzle();
-            }
+            
         }
+        
 
     }
 
@@ -371,8 +401,6 @@ public class Player : MonoBehaviour
         switch (actualState)
         {
             case PlayerStates.IDLE:
-                _Rigidbody.linearVelocity = Vector3.zero;
-                _Rigidbody.angularVelocity = Vector3.zero;
                 break;
             case PlayerStates.MOVE:
                 coroutineMove = StartCoroutine(MakeNoiseMove());
@@ -381,8 +409,8 @@ public class Player : MonoBehaviour
                 coroutineRun = StartCoroutine(MakeNoiseRun());
                 break;
             case PlayerStates.CROUCH:
-                this.GetComponent<CapsuleCollider>().center = new Vector3(0f, crouchedCenterCollider, 0f);
-                this.GetComponent<CapsuleCollider>().height = crouchedHeightCollider;
+                this.GetComponent<CharacterController>().center = new Vector3(0f, crouchedCenterCollider, 0f);
+                this.GetComponent<CharacterController>().height = crouchedHeightCollider;
                 _Camera.transform.localPosition = new Vector3(0f, 0f, -0.198f);
                 cameraShenanigansGameObject.transform.localPosition = Vector3.zero;
                 _VelocityMove /= 2;
@@ -472,8 +500,8 @@ public class Player : MonoBehaviour
             case PlayerStates.CROUCH:
                 if (coroutineCrouch != null)
                     StopCoroutine(coroutineCrouch);
-                this.GetComponent<CapsuleCollider>().center = Vector3.zero;
-                this.GetComponent<CapsuleCollider>().height = 2;
+                this.GetComponent<CharacterController>().center = Vector3.zero;
+                this.GetComponent<CharacterController>().height = 2;
                 _Camera.transform.localPosition = cameraPositionBeforeCrouch;
                 cameraShenanigansGameObject.transform.localPosition = new Vector3(0f, _Camera.transform.localPosition.y, 0f);
                 _VelocityMove *= 2;
@@ -487,7 +515,6 @@ public class Player : MonoBehaviour
 
     public IEnumerator InteractuarRaycast()
     {
-        //Interactuar con todo y mirar que me devuelve;
         while (true)
         {
             Debug.DrawRay(_Camera.transform.position, _Camera.transform.forward, Color.magenta, 5f);
@@ -555,6 +582,10 @@ public class Player : MonoBehaviour
                     else if (hit.transform.gameObject.layer == 14)
                     {
                         keypad = true;
+                    }else if (hit.transform.gameObject.layer == 18)
+                    {
+                        morse = true;
+                        door = false;
                     }
                     else if (hit.transform.gameObject.layer == 17)
                     {
@@ -564,7 +595,8 @@ public class Player : MonoBehaviour
                 }
                 else if (hit.transform.gameObject.layer == 10)
                 {
-                    door = true;
+                    if (!morse)
+                        door = true;
                 }
 
             }
@@ -574,9 +606,11 @@ public class Player : MonoBehaviour
                 book=false;
                 keypad=false;
                 item = false;
+                morse=false;
                 clockPuzzle = false;
                 bookItem = false;
                 picture = false;
+                note = false;
                 if (interactiveGameObject != null)
                 {
                     if (interactiveGameObject.transform.gameObject.layer != 15)
