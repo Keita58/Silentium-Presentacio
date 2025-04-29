@@ -51,6 +51,7 @@ public class BlindEnemy : Enemy
         StartCoroutine(OpenDoors());
 
         _AttackCoroutine = null;
+        _ChangeStateToPatrol = null;
     }
 
     private void Start()
@@ -78,7 +79,10 @@ public class BlindEnemy : Enemy
         switch (_CurrentState)
         {
             case EnemyStates.PATROL:
-                _NavMeshAgent.speed = 3f;
+                if (_Search)
+                    _NavMeshAgent.speed = 6f;
+                else
+                    _NavMeshAgent.speed = 3f;
                 _PatrolCoroutine = StartCoroutine(Patrol(_RangeSearchSound, _PointOfPatrol));
                 break;
             case EnemyStates.ATTACK:
@@ -96,10 +100,12 @@ public class BlindEnemy : Enemy
         {
             case EnemyStates.PATROL:
                 _Patrolling = false;
-                if(_PatrolCoroutine != null)
-                    StopCoroutine(_PatrolCoroutine);
+                StopCoroutine(_PatrolCoroutine);
                 if(_ChangeStateToPatrol != null)
+                {
                     StopCoroutine(_ChangeStateToPatrol);
+                    _ChangeStateToPatrol = null;
+                }
                 break;
             case EnemyStates.ATTACK:
                 _PointOfPatrol = transform.position;
@@ -120,6 +126,7 @@ public class BlindEnemy : Enemy
         Vector3 point = Vector3.zero;
         while (true)
         {
+            Debug.Log("Entro al Patrol");
             if (!_Patrolling)
             {
                 if (!_Search)
@@ -142,8 +149,11 @@ public class BlindEnemy : Enemy
 
             if (_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
             {
-                if(_Search && _ChangeStateToPatrol == null)
+                if(_Search && _CurrentState != EnemyStates.ATTACK && _ChangeStateToPatrol == null)
+                {
+                    Debug.Log("Activo la corutina WakeUp");
                     _ChangeStateToPatrol = StartCoroutine(WakeUp(10));
+                }
                 _Patrolling = false;
                 yield return new WaitForSeconds(2);
             }
@@ -171,13 +181,16 @@ public class BlindEnemy : Enemy
                 areaMask = _NavMeshAgent.areaMask,
             };
 
+            Debug.Log(_NavMeshAgent.areaMask);
+
             //Comprovem que el punt que hem agafat esta dins del NavMesh
-            if (NavMesh.SamplePosition(point, out NavMeshHit hit, 1.0f, filter) && Vector3.Distance(point, center) > 1.75f)
+            if (NavMesh.SamplePosition(point, out NavMeshHit hit, 1.0f, filter))
             {
                 result = hit.position;
                 return true;
             }
         }
+        Debug.Log("No he trobat un punt! (Enemic cec)");
         result = center;
         return false;
     }
@@ -244,6 +257,7 @@ public class BlindEnemy : Enemy
             }
             else if (lvlSound > 5)
             {
+                _RangeSearchSound = 0.5f;
                 bool wall = false;
                 RaycastHit[] hits2 = Physics.RaycastAll(this.transform.position, _SoundPos - this.transform.position, Vector3.Distance(_SoundPos, this.transform.position));
 
@@ -269,6 +283,7 @@ public class BlindEnemy : Enemy
                     link.agentTypeID = _NavMeshAgent.agentTypeID;
                     link.area = 3;
                     link.bidirectional = false;
+                    link.costModifier = 1;
                     GetComponent<AgentLinkMover>().enabled = true;
 
                     _NavMeshAgent.SetDestination(_SoundPos);
@@ -297,7 +312,6 @@ public class BlindEnemy : Enemy
     {
         yield return new WaitForSeconds(time);
         _Search = false;
-        _ChangeStateToPatrol = null;
         if(_CurrentState != EnemyStates.PATROL)
             ChangeState(EnemyStates.PATROL);
     }
@@ -340,8 +354,10 @@ public class BlindEnemy : Enemy
 
     IEnumerator Attack()
     {
+        _NavMeshAgent.isStopped = true;
         while (true)
         {
+            Debug.Log("Entro a l'atac");
             _Player.GetComponent<Player>().TakeDamage(3);
             Debug.Log("Estic fent mal (Enemic cec)");
             yield return new WaitForSeconds(1);
@@ -350,13 +366,14 @@ public class BlindEnemy : Enemy
 
     private void OnEnter()
     {
+        _Search = false;
         if(_ChangeStateToPatrol != null)
         {
             StopCoroutine(_ChangeStateToPatrol);
             _ChangeStateToPatrol = null;
         }
         ChangeState(EnemyStates.ATTACK);
-        if(_AttackCoroutine != null) 
+        if(_AttackCoroutine == null) 
             _AttackCoroutine = StartCoroutine(Attack());
     }
 
@@ -372,5 +389,6 @@ public class BlindEnemy : Enemy
         _RangeSearchSound = 0.5f;
         _PointOfPatrol = transform.position;
         ChangeState(EnemyStates.PATROL);
+        Debug.Log("Activo l'estat de Patrol");
     }
 }

@@ -162,13 +162,13 @@ public class FatEnemy : Enemy
             Vector3 point = new Vector3(randomPoint.x, randomPoint.y, randomPoint.z);
 
             //Comprovem que el punt que hem agafat esta dins del NavMesh
-            if (NavMesh.SamplePosition(point, out NavMeshHit hit, 1.0f, NavMesh.GetAreaFromName("Walkable")) && Vector3.Distance(point, center) > 1.75f)
+            if (NavMesh.SamplePosition(point, out NavMeshHit hit, 1.0f, NavMesh.GetAreaFromName("Walkable")))
             {
                 result = hit.position;
                 return true;
             }
         }
-        Debug.Log("No he trobat un punt!");
+        Debug.Log("No he trobat un punt! (Enemic gras)");
         result = center;
         return false;
     }
