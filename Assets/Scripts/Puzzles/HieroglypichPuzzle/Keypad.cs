@@ -34,6 +34,7 @@ namespace NavKeypad
         private string currentInput;
         private bool displayingResult = false;
         private bool accessWasGranted = false;
+        [SerializeField] GameObject panelCollider;
 
 
         public InputSystem_Actions inputActions { get; private set; }
@@ -110,14 +111,17 @@ namespace NavKeypad
         private void AccessGranted()
         {
             door.SetLocked(false);
+            door.Open(new Vector3(0, 0, 0));
             accessWasGranted = true;
             keypadDisplayText.text = accessGrantedText;
-            PuzzleManager.instance.HieroglyphicPuzzleExit();
+            PuzzleManager.instance.HieroglyphicPuzzleExitAnimation();
             audioSource.PlayOneShot(accessGrantedSfx);
+            this.transform.gameObject.layer = 0;
+            panelCollider.gameObject.layer = 0;
         }
         private void ExitPuzzle(InputAction.CallbackContext context)
         {
-            PuzzleManager.instance.HieroglyphicPuzzleExit();
+            PuzzleManager.instance.HieroglyphicPuzzleExit(false);
         }
     }
 }

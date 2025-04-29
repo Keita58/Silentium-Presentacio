@@ -1,5 +1,4 @@
 using NavKeypad;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -16,6 +15,8 @@ public class PuzzleManager : MonoBehaviour
     private InputSystem_Actions inputActionPlayer;
     [SerializeField]
     private Camera cam_Hierogliphic;
+    [SerializeField]
+    private Camera cam_HieroglyphicAnimation;
     [SerializeField]
     BookPuzzle bookPuzzle;
     [SerializeField]
@@ -35,9 +36,15 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     private AnimationClip doorsMorseAnimation;
     [SerializeField]
-    private Animator animator;
+    private AnimationClip doorsHieroglyphic;
+    [SerializeField]
+    private Animator morseAnimator;
+    [SerializeField]
+    private Animator hieroglyphicAnimator;
     float animationTime = 0f;
     bool isMorseCompleted = false;
+    [SerializeField]
+    private bool isHieroglyphicCompleted = false;
     private void Awake()
     {
         inputActionPlayer = new InputSystem_Actions();
@@ -77,13 +84,26 @@ public class PuzzleManager : MonoBehaviour
         Cursor.visible = true;
     }
 
-    public void HieroglyphicPuzzleExit()
+    public void HieroglyphicPuzzleExitAnimation()
     {
+        cam_Hierogliphic.gameObject.SetActive(false);
+        cam_HieroglyphicAnimation.gameObject.SetActive(true);
+        hieroglyphicAnimator.Play("HieroDoor");
+        animationTime = 0f;
+        isHieroglyphicCompleted = true;
+    }
+
+    public void HieroglyphicPuzzleExit(bool isCompleted)
+    {
+        if (isCompleted)
+            cam_HieroglyphicAnimation.gameObject.SetActive(false);
+        else
+            cam_Hierogliphic.gameObject.SetActive(false);
+
         player._inputActions.Player.Enable();
         cam_Hierogliphic.transform.parent.GetComponent<Keypad>().inputActions.Hieroglyphic.Disable();
         player.ResumeInteract();
         cam_Player.gameObject.SetActive(true);
-        cam_Hierogliphic.gameObject.SetActive(false);
         Cursor.visible = false;
     }
 
@@ -91,24 +111,9 @@ public class PuzzleManager : MonoBehaviour
     {
         cam_morse.gameObject.SetActive(false);
         cam_doorsMorseAnimation.SetActive(true);
-        animator.Play("FinalDoor");
+        morseAnimator.Play("FinalDoor");
         animationTime = 0f;
         isMorseCompleted = true;
-    }
-
-    private void Update()
-    {
-        if (isMorseCompleted)
-        {
-            animationTime += Time.deltaTime;
-            if (animationTime >= 2.4f)
-            {
-                ExitMorsePuzzle(true);
-                animationTime = 0f;
-                isMorseCompleted = false;
-            }
-        }
-        
     }
 
     public void ExitMorsePuzzle(bool isCompleted)
@@ -132,7 +137,7 @@ public class PuzzleManager : MonoBehaviour
         cam_morse.gameObject.SetActive(true);
         player._inputActions.Player.Disable();
         morseKeypad.inputActions.Morse.Enable();
-        Cursor.visible= true;
+        Cursor.visible = true;
     }
 
     public void CheckBookPuzzle()
@@ -142,22 +147,46 @@ public class PuzzleManager : MonoBehaviour
     }
     public void TakePoemPart()
     {
-        for (int i = 0; i < picturesClicked.Count; i++) {
+        for (int i = 0; i < picturesClicked.Count; i++)
+        {
             if (picturesClicked.ElementAt(i) == pictureList.ElementAt(i))
             {
-                if(i == pictureList.Count - 1)
+                if (i == pictureList.Count - 1)
                 {
                     for (int x = 0; x < picturesClicked.Count; x++)
                     {
                         pictureList.ElementAt(x).gameObject.layer = 0;
                     }
-                        DoorPoem3.isLocked = false;
-                }            
+                    DoorPoem3.isLocked = false;
+                }
             }
             else
             {
                 picturesClicked.Clear();
             }
         }
+    }
+
+    private void Update()
+    {
+        if (isMorseCompleted)
+        {
+            animationTime += Time.deltaTime;
+            if (animationTime >= 2.4f)
+            {
+                ExitMorsePuzzle(true);
+                animationTime = 0f;
+            }
+        }
+        else if (isHieroglyphicCompleted)
+        {
+            animationTime += Time.deltaTime;
+            if (animationTime >= 2.4f)
+            {
+                HieroglyphicPuzzleExit(true);
+                animationTime = 0f;
+            }
+        }
+
     }
 }

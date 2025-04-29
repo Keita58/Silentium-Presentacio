@@ -38,6 +38,7 @@ namespace NavKeypad
         private string currentMorseCharacter = "";
         private bool displayingResult = false;
         private bool accessWasGranted = false;
+        [SerializeField] private GameObject panelCollider;
 
         private Dictionary<string, char> morseCode = new Dictionary<string, char>()
         {
@@ -161,7 +162,8 @@ namespace NavKeypad
             keypadDisplayText.text = accessGrantedText;
             PuzzleManager.instance.ExitMorsePuzzleAnimation();
             audioSource.PlayOneShot(accessGrantedSfx);
-
+            this.transform.gameObject.layer = 0;
+            panelCollider.transform.gameObject.layer = 0;
         }
         private void ExitPuzzle(InputAction.CallbackContext context)
         {
