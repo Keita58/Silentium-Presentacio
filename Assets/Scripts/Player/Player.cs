@@ -581,7 +581,7 @@ public class Player : MonoBehaviour
                     else if (hit.transform.gameObject.layer == 14)
                     {
                         keypad = true;
-                    }else if (hit.transform.gameObject.layer == 18)
+                    }else if (hit.transform.gameObject.layer == 20)
                     {
                         morse = true;
                         door = false;

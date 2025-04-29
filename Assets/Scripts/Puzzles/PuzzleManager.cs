@@ -17,6 +17,7 @@ public class PuzzleManager : MonoBehaviour
     private Camera cam_Hierogliphic;
     [SerializeField]
     private Camera cam_WeaponPuzzle;
+    [SerializeField]
     private Camera cam_HieroglyphicAnimation;
     [SerializeField]
     BookPuzzle bookPuzzle;
