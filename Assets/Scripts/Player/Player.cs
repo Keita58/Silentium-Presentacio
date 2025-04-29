@@ -215,7 +215,6 @@ public class Player : MonoBehaviour
                         if (note.noteId == 10)
                         {
                             InventoryManager.instance.ShowNoteScroll(note);
-                            interactiveGameObject.gameObject.SetActive(false);
                         }else if (note.noteType == NotesSO.NoteType.Image)
                         {
                             InventoryManager.instance.ShowImageNote(note.noteContent);

@@ -121,7 +121,7 @@ public class PuzzleManager : MonoBehaviour
             cam_morse.gameObject.SetActive(false);
 
         player._inputActions.Player.Enable();
-        morseKeypad.inputActions.Morse.Disable();
+        //morseKeypad.inputActions.Morse.Disable();
         player.ResumeInteract();
         cam_Player.gameObject.SetActive(true);
         Cursor.visible = false;
@@ -133,7 +133,7 @@ public class PuzzleManager : MonoBehaviour
         cam_Player.gameObject.SetActive(false);
         cam_morse.gameObject.SetActive(true);
         player._inputActions.Player.Disable();
-        morseKeypad.inputActions.Morse.Enable();
+        //morseKeypad.inputActions.Morse.Enable();
         Cursor.visible= true;
     }
 
