@@ -125,7 +125,7 @@ public class PuzzleManager : MonoBehaviour
             cam_morse.gameObject.SetActive(false);
 
         player._inputActions.Player.Enable();
-        //morseKeypad.inputActions.Morse.Disable();
+        morseKeypad.inputActions.Morse.Disable();
         player.ResumeInteract();
         cam_Player.gameObject.SetActive(true);
         Cursor.visible = false;
@@ -184,8 +184,9 @@ public class PuzzleManager : MonoBehaviour
         cam_Player.transform.parent.rotation = new Quaternion(0, -0.608760536f, 0, 0.793354094f);
         cam_Player.transform.parent.GetComponent<Player>()._inputActions.Player.Enable();
         cam_WeaponPuzzle.transform.parent.GetComponent<WeaponPuzzle>().inputActions.WeaponPuzzle.Disable();
+    }
 
-    private void Update()
+    void Update()
     {
         if (isMorseCompleted)
         {
@@ -205,6 +206,5 @@ public class PuzzleManager : MonoBehaviour
                 animationTime = 0f;
             }
         }
-
     }
-}
+    }
