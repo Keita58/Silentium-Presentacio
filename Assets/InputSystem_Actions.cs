@@ -977,6 +977,62 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""WeaponPuzzle"",
+            ""id"": ""a4685a8a-ec1f-41fe-bf07-3499621325b0"",
+            ""actions"": [
+                {
+                    ""name"": ""Unmount"",
+                    ""type"": ""Button"",
+                    ""id"": ""e94fa947-8831-4eea-b67e-c2ad1db7dff2"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""48fb6154-2d34-4f85-b018-c9acc1e1f3b8"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Unmount"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""Morse"",
+            ""id"": ""e20d5a2a-9527-402b-b932-1ac9d13787eb"",
+            ""actions"": [
+                {
+                    ""name"": ""Exit"",
+                    ""type"": ""Button"",
+                    ""id"": ""b6011156-d0ea-4cb8-9a2e-486622d6c632"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""c4b7e6f8-d8f7-4e3a-8e01-2c90e5ced59f"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Exit"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -1073,6 +1129,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         // Hieroglyphic
         m_Hieroglyphic = asset.FindActionMap("Hieroglyphic", throwIfNotFound: true);
         m_Hieroglyphic_Exit = m_Hieroglyphic.FindAction("Exit", throwIfNotFound: true);
+        // WeaponPuzzle
+        m_WeaponPuzzle = asset.FindActionMap("WeaponPuzzle", throwIfNotFound: true);
+        m_WeaponPuzzle_Unmount = m_WeaponPuzzle.FindAction("Unmount", throwIfNotFound: true);
+        // Morse
+        m_Morse = asset.FindActionMap("Morse", throwIfNotFound: true);
+        m_Morse_Exit = m_Morse.FindAction("Exit", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
@@ -1081,6 +1143,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         Debug.Assert(!m_UI.enabled, "This will cause a leak and performance issues, InputSystem_Actions.UI.Disable() has not been called.");
         Debug.Assert(!m_Clock.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Clock.Disable() has not been called.");
         Debug.Assert(!m_Hieroglyphic.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Hieroglyphic.Disable() has not been called.");
+        Debug.Assert(!m_WeaponPuzzle.enabled, "This will cause a leak and performance issues, InputSystem_Actions.WeaponPuzzle.Disable() has not been called.");
+        Debug.Assert(!m_Morse.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Morse.Disable() has not been called.");
     }
 
     public void Dispose()
@@ -1474,6 +1538,98 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         }
     }
     public HieroglyphicActions @Hieroglyphic => new HieroglyphicActions(this);
+
+    // WeaponPuzzle
+    private readonly InputActionMap m_WeaponPuzzle;
+    private List<IWeaponPuzzleActions> m_WeaponPuzzleActionsCallbackInterfaces = new List<IWeaponPuzzleActions>();
+    private readonly InputAction m_WeaponPuzzle_Unmount;
+    public struct WeaponPuzzleActions
+    {
+        private @InputSystem_Actions m_Wrapper;
+        public WeaponPuzzleActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Unmount => m_Wrapper.m_WeaponPuzzle_Unmount;
+        public InputActionMap Get() { return m_Wrapper.m_WeaponPuzzle; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(WeaponPuzzleActions set) { return set.Get(); }
+        public void AddCallbacks(IWeaponPuzzleActions instance)
+        {
+            if (instance == null || m_Wrapper.m_WeaponPuzzleActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_WeaponPuzzleActionsCallbackInterfaces.Add(instance);
+            @Unmount.started += instance.OnUnmount;
+            @Unmount.performed += instance.OnUnmount;
+            @Unmount.canceled += instance.OnUnmount;
+        }
+
+        private void UnregisterCallbacks(IWeaponPuzzleActions instance)
+        {
+            @Unmount.started -= instance.OnUnmount;
+            @Unmount.performed -= instance.OnUnmount;
+            @Unmount.canceled -= instance.OnUnmount;
+        }
+
+        public void RemoveCallbacks(IWeaponPuzzleActions instance)
+        {
+            if (m_Wrapper.m_WeaponPuzzleActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IWeaponPuzzleActions instance)
+        {
+            foreach (var item in m_Wrapper.m_WeaponPuzzleActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_WeaponPuzzleActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public WeaponPuzzleActions @WeaponPuzzle => new WeaponPuzzleActions(this);
+
+    // Morse
+    private readonly InputActionMap m_Morse;
+    private List<IMorseActions> m_MorseActionsCallbackInterfaces = new List<IMorseActions>();
+    private readonly InputAction m_Morse_Exit;
+    public struct MorseActions
+    {
+        private @InputSystem_Actions m_Wrapper;
+        public MorseActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Exit => m_Wrapper.m_Morse_Exit;
+        public InputActionMap Get() { return m_Wrapper.m_Morse; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(MorseActions set) { return set.Get(); }
+        public void AddCallbacks(IMorseActions instance)
+        {
+            if (instance == null || m_Wrapper.m_MorseActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_MorseActionsCallbackInterfaces.Add(instance);
+            @Exit.started += instance.OnExit;
+            @Exit.performed += instance.OnExit;
+            @Exit.canceled += instance.OnExit;
+        }
+
+        private void UnregisterCallbacks(IMorseActions instance)
+        {
+            @Exit.started -= instance.OnExit;
+            @Exit.performed -= instance.OnExit;
+            @Exit.canceled -= instance.OnExit;
+        }
+
+        public void RemoveCallbacks(IMorseActions instance)
+        {
+            if (m_Wrapper.m_MorseActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IMorseActions instance)
+        {
+            foreach (var item in m_Wrapper.m_MorseActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_MorseActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public MorseActions @Morse => new MorseActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     public InputControlScheme KeyboardMouseScheme
     {
@@ -1551,6 +1707,14 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         void OnFinishClock(InputAction.CallbackContext context);
     }
     public interface IHieroglyphicActions
+    {
+        void OnExit(InputAction.CallbackContext context);
+    }
+    public interface IWeaponPuzzleActions
+    {
+        void OnUnmount(InputAction.CallbackContext context);
+    }
+    public interface IMorseActions
     {
         void OnExit(InputAction.CallbackContext context);
     }

@@ -24,6 +24,10 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] GameObject unequipButton;
     [SerializeField] GameObject itemDescriptionPanel;
     [SerializeField] GameObject notesPanel;
+    [SerializeField] GameObject notesPanelScroll;
+    [SerializeField] private GameObject imagePanel;
+    [SerializeField] private GameObject bookPanel;
+
     private Item equippedItem;
 
     public bool isCombining { get; private set; }
@@ -308,19 +312,58 @@ public class InventoryManager : MonoBehaviour
         noteInventory.AddNote(note);
     }
 
+    public void ShowNoteScroll(NotesSO note)
+    {
+        notesPanelScroll.SetActive(true);
+        notesPanelScroll.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = note.Name;
+        notesPanelScroll.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = note.noteContent;
+        player.ToggleInputPlayer(false, false);
+
+    }    
     public void ShowNote(NotesSO note)
     {
         notesPanel.SetActive(true);
         notesPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = note.Name;
         notesPanel.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = note.noteContent;
-        player.ToggleInputPlayer(false);
+        player.ToggleInputPlayer(false, false);
 
+    }
+
+    public void ShowImageNote(string content)
+    {
+        imagePanel.SetActive(true);
+        imagePanel.transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = content;
+        player.ToggleInputPlayer(false, false);
+    }
+
+    public void ShowBookNote(string content)
+    {
+        bookPanel.SetActive(true);
+        bookPanel.transform.GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>().text = content;
+        player.ToggleInputPlayer(false, false);
     }
 
     public void CloseNote()
     {
         notesPanel.SetActive(false);
-        player.ToggleInputPlayer(true);
+        player.ToggleInputPlayer(true, true);
+    }    
+    public void CloseNoteScroll()
+    {
+        notesPanelScroll.SetActive(false);
+        player.ToggleInputPlayer(true, true);
+    }
+
+    public void CloseImageNote()
+    {
+        imagePanel.SetActive(false);
+        player.ToggleInputPlayer(true, true);
+    }
+
+    public void CloseBookNote()
+    {
+        bookPanel.SetActive(false);
+        player.ToggleInputPlayer(true, true);
     }
 
     public void ShowDiscoveredNotes()
@@ -332,17 +375,17 @@ public class InventoryManager : MonoBehaviour
                 if (noteInventory.notes.ElementAt(i).noteId == notesRoot.transform.GetChild(j).GetComponent<NotesButton>().id)
                 {
                     notesRoot.transform.GetChild(j).GetComponent<Button>().interactable = true;
-                    notesRoot.transform.GetChild(j).GetChild(0).GetComponent<TextMeshProUGUI>().text = noteInventory.notes.ElementAt(i).name;
+                    notesRoot.transform.GetChild(j).GetComponent<TextMeshProUGUI>().text = noteInventory.notes.ElementAt(i).name;
                 }
             }
         }
-    }
+    }    
 
     public void OpenChest()
     {
         this.OpenInventory(null);
         this.inventoryUI.ShowChest();
-        player.ToggleInputPlayer(false);
+        player.ToggleInputPlayer(false, true);
         player.inventoryOpened = true;
         ChangeState(ActionStates.CHEST_OPENED);
     }

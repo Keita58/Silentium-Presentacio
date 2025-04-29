@@ -9,6 +9,11 @@ TagManager:
   - GoodPositionBook
   - Book
   - Wall
+  - FrontTop
+  - FrontDown
+  - WeaponMiddle
+  - WeaponTopRight
+  - WeaponDownRight
   layers:
   - Default
   - TransparentFX
@@ -27,9 +32,13 @@ TagManager:
   - keypad
   - CellBook
   - Book
+  - Picture
+  - AKM
   - 
   - 
   - Wall
+  - Morse
+  - MorseTrigger
   - 
   - 
   - 

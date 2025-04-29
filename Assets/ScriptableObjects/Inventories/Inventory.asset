@@ -13,6 +13,18 @@ MonoBehaviour:
   m_Name: Inventory
   m_EditorClassIdentifier: 
   items:
-  - item: {fileID: 11400000, guid: 4a930a82e1db5ed4db7bb072b980d6c1, type: 2}
-    amount: 2
+  - item: {fileID: 11400000, guid: 41b1dcc054827cb43b8acc8597526bd9, type: 2}
+    amount: 0
+    stackable: 0
+  - item: {fileID: 11400000, guid: ce24b6d771761af4aa8fdb54f0b7ff05, type: 2}
+    amount: 0
+    stackable: 0
+  - item: {fileID: 11400000, guid: 231cb2affe9f68d45adb9ff933be5e16, type: 2}
+    amount: 0
+    stackable: 0
+  - item: {fileID: 11400000, guid: 65ed4f6c6a533a64799f8c0eb11984f2, type: 2}
+    amount: 0
+    stackable: 0
+  - item: {fileID: 11400000, guid: 26b23b2dbd0a6ba44a82a207083be133, type: 2}
+    amount: 0
     stackable: 0

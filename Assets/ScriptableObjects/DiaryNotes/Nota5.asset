@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Nota5
   m_EditorClassIdentifier: 
   Name: 
-  noteId: 
+  noteId: 5
   noteContent: 
