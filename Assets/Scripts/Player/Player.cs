@@ -683,7 +683,7 @@ public class Player : MonoBehaviour
                 if (collider.gameObject.TryGetComponent<Enemy>(out Enemy en))
                 {
                     Debug.Log("Entro a crouch");
-                    en.ListenSound(this.transform.position, 5);
+                    en.ListenSound(this.transform.position, 1);
                 }
             }
             yield return new WaitForSeconds(1);
