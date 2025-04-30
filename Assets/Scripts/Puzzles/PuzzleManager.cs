@@ -125,7 +125,7 @@ public class PuzzleManager : MonoBehaviour
         else
             cam_morse.gameObject.SetActive(false);
 
-        player._inputActions.Player.Enable();
+        player.ToggleInputPlayer(true, true);
         morseKeypad.inputActions.Morse.Disable();
         player.ResumeInteract();
         cam_Player.gameObject.SetActive(true);
@@ -196,6 +196,7 @@ public class PuzzleManager : MonoBehaviour
             {
                 ExitMorsePuzzle(true);
                 animationTime = 0f;
+                isMorseCompleted = false;
             }
         }
         else if (isHieroglyphicCompleted)
@@ -205,6 +206,7 @@ public class PuzzleManager : MonoBehaviour
             {
                 HieroglyphicPuzzleExit(true);
                 animationTime = 0f;
+                isHieroglyphicCompleted = false;
             }
         }
     }

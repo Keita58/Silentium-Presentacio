@@ -61,13 +61,17 @@ public class Player : MonoBehaviour
     //interactive booleans
     [SerializeField]
     bool item = false;
+    [SerializeField]
     bool note = false;
+    [SerializeField]
     bool chest = false;
     [SerializeField]
     bool book = false;
+    [SerializeField]
     bool keypad = false;
     [SerializeField]
     bool bookItem= false;
+    [SerializeField]
     bool picture = false;
     [SerializeField]
     bool morse = false;
@@ -101,6 +105,7 @@ public class Player : MonoBehaviour
     {
         if (!enable)
         {
+            Cursor.visible = true;
             _inputActions.Player.Shoot.Disable();
             _inputActions.Player.Aim.Disable();
             _inputActions.Player.Move.Disable();
@@ -110,6 +115,7 @@ public class Player : MonoBehaviour
         }
         else
         {
+            Cursor.visible = false;
             _inputActions.Player.Shoot.Enable();
             _inputActions.Player.Aim.Enable();
             _inputActions.Player.Move.Enable();
@@ -124,8 +130,6 @@ public class Player : MonoBehaviour
 
     private void OpenInventory(InputAction.CallbackContext context)
     {
-
-        InventoryManager.instance.OpenInventory(this.gameObject);
         if (!inventoryOpened)
         {
             Cursor.visible = true;
@@ -610,12 +614,17 @@ public class Player : MonoBehaviour
                 bookItem = false;
                 picture = false;
                 note = false;
+                chest = false;
                 if (interactiveGameObject != null)
                 {
                     if (interactiveGameObject.transform.gameObject.layer != 15)
                     {
                         interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
                         interactiveGameObject = null;
+                    }
+                    else
+                    {
+                        interactiveGameObject=null;
                     }
                 }
                 //onNotInteractuable?.Invoke();

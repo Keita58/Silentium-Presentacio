@@ -15,3 +15,4 @@ MonoBehaviour:
   Name: Recuerda
   noteId: 2
   noteContent: En 1992 a mi abuelo le dio alzheimer
+  noteType: 2
