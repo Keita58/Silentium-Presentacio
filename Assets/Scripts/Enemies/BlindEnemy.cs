@@ -80,7 +80,7 @@ public class BlindEnemy : Enemy
         {
             case EnemyStates.PATROL:
                 if (_Search)
-                    _NavMeshAgent.speed = 6f;
+                    _NavMeshAgent.speed = 4.5f;
                 else
                     _NavMeshAgent.speed = 3f;
                 _PatrolCoroutine = StartCoroutine(Patrol(_RangeSearchSound, _PointOfPatrol));
@@ -225,11 +225,11 @@ public class BlindEnemy : Enemy
         {
             if (info.collider.TryGetComponent<Player>(out Player player))
             {
-                lvlSound *= 4;
+                lvlSound = 5;
             }
             else
             {
-                lvlSound = 8;
+                lvlSound = 2;
             }
         }
 
@@ -312,8 +312,7 @@ public class BlindEnemy : Enemy
     {
         yield return new WaitForSeconds(time);
         _Search = false;
-        if(_CurrentState != EnemyStates.PATROL)
-            ChangeState(EnemyStates.PATROL);
+        ChangeState(EnemyStates.PATROL);
     }
 
     IEnumerator OpenDoors()
