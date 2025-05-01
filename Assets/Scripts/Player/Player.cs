@@ -479,6 +479,20 @@ public class Player : MonoBehaviour
                 else if (!crouched)
                 {
                     ChangeState(PlayerStates.MOVE);
+                }else if (crouched && movementInput == Vector2.zero)
+                {
+                   if (coroutineCrouch != null)
+                    {
+                        StopCoroutine(coroutineCrouch);
+                        coroutineCrouch = null;
+                    }
+                }
+                else
+                {
+                    if (coroutineCrouch == null)
+                    {
+                        coroutineCrouch = StartCoroutine(MakeNoiseCrouch());
+                    }
                 }
                 break;
             default:
