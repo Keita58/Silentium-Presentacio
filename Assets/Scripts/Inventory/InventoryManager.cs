@@ -318,14 +318,16 @@ public class InventoryManager : MonoBehaviour
         notesPanelScroll.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = note.Name;
         notesPanelScroll.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = note.noteContent;
         player.ToggleInputPlayer(false, false);
+        Cursor.visible = true;
 
-    }    
+    }
     public void ShowNote(NotesSO note)
-    {
+    {   
         notesPanel.SetActive(true);
         notesPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = note.Name;
         notesPanel.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = note.noteContent;
         player.ToggleInputPlayer(false, false);
+        Cursor.visible = true;
 
     }
 
@@ -334,10 +336,12 @@ public class InventoryManager : MonoBehaviour
         imagePanel.SetActive(true);
         imagePanel.transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = content;
         player.ToggleInputPlayer(false, false);
+        Cursor.visible = true;
     }
 
     public void ShowBookNote(string content)
     {
+        Cursor.visible = true;
         bookPanel.SetActive(true);
         bookPanel.transform.GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>().text = content;
         player.ToggleInputPlayer(false, false);
@@ -350,6 +354,7 @@ public class InventoryManager : MonoBehaviour
     }    
     public void CloseNoteScroll()
     {
+        Cursor.visible = false;
         notesPanelScroll.SetActive(false);
         player.ToggleInputPlayer(true, true);
     }

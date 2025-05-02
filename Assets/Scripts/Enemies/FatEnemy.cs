@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Rendering.HighDefinition;
 
 public class FatEnemy : Enemy
 {
@@ -13,13 +12,13 @@ public class FatEnemy : Enemy
     [SerializeField] private LayerMask _LayerObjectsAndPlayer;
     [SerializeField] private LayerMask _LayerDoor;
     [SerializeField] private GameObject _DetectionSphere;
-    [SerializeField] private List<Transform> _Waypoints;
+    [SerializeField] private List<Vector3> _Waypoints;
 
     private NavMeshAgent _NavMeshAgent;
     private Vector3 _SoundPos;
     private Vector3 _PointOfPatrol;
-    private bool _Patrolling;
-    private bool _Search;
+    [SerializeField] private bool _Patrolling;
+    [SerializeField] private bool _Search;
 
     private int _Hp;
     public override int hp => _Hp;
@@ -32,7 +31,6 @@ public class FatEnemy : Enemy
 
     private Coroutine _PatrolCoroutine;
     private Coroutine _AttackCoroutine;
-    private Coroutine _ActivateAttackCoroutine;
     private Coroutine _ChangeToPatrolCoroutine;
 
     private void Awake()
@@ -60,10 +58,10 @@ public class FatEnemy : Enemy
 
     private void ChangeState(EnemyStates newState)
     {
-      //  Debug.Log($"---------------------- Sortint de {_CurrentState} a {newState} ------------------------");
+        Debug.Log($"---------------------- Sortint de {_CurrentState} a {newState} ------------------------");
         ExitState(_CurrentState);
 
-        //Debug.Log($"---------------------- Entrant a {newState} ------------------------");
+        Debug.Log($"---------------------- Entrant a {newState} ------------------------");
         InitState(newState);
     }
 
@@ -76,6 +74,8 @@ public class FatEnemy : Enemy
             case EnemyStates.PATROL:
                 _Patrolling = false;
                 _PatrolCoroutine = StartCoroutine(Patrol(_RangeSearchSound, _PointOfPatrol));
+                if (_Search)
+                    _ChangeToPatrolCoroutine = StartCoroutine(ChangeToPatrol(7));
                 break;
             case EnemyStates.ATTACK:
                 _AttackCoroutine = StartCoroutine(AttackPlayer());
@@ -92,7 +92,11 @@ public class FatEnemy : Enemy
         {
             case EnemyStates.PATROL:
                 StopCoroutine(_PatrolCoroutine);
-                _ChangeToPatrolCoroutine = null;
+                if(_ChangeToPatrolCoroutine != null)
+                {
+                    StopCoroutine(_ChangeToPatrolCoroutine);
+                    _ChangeToPatrolCoroutine = null;
+                }
                 break;
             case EnemyStates.ATTACK:
                 StopCoroutine(_AttackCoroutine);
@@ -108,7 +112,7 @@ public class FatEnemy : Enemy
     // Funci� per moure l'enemic pel mapa
     IEnumerator Patrol(int range, Vector3 pointOfSearch)
     {
-        Transform point = default;
+        Vector3 point = Vector3.zero;
         while (true)
         {
             if (!_Patrolling)
@@ -118,23 +122,26 @@ public class FatEnemy : Enemy
                     while (true)
                     {
                         point = _Waypoints[Random.Range(0, _Waypoints.Count)];
-                        if (point.position != _NavMeshAgent.destination)
+                        if (point != _NavMeshAgent.destination)
                             break;
                     }
                 }
                 else
                 {
-                    RandomPoint(pointOfSearch, range, out Vector3 coord);
-                    point.position = coord;
+                    RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
+                    point = coord;
                 }
-                _NavMeshAgent.SetDestination(new Vector3(point.position.x, point.position.y, point.position.z));
+                _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
                 _Patrolling = true;
             }
 
             if (_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
             {
                 _Patrolling = false;
-                yield return new WaitForSeconds(2);
+                if(!_Search) 
+                    yield return new WaitForSeconds(2);
+                else
+                    yield return new WaitForSeconds(5);
             }
             else
                 yield return new WaitForSeconds(0.5f);
@@ -155,12 +162,13 @@ public class FatEnemy : Enemy
             Vector3 point = new Vector3(randomPoint.x, randomPoint.y, randomPoint.z);
 
             //Comprovem que el punt que hem agafat esta dins del NavMesh
-            if (NavMesh.SamplePosition(point, out NavMeshHit hit, 1.0f, 0) && Vector3.Distance(point, center) > 1.75f)
+            if (NavMesh.SamplePosition(point, out NavMeshHit hit, 1.0f, NavMesh.GetAreaFromName("Walkable")))
             {
                 result = hit.position;
                 return true;
             }
         }
+        Debug.Log("No he trobat un punt! (Enemic gras)");
         result = center;
         return false;
     }
@@ -170,15 +178,9 @@ public class FatEnemy : Enemy
         _SoundPos = pos;
         RaycastHit[] hits = Physics.RaycastAll(this.transform.position, _SoundPos - this.transform.position, Vector3.Distance(_SoundPos, this.transform.position));
 
-    /*    foreach (RaycastHit hit in hits)
-        {
-            if (hit.collider.TryGetComponent<IAtenuacio>(out IAtenuacio a))
-            {
-                lvlSound = a.atenuarSo(lvlSound);
-            }
-        }*/
         float dist = Vector3.Distance(this.transform.position, pos);
         Debug.Log("DISTANCIA: "+dist);
+
         if (dist > 10)
         {
             Debug.Log("dist>10");
@@ -213,26 +215,27 @@ public class FatEnemy : Enemy
                 Debug.Log("dist<10 y se PONE A 8");
             }
         }
+
         Debug.Log(lvlSound);
 
         if (lvlSound > 0 && _CurrentState == EnemyStates.PATROL)
         {
             if (lvlSound > 0 && lvlSound <= 3)
             {
-                _RangeSearchSound = 7;
+                _RangeSearchSound = 3;
                 Debug.Log("El mas bajo");
                 _Search = true;
             }
             else if (lvlSound > 3 && lvlSound <= 7)
             {
                 Debug.Log("El bajo-Medio");
-                _RangeSearchSound = 5;
+                _RangeSearchSound = 2;
                 _Search = true;
             }
             else if (lvlSound > 7 && lvlSound <= 10)
             {
                 Debug.Log("El medio-Alto (Aqui entra cuando el 8");
-                _RangeSearchSound = 2;
+                _RangeSearchSound = 1;
                 _Search = true;
             }
             else if (lvlSound > 10)
@@ -242,11 +245,8 @@ public class FatEnemy : Enemy
             }
 
             _PointOfPatrol = pos;
-            if (_ChangeToPatrolCoroutine == null)
-            {
-                _ChangeToPatrolCoroutine = StartCoroutine(ChangeToPatrol());
+            if(_CurrentState == EnemyStates.PATROL) 
                 ChangeState(EnemyStates.PATROL);
-            }
         }
     }
 
@@ -312,51 +312,28 @@ public class FatEnemy : Enemy
         while (true)
         {
             //Animation -> attack
+            transform.LookAt(_Player.transform.position);
             _Player.GetComponent<Player>().TakeDamage(1);
-            yield return new WaitForSeconds(1);
-        }
-    }
-
-    IEnumerator ChangeToPatrol()
-    {
-        yield return new WaitForSeconds(10f);
-        _Search = false;
-        _PointOfPatrol = transform.position;
-        ChangeState(EnemyStates.PATROL);
-    }
-
-    IEnumerator WaitingAttack()
-    {
-        while (true)
-        {
-            Collider[] aux = Physics.OverlapSphere(transform.position, 2f, _LayerPlayer);
-            if (aux.Length > 0)
-            {
-                if (Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit info, _LayerObjectsAndPlayer))
-                {
-                    if (info.transform.tag == "Player")
-                    {
-                        transform.LookAt(info.transform.position);
-                        _NavMeshAgent.SetDestination(transform.position);
-                        if(_CurrentState != EnemyStates.ATTACK)
-                            ChangeState(EnemyStates.ATTACK);
-                    }
-                }
-            }
-
             yield return new WaitForSeconds(0.5f);
         }
     }
 
+    IEnumerator ChangeToPatrol(float time)
+    {
+        yield return new WaitForSeconds(time);
+        _Search = false;
+        ChangeState(EnemyStates.PATROL);
+    }
+
     private void ActivateAttackCoroutine()
     {
-        _ActivateAttackCoroutine = StartCoroutine(WaitingAttack());
+        _NavMeshAgent.SetDestination(transform.position);
+        ChangeState(EnemyStates.ATTACK);
     }
 
     private void DeactivateAttackCoroutine()
     {
-        StopCoroutine(_ActivateAttackCoroutine);
-        if (_CurrentState == EnemyStates.ATTACK)
-            ChangeState(EnemyStates.PATROL);
+        _Search = false;
+        ChangeState(EnemyStates.PATROL);
     }
 }

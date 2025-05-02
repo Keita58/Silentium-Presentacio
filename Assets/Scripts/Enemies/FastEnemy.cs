@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Rendering.HighDefinition;
 
 public class FastEnemy : Enemy
 {
@@ -14,7 +13,7 @@ public class FastEnemy : Enemy
     [SerializeField] private LayerMask _LayerObjectsAndPlayer;
     [SerializeField] private LayerMask _LayerDoor;
     [SerializeField] private GameObject _DetectionSphere;
-    [SerializeField] private List<Transform> _Waypoints;
+    [SerializeField] private List<Vector3> _Waypoints;
 
     private NavMeshAgent _NavMeshAgent;
     private Vector3 _SoundPos;
@@ -115,7 +114,7 @@ public class FastEnemy : Enemy
                 _ChangeToPatrolCoroutine = null;
                 break;
             case EnemyStates.CHASE:
-                _NavMeshAgent.speed = 3.5f;
+                _NavMeshAgent.speed = 4f;
                 _RangeChaseAfterStop = 25;
                 break;
             case EnemyStates.ATTACK:
@@ -155,7 +154,7 @@ public class FastEnemy : Enemy
             print(NavMesh.GetAreaNames().Length);
 
             //Comprovem que el punt que hem agafat esta dins del NavMesh
-            if (NavMesh.SamplePosition(point, out hit, 1.0f, 0) && Vector3.Distance(point, center) > 1.75f)
+            if (NavMesh.SamplePosition(point, out hit, 1.0f, NavMesh.GetAreaFromName("Walkable")))
             {
                 result = hit.position;
                 return true;
@@ -174,16 +173,41 @@ public class FastEnemy : Enemy
     {
         _SoundPos = pos;
         RaycastHit[] hits = Physics.RaycastAll(this.transform.position, _SoundPos - this.transform.position, Vector3.Distance(_SoundPos, this.transform.position));
-        
-        foreach (RaycastHit hit in hits)
+
+        float dist = Vector3.Distance(this.transform.position, pos);
+        if (dist > 10)
         {
-            if (hit.collider.TryGetComponent<IAtenuacio>(out IAtenuacio a))
+            while (Mathf.Abs(dist) > 0)
             {
-                lvlSound = a.atenuarSo(lvlSound);
+                if (dist > 10)
+                {
+                    dist -= 10;
+                    lvlSound -= 1;
+                }
+                else
+                {
+                    dist = 0;
+                }
+
+                if (dist <= 0)
+                {
+                    break;
+                }
+            }
+        }
+        else if (Physics.Raycast(this.transform.position, pos, out RaycastHit info))
+        {
+            if (info.collider.TryGetComponent<Player>(out Player player))
+            {
+                lvlSound *= 4;
+            }
+            else
+            {
+                lvlSound = 8;
             }
         }
 
-        if(lvlSound > 0 && _CurrentState == EnemyStates.PATROL)
+        if (lvlSound > 0 && _CurrentState == EnemyStates.PATROL)
         {
             if (lvlSound > 0 && lvlSound <= 2)
             {
@@ -225,7 +249,7 @@ public class FastEnemy : Enemy
     // Funció per moure l'enemic pel mapa
     IEnumerator Patrol(int range, Vector3 pointOfSearch)
     {
-        Transform point = default;
+        Vector3 point = Vector3.zero;
         while (true)
         {
             if (!_Patrolling)
@@ -235,17 +259,17 @@ public class FastEnemy : Enemy
                     while(true)
                     {
                         point = _Waypoints[Random.Range(0, _Waypoints.Count)];
-                        if (point.position != _NavMeshAgent.destination)
+                        if (point != _NavMeshAgent.destination)
                             break;
                     }
                 }
                 else
                 {
-                    RandomPoint(pointOfSearch, range, out Vector3 coord);
-                    point.position = coord;
+                    RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
+                    point = coord;
                 }
-                _NavMeshAgent.SetDestination(new Vector3(point.position.x, point.position.y, point.position.z));
                 _Patrolling = true;
+                _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
             }
 
             if (_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)

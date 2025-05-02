@@ -985,12 +985,12 @@
         },
         {
             "name": "Morse",
-            "id": "8a083abb-8794-4c37-91ba-984e68114041",
+            "id": "e20d5a2a-9527-402b-b932-1ac9d13787eb",
             "actions": [
                 {
                     "name": "Exit",
                     "type": "Button",
-                    "id": "62091ae0-d9ff-4b32-a397-d973785e9e5c",
+                    "id": "b6011156-d0ea-4cb8-9a2e-486622d6c632",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -1000,7 +1000,7 @@
             "bindings": [
                 {
                     "name": "",
-                    "id": "76f130d9-0ded-420b-9054-eb81e86fe1ef",
+                    "id": "c4b7e6f8-d8f7-4e3a-8e01-2c90e5ced59f",
                     "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",

@@ -61,13 +61,17 @@ public class Player : MonoBehaviour
     //interactive booleans
     [SerializeField]
     bool item = false;
+    [SerializeField]
     bool note = false;
+    [SerializeField]
     bool chest = false;
     [SerializeField]
     bool book = false;
+    [SerializeField]
     bool keypad = false;
     [SerializeField]
     bool bookItem= false;
+    [SerializeField]
     bool picture = false;
     [SerializeField]
     bool morse = false;
@@ -101,6 +105,7 @@ public class Player : MonoBehaviour
     {
         if (!enable)
         {
+            Cursor.visible = true;
             _inputActions.Player.Shoot.Disable();
             _inputActions.Player.Aim.Disable();
             _inputActions.Player.Move.Disable();
@@ -110,6 +115,7 @@ public class Player : MonoBehaviour
         }
         else
         {
+            Cursor.visible = false;
             _inputActions.Player.Shoot.Enable();
             _inputActions.Player.Aim.Enable();
             _inputActions.Player.Move.Enable();
@@ -124,8 +130,6 @@ public class Player : MonoBehaviour
 
     private void OpenInventory(InputAction.CallbackContext context)
     {
-
-        InventoryManager.instance.OpenInventory(this.gameObject);
         if (!inventoryOpened)
         {
             Cursor.visible = true;
@@ -480,6 +484,20 @@ public class Player : MonoBehaviour
                 else if (!crouched)
                 {
                     ChangeState(PlayerStates.MOVE);
+                }else if (crouched && movementInput == Vector2.zero)
+                {
+                   if (coroutineCrouch != null)
+                    {
+                        StopCoroutine(coroutineCrouch);
+                        coroutineCrouch = null;
+                    }
+                }
+                else
+                {
+                    if (coroutineCrouch == null)
+                    {
+                        coroutineCrouch = StartCoroutine(MakeNoiseCrouch());
+                    }
                 }
                 break;
             default:
@@ -586,7 +604,7 @@ public class Player : MonoBehaviour
                     else if (hit.transform.gameObject.layer == 14)
                     {
                         keypad = true;
-                    }else if (hit.transform.gameObject.layer == 18)
+                    }else if (hit.transform.gameObject.layer == 20)
                     {
                         weaponPuzzle = true;
                     }else if (hit.transform.gameObject.layer == 20)
@@ -619,12 +637,17 @@ public class Player : MonoBehaviour
                 picture = false;
                 note = false;
                 weaponPuzzle = false;
+                chest = false;
                 if (interactiveGameObject != null)
                 {
                     if (interactiveGameObject.transform.gameObject.layer != 15)
                     {
                         interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
                         interactiveGameObject = null;
+                    }
+                    else
+                    {
+                        interactiveGameObject=null;
                     }
                 }
                 //onNotInteractuable?.Invoke();
@@ -683,7 +706,7 @@ public class Player : MonoBehaviour
                 if (collider.gameObject.TryGetComponent<Enemy>(out Enemy en))
                 {
                     Debug.Log("Entro a crouch");
-                    en.ListenSound(this.transform.position, 5);
+                    en.ListenSound(this.transform.position, 1);
                 }
             }
             yield return new WaitForSeconds(1);
