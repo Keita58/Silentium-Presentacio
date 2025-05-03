@@ -79,7 +79,6 @@ public class BlindEnemy : Enemy
         switch (_CurrentState)
         {
             case EnemyStates.PATROL:
-
                 _PatrolCoroutine = StartCoroutine(Patrol(_RangeSearchSound, _PointOfPatrol));
                 break;
             case EnemyStates.ATTACK:
@@ -264,6 +263,7 @@ public class BlindEnemy : Enemy
                 if (Vector3.Distance(_SoundPos, transform.position) > 1.5f && Vector3.Distance(_SoundPos, transform.position) <= 4 && !wall)
                 {
                     Debug.Log("Faig salt!");
+                    ExitState(_CurrentState);
                     Vector3 start = transform.position;
                     Vector3 end = _SoundPos;
                     
