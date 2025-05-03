@@ -47,6 +47,21 @@ public class PuzzleManager : MonoBehaviour
     bool isMorseCompleted = false;
     [SerializeField]
     private bool isHieroglyphicCompleted = false;
+    [SerializeField]
+    private AnimationClip fadeOut;
+    [SerializeField]
+    private Animator fadeAnimator;
+    bool fadeOutStarted = false;
+    bool teleported = false;
+    Transform positionToTeleport;
+    [SerializeField]
+    GameObject bookWall;
+
+    [Header("Positions after puzzles")]
+    [SerializeField]
+    private Transform positionAfterHieroglyphic;
+    [SerializeField]
+    private Transform positionAfterBook;
     private void Awake()
     {
         inputActionPlayer = new InputSystem_Actions();
@@ -147,6 +162,17 @@ public class PuzzleManager : MonoBehaviour
         Debug.Log("CheckBookPuzzle");
         bookPuzzle.checkBookPosition();
     }
+
+    public void BookPuzzleCompleted()
+    {
+        bookWall.SetActive(false);
+        player.ToggleInputPlayer(false, false);
+        positionToTeleport = positionAfterBook;
+        fadeAnimator.Play("FadeOut");
+        fadeOutStarted = true;
+        animationTime = 0f;
+    }
+
     public void TakePoemPart()
     {
         for (int i = 0; i < picturesClicked.Count; i++)
@@ -208,6 +234,33 @@ public class PuzzleManager : MonoBehaviour
                 animationTime = 0f;
                 isHieroglyphicCompleted = false;
             }
+        }else if (fadeOutStarted)
+        {
+            animationTime += Time.deltaTime;
+            if (animationTime >= 2f && !teleported)
+            {
+                player.GetComponent<CharacterController>().enabled = false;
+                player.transform.position = positionToTeleport.position;
+                player.GetComponent<CharacterController>().enabled = true;
+                teleported = true;
+                positionToTeleport = null;
+            }
+            if (animationTime >= fadeOut.length && teleported)
+            {
+                animationTime = 0f;
+                fadeOutStarted = false;
+                player.ToggleInputPlayer(true, true);
+            }
         }
     }
+
+    public void ChangePositionPlayerAfterHieroglyphic()
+    {
+        player.ToggleInputPlayer(false, false);
+        fadeAnimator.Play("FadeOut");
+        fadeOutStarted = true;
+        animationTime = 0f;
+        positionToTeleport = positionAfterHieroglyphic;
     }
+
+}
