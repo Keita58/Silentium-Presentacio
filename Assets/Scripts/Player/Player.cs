@@ -664,7 +664,7 @@ public class Player : MonoBehaviour
                     en.ListenSound(this.transform.position, 3);
                 }
             }
-            yield return new WaitForSeconds(3);
+            yield return new WaitForSeconds(0.5f);
         }
     }
 
@@ -682,7 +682,7 @@ public class Player : MonoBehaviour
                     en.ListenSound(this.transform.position, 7);
                 }
             }
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0.5f);
         }
     }
 
@@ -700,7 +700,7 @@ public class Player : MonoBehaviour
                     en.ListenSound(this.transform.position, 1);
                 }
             }
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0.5f);
         }
     }
     #endregion
