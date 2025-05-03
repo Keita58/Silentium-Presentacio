@@ -347,6 +347,8 @@ public class BlindEnemy : Enemy
     {
         yield return new WaitForSeconds(1);
         _NavMeshAgent.enabled = true;
+        if (_CurrentState != EnemyStates.ATTACK)
+            ChangeState(EnemyStates.PATROL);
     }
 
     IEnumerator Attack()
