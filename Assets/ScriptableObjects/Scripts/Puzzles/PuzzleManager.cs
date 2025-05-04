@@ -54,14 +54,7 @@ public class PuzzleManager : MonoBehaviour
     private Animator morseAnimator;
     [Header("Weapon Puzzle")]
     [SerializeField]
-    private GameObject TopLeftPiece;
-    [SerializeField]
-    private GameObject DownLeftPiece;
-    [SerializeField]
-    private GameObject TopRightPiece;
-    [SerializeField]
-    private GameObject DownRightPiece;
-
+    private BoxCollider allWeapon;
     float animationTime = 0f;
     bool isMorseCompleted = false;
     [SerializeField]
@@ -191,16 +184,19 @@ public class PuzzleManager : MonoBehaviour
     {
         cam_Player.gameObject.SetActive(false);
         cam_WeaponPuzzle.gameObject.SetActive(true);
+        cam_WeaponPuzzle.transform.parent.GetComponent<WeaponPuzzle>().inputAction.WeaponPuzzle.Enable();
         cam_Player.transform.parent.GetComponent<Player>()._inputActions.Player.Disable();
-        TopLeftPiece.GetComponent<BoxCollider>().enabled = true;
-        TopRightPiece.GetComponent<BoxCollider>().enabled = true;
+        allWeapon.enabled = false;
         Cursor.visible = true;
     }
     public void ExitWeaponPuzzle()
     {
+
+        cam_WeaponPuzzle.transform.parent.GetComponent<WeaponPuzzle>().inputAction.WeaponPuzzle.Disable();
+        cam_Player.transform.parent.GetComponent<Player>().ResumeInteract();
+        cam_Player.transform.parent.GetComponent<Player>()._inputActions.Player.Enable();      
         cam_Player.gameObject.SetActive(true);
         cam_WeaponPuzzle.gameObject.SetActive(false);
-        cam_Player.transform.parent.GetComponent<Player>()._inputActions.Player.Enable();
         Cursor.visible = false;
     }
 
