@@ -9,18 +9,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 93a2625516f24b447be9ad1d9f42861e, type: 3}
-  m_Name: Amoxicilina
+  m_Script: {fileID: 11500000, guid: 5e3265da449bb22418b7c9a61178f218, type: 3}
+  m_Name: Silencer
   m_EditorClassIdentifier: 
-  nom: Amoxicilina
-  description: Cura de grande efecto. Creada a partir de dos Paracetamoles.
-  sprite: {fileID: 21300000, guid: 7e18085c06cb88147aa9e499634e2e71, type: 3}
-  healing: 2
+  nom: Silenciador
+  description: "Silenciador de pacotilla para silenciar los disparos. No servir\xE1
+    para muchos tiros..."
+  sprite: {fileID: 0}
   prefab: {fileID: 0}
   itemsToCombine: []
-  stackable: 1
-  itemType: 0
+  stackable: 0
+  itemType: 13
   usable: 1
   equipable: 0
   combinable: 0
-  itemAfterCombineParacetamol: {fileID: 0}
+  silencer: {fileID: 0}
