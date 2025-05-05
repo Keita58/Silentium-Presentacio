@@ -15,11 +15,11 @@ MonoBehaviour:
   nom: Cinta
   description: "Cinta americana. Si la combinase con otro objeto podr\xEDa hacer
     que la pistola hiciese menos ruido..."
-  sprite: {fileID: 0}
-  prefab: {fileID: 0}
+  sprite: {fileID: 21300000, guid: 58767aa96f79cd9419bc0ac16591164c, type: 3}
+  prefab: {fileID: 7621407073725110988, guid: 3ff6d9a8a98cdbd4c8697cc4530f0552, type: 3}
   itemsToCombine:
   - {fileID: 11400000, guid: 68558df8a6fc21e4e826b17012aa5235, type: 2}
-  stackable: 0
+  stackable: 1
   itemType: 2
   usable: 0
   equipable: 0
