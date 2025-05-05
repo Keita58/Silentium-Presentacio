@@ -175,10 +175,8 @@ public class FastEnemy : Enemy
         RaycastHit[] hits = Physics.RaycastAll(this.transform.position, _SoundPos - this.transform.position, Vector3.Distance(_SoundPos, this.transform.position));
 
         float dist = Vector3.Distance(this.transform.position, pos);
-        Debug.Log("DISTANCIA: " + dist);
         if (dist > 10)
         {
-            Debug.Log("dist>10");
             while (Mathf.Abs(dist) > 0)
             {
                 if (dist > 10)
@@ -201,13 +199,11 @@ public class FastEnemy : Enemy
         {
             if (info.collider.TryGetComponent<Player>(out Player player))
             {
-                Debug.Log("dist<10 y se multiplica");
                 lvlSound *= 4;
             }
             else
             {
                 lvlSound = 8;
-                Debug.Log("dist<10 y se PONE A 8");
             }
         }
 

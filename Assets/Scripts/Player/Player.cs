@@ -177,23 +177,29 @@ public class Player : MonoBehaviour
             if (item)
             {
                 Debug.Log("ENTRO DEFINITIVAMENTE");
-                InventoryManager.instance.AddItem(interactiveGameObject.GetComponent<PickItem>().item);
-                Debug.Log("QUE COJO?" + interactiveGameObject.GetComponent<PickItem>().item);
+                Item itemPicked = interactiveGameObject.GetComponent<PickItem>().item;
+                if (InventoryManager.instance.inventory.items.Count<6)
+                    InventoryManager.instance.AddItem(itemPicked);
+                else
+                    Debug.Log("Inventory full");
+                Debug.Log("QUE COJO?" + itemPicked);
 
                 Debug.Log("Entro Coger item");
                 if (bookItem)
                 {
-                    if (interactiveGameObject.GetComponent<Book>().placed)
+                    Book book = interactiveGameObject.GetComponent<Book>();
+                    if (book.placed)
                     {
-                        interactiveGameObject.GetComponent<Book>().placed = false;
-                        interactiveGameObject.GetComponent<Book>().collider.enabled = true;
-                        interactiveGameObject.GetComponent<Book>().collider.transform.GetComponent<CellBook>().SetBook(null);
-                        interactiveGameObject.GetComponent<Book>().collider = null;
+                        book.placed = false;
+                        book.collider.enabled = true;
+                        book.collider.transform.GetComponent<CellBook>().SetBook(null);
+                        book.collider = null;
                         bookItem = false;
                         item = false;
                     }
                 }
                 interactiveGameObject.gameObject.SetActive(false);
+                if (itemPicked is BookItem && itemPicked.ItemType == ItemTypes.BOOK2) PuzzleManager.instance.ChangePositionPlayerAfterHieroglyphic();
                 interactiveGameObject = null;
             }
             else
@@ -481,6 +487,20 @@ public class Player : MonoBehaviour
                 else if (!crouched)
                 {
                     ChangeState(PlayerStates.MOVE);
+                }else if (crouched && movementInput == Vector2.zero)
+                {
+                   if (coroutineCrouch != null)
+                    {
+                        StopCoroutine(coroutineCrouch);
+                        coroutineCrouch = null;
+                    }
+                }
+                else
+                {
+                    if (coroutineCrouch == null)
+                    {
+                        coroutineCrouch = StartCoroutine(MakeNoiseCrouch());
+                    }
                 }
                 break;
             default:
@@ -652,7 +672,7 @@ public class Player : MonoBehaviour
                     en.ListenSound(this.transform.position, 3);
                 }
             }
-            yield return new WaitForSeconds(3);
+            yield return new WaitForSeconds(0.5f);
         }
     }
 
@@ -670,7 +690,7 @@ public class Player : MonoBehaviour
                     en.ListenSound(this.transform.position, 7);
                 }
             }
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0.5f);
         }
     }
 
@@ -685,10 +705,10 @@ public class Player : MonoBehaviour
                 if (collider.gameObject.TryGetComponent<Enemy>(out Enemy en))
                 {
                     Debug.Log("Entro a crouch");
-                    en.ListenSound(this.transform.position, 5);
+                    en.ListenSound(this.transform.position, 1);
                 }
             }
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0.5f);
         }
     }
     #endregion
