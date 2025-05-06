@@ -62,6 +62,8 @@ public class PuzzleManager : MonoBehaviour
     private Transform positionAfterHieroglyphic;
     [SerializeField]
     private Transform positionAfterBook;
+    [SerializeField]
+    private Transform positionAfterPoem;
     private void Awake()
     {
         inputActionPlayer = new InputSystem_Actions();
@@ -186,6 +188,11 @@ public class PuzzleManager : MonoBehaviour
                         pictureList.ElementAt(x).gameObject.layer = 0;
                     }
                     DoorPoem3.isLocked = false;
+                    player.ToggleInputPlayer(false, false);
+                    positionToTeleport = positionAfterPoem;
+                    fadeAnimator.Play("FadeOut");
+                    fadeOutStarted = true;
+                    animationTime = 0f;
                 }
             }
             else
@@ -194,6 +201,7 @@ public class PuzzleManager : MonoBehaviour
             }
         }
     }
+
     public void InteractWeaponPuzzle()
     {
         cam_Player.gameObject.SetActive(false);

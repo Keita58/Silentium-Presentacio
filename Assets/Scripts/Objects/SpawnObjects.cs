@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 public class SpawnObjects : MonoBehaviour
@@ -65,29 +66,68 @@ public class SpawnObjects : MonoBehaviour
             GameObject spawnObject = Instantiate(_ImportantObjects[pos].prefabToEquip, spawn);
         }
 
+        int[] countItems = new int[_NormalObjects.Length];
+
+        for(int i = 0; i < _NormalObjects.Length; i++)
+        {
+            countItems[i] = 0;
+        }
+
         foreach (Transform spawn in _NormalSpawns)
         {
-            int rand = Random.Range(0, 9);
+            int rand = Random.Range(0, 8);
             int pos = 0;
 
-            if (rand >= 0 && rand < 2)
+
+            if (rand == 0)
             {
-                pos = 0; // Llibre
+                if (countItems[0] == 2)
+                {
+                    pos = 4; // Bales
+                    countItems[4]++;
+                }
+                else
+                {
+                    pos = 0; // Llibre
+                    countItems[0]++;
+                }
             }
-            else if (rand >= 2 && rand < 4)
+            else if (rand == 1)
             {
-                pos = 1; // Ampolla
+                if (countItems[0] == 2)
+                {
+                    pos = 3; // Paracetamol
+                    countItems[3]++;
+                }
+                else
+                {
+                    pos = 1; // Ampolla
+                    countItems[1]++;
+                }
             }
-            else if(rand >= 4 && rand < 6)
+            else if(rand == 2)
             {
-                pos = 2; // Boli
+                if (countItems[0] == 2)
+                {
+                    pos = 4; // Bales
+                    countItems[4]++;
+                }
+                else
+                {
+                    pos = 2; // Boli
+                    countItems[2]++;
+                }
             }
-            else if (rand >= 6 && rand < 8)
+            else if (rand >= 3 && rand < 5)
             {
                 pos = 3; // Paracetamol
+                countItems[3]++;
             }
             else
+            {
                 pos = 4; // Bales
+                countItems[4]++;
+            }
 
             GameObject spawnObject2 = Instantiate(_NormalObjects[pos].prefabToEquip, spawn);
         }

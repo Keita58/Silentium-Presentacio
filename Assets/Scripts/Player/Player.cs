@@ -117,6 +117,7 @@ public class Player : MonoBehaviour
             _inputActions.Player.Look.Disable();
             _inputActions.Player.Crouch.Disable();
             _inputActions.Player.PickUpItem.Disable();
+            _RunAction.Disable();
         }
         else
         {
@@ -127,6 +128,7 @@ public class Player : MonoBehaviour
             _inputActions.Player.Look.Enable();
             _inputActions.Player.Crouch.Enable();
             _inputActions.Player.PickUpItem.Enable();
+            _RunAction.Enable();
         }
         if (enableInventory) _inputActions.Player.Inventory.Enable();
         else _inputActions.Player.Inventory.Disable();

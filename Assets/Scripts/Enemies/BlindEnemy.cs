@@ -280,7 +280,7 @@ public class BlindEnemy : Enemy
         }
     }
 
-    public void TakeHealth()
+    public override void TakeHealth()
     {
         if (_CurrentState != EnemyStates.KNOCKED)
         {
