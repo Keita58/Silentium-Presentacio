@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05fddcd6ae62fb44a8090a13224fa9b4, type: 3}
+  m_Name: PoemaDeVerdad
+  m_EditorClassIdentifier: 
+  Name: La hermosa noche
+  noteId: 10
+  noteContent: "Bajo ramas que tiemblan sin viento,  la tierra cruje como si recordara.
+    Sombras ocres bailan entre grietas, y el tiempo se disuelve en su garganta. Un
+    eco de sal roza sus ra\xEDces, mientras el fuego late tras la cara helada, y
+    un aliento helado blanco silba entre los surcos dormidos.  El cielo sangra sin
+    herida visible, pintando de oro las alas del silencio. La luz cae, rota, sobre
+    piedras mojadas, y un rugido lejano se esconde tras la espuma. L\xEDneas de hielo
+    cruzan el firmamento, como si el fr\xEDo tambi\xE9n ardiera al caer, y las hojas,
+    ya ausentes, arden en su reflejo.  Susurra el abismo en lenguas partidas, entre
+    pe\xF1ascos que muerden la espuma. Gotas que no caen del cielo, sino del tiempo,
+    visten de escarcha los bordes del recuerdo. Un resplandor rojo se arrastra entre
+    las olas, como si el sol a\xFAn muriera en su vientre, y bajo el agua, ramas
+    secas a\xFAn danzan.  Se alza un caparaz\xF3n de ceniza imp\xE1vida, donde el
+    susurro del fuego perenne se hiela en su pecho. Corrientes dormidas murmuran
+    en sus cavernas, trayendo ecos de ramas que ya no susurran. Un latido marino
+    palpita bajo la escarcha, y el cielo sangrante yace ahogado en sus entra\xF1as.
+    La cumbre, juez silente, corona el enigma sin nombre."
+  noteType: 1

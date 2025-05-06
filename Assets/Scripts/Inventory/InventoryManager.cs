@@ -282,8 +282,15 @@ public class InventoryManager : MonoBehaviour
         Debug.Log("Player recarrega les bales");
         inventory.UseItem(item);
     }
+
     public void UseKeyItem(Item item)
     {
+        inventory.UseItem(item);
+    }
+
+    public void UseSilencer(Item item)
+    {
+        //Fer que la pistola faci menys so
         inventory.UseItem(item);
     }
 
