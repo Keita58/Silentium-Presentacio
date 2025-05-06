@@ -246,7 +246,7 @@ public class FatEnemy : Enemy
         }
     }
 
-    public void TakeHealth()
+    public override void TakeHealth()
     {
         if (_CurrentState != EnemyStates.KNOCKED)
         {
