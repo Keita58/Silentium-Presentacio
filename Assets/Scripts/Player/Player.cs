@@ -85,6 +85,11 @@ public class Player : MonoBehaviour
     CharacterController characterController;
     Vector3 velocity;
 
+    [SerializeField] GameObject silencer;
+    public bool isSilencerEquipped { get; private set; }
+    int silencerUses;
+    int maxSilencerUses = 10;
+
     private void Awake()
     {
         _inputActions = new InputSystem_Actions();
@@ -364,14 +369,35 @@ public class Player : MonoBehaviour
     {
         if (gunAmmo >= 1)
         {
+            gunAmmo--;
             Debug.DrawRay(shootPosition.transform.position, -shootPosition.transform.right, Color.magenta, 5f);
             Debug.Log("TIRO DEBUGRAY");
-            if (Physics.Raycast(shootPosition.transform.position, -shootPosition.transform.right, 5f, enemyLayerMask))
+            if (isSilencerEquipped)
             {
-                //e.RebreMal(5);
+                if (silencerUses > 0)
+                {
+                    silencerUses--;
+                }
+                else
+                {
+                    isSilencerEquipped = false;
+                    silencer.SetActive(false);
+                }
+            }
+            if (Physics.Raycast(shootPosition.transform.position, -shootPosition.transform.right, out RaycastHit e, 5f, enemyLayerMask))
+            {
+                //e.transform.GetComponent<Enemy>().TakeHealth();
+                if (isSilencerEquipped)
+                {
+                    Debug.Log("Hago sonido silenciador");
+                    MakeNoise(5, 5);
+                }
+                else
+                {
+                    MakeNoise(10, 10);
+                }
                 Debug.Log("Enemy hit");
             }
-            gunAmmo--;
             //OnDisparar?.Invoke();
         }
     }
@@ -387,6 +413,16 @@ public class Player : MonoBehaviour
         aim = !aim;
         gunGameObject.transform.localPosition = aim ? new Vector3(0.057f, -0.312999994f, 0.391000003f) : new Vector3(0.456f, -0.313f, 0.505f);
         weaponCamera.transform.localPosition = aim ? new Vector3(0f, 0f, -0.28f) : Vector3.zero;
+    }
+
+    public void UseSilencer()
+    {
+        if (!isSilencerEquipped)
+        {
+            silencer.SetActive(true);
+            isSilencerEquipped = true;
+            silencerUses = maxSilencerUses;
+        }
     }
 
     #region FSM
@@ -661,15 +697,7 @@ public class Player : MonoBehaviour
     {
         while (true)
         {
-            Collider[] colliderHits = Physics.OverlapSphere(this.transform.position, 30);
-            foreach (Collider collider in colliderHits)
-            {
-                Debug.Log("CORUTINAMOVER");
-                if (collider.gameObject.TryGetComponent<Enemy>(out Enemy en))
-                {
-                    en.ListenSound(this.transform.position, 3);
-                }
-            }
+            MakeNoise(30, 3);
             yield return new WaitForSeconds(0.5f);
         }
     }
@@ -679,15 +707,7 @@ public class Player : MonoBehaviour
         while (true)
         {
             Debug.Log("CORUTINACORRER");
-            Collider[] colliderHits = Physics.OverlapSphere(this.transform.position, 37);
-            foreach (Collider collider in colliderHits)
-            {
-                if (collider.gameObject.TryGetComponent<Enemy>(out Enemy en))
-                {
-                    Debug.Log("Entro a correr");
-                    en.ListenSound(this.transform.position, 7);
-                }
-            }
+            MakeNoise(37, 7);
             yield return new WaitForSeconds(0.5f);
         }
     }
@@ -697,19 +717,24 @@ public class Player : MonoBehaviour
         while (true)
         {
             Debug.Log("CORUTINACROUCH");
-            Collider[] colliderHits = Physics.OverlapSphere(this.transform.position, 5);
-            foreach (Collider collider in colliderHits)
-            {
-                if (collider.gameObject.TryGetComponent<Enemy>(out Enemy en))
-                {
-                    Debug.Log("Entro a crouch");
-                    en.ListenSound(this.transform.position, 1);
-                }
-            }
+            MakeNoise(5, 1);
             yield return new WaitForSeconds(0.5f);
         }
     }
     #endregion
+
+    private void MakeNoise(int radius, int noiseQuantity)
+    {
+        Collider[] colliderHits = Physics.OverlapSphere(this.transform.position,radius);
+        foreach (Collider collider in colliderHits)
+        {
+            if (collider.gameObject.TryGetComponent<Enemy>(out Enemy en))
+            {
+                Debug.Log("Entro a crouch");
+                en.ListenSound(this.transform.position, noiseQuantity);
+            }
+        }
+    }
 
     private void OnDestroy()
     {

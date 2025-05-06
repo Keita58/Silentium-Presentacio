@@ -290,8 +290,11 @@ public class InventoryManager : MonoBehaviour
 
     public void UseSilencer(Item item)
     {
-        //Fer que la pistola faci menys so
-        inventory.UseItem(item);
+        if (!player.isSilencerEquipped)
+        {
+            inventory.UseItem(item);
+            player.UseSilencer();
+        }
     }
 
     public void EquipThrowableItem(Item item, GameObject equipableObject)

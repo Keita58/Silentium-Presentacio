@@ -45,8 +45,6 @@ public class SilencerItem : Item
     public override void Combine(Item item)
     {
         Debug.Log("Rep aquest item per a combinar: " + item);
-        Debug.Log("Es throwable?" + item is ThrowableItem);
-
         if (item.ItemType == ItemTypes.TAPE && this.itemType == ItemTypes.PLASTICBOTTLE)
         {
             InventoryManager.instance.AddNewItemAfterCombine(silencer);
@@ -55,6 +53,5 @@ public class SilencerItem : Item
 
     public override void Equip()
     {
-        throw new System.NotImplementedException();
     }
 }
