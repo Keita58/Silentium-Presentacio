@@ -669,7 +669,7 @@ public class Player : MonoBehaviour
                 Debug.Log("CORUTINAMOVER");
                 if (collider.gameObject.TryGetComponent<Enemy>(out Enemy en))
                 {
-                    en.ListenSound(this.transform.position, 3);
+                    en.ListenSound(this.transform.position, 5);
                 }
             }
             yield return new WaitForSeconds(0.5f);
@@ -687,7 +687,7 @@ public class Player : MonoBehaviour
                 if (collider.gameObject.TryGetComponent<Enemy>(out Enemy en))
                 {
                     Debug.Log("Entro a correr");
-                    en.ListenSound(this.transform.position, 7);
+                    en.ListenSound(this.transform.position, 9);
                 }
             }
             yield return new WaitForSeconds(0.5f);
@@ -705,7 +705,7 @@ public class Player : MonoBehaviour
                 if (collider.gameObject.TryGetComponent<Enemy>(out Enemy en))
                 {
                     Debug.Log("Entro a crouch");
-                    en.ListenSound(this.transform.position, 1);
+                    en.ListenSound(this.transform.position, 2);
                 }
             }
             yield return new WaitForSeconds(0.5f);

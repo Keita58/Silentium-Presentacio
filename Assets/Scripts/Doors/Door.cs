@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Door : MonoBehaviour
 {
@@ -22,15 +24,21 @@ public class Door : MonoBehaviour
 
     private Vector3 startRotation;
 
+    public event Action<Door> onDoorOpen;
+
     private void Awake()
     {
         isOpen = false;
         startRotation = transform.localRotation.eulerAngles;
     }
+
     public void SetLocked(bool locked)
     {
         this.isLocked = locked;
+        if (TryGetComponent<NavMeshObstacle>(out NavMeshObstacle aux))
+            aux.enabled = false;
     }
+
     public void Open(Vector3 playerPosition)
     {
         if (!isLocked)
@@ -80,6 +88,7 @@ public class Door : MonoBehaviour
             time += Time.deltaTime * speed;
         }
 
+        onDoorOpen?.Invoke(this);
     }
 
     public void Close()

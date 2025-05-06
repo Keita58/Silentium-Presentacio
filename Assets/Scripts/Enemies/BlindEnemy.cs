@@ -14,13 +14,14 @@ public class BlindEnemy : Enemy
     [SerializeField] private LayerMask _LayerObjectsAndPlayer;
     [SerializeField] private LayerMask _LayerDoor;
     [SerializeField] private GameObject _DetectionSphere;
-    [SerializeField] private List<Vector3> _Waypoints;
+    [SerializeField] private List<GameObject> _Waypoints;
 
     private NavMeshAgent _NavMeshAgent;
     private Vector3 _SoundPos;
     private Vector3 _PointOfPatrol;
     [SerializeField] private bool _Patrolling;
     [SerializeField] private bool _Search;
+    private bool _OpeningDoor;
 
     private int _Hp;
     public override int hp => _Hp;
@@ -44,6 +45,7 @@ public class BlindEnemy : Enemy
         _RangeSearchSound = 55;
         _Patrolling = false;
         _Search = false;
+        _OpeningDoor = false;
         _Hp = MAXHEALTH;
 
         _DetectionSphere.GetComponent<DetectionSphere>().OnEnter += OnEnter;
@@ -130,9 +132,9 @@ public class BlindEnemy : Enemy
                 {
                     while (true)
                     {
-                        point = _Waypoints[Random.Range(0, _Waypoints.Count)];
+                        point = _Waypoints[Random.Range(0, _Waypoints.Count)].transform.position;
                         if (point != _NavMeshAgent.destination)
-                            break;
+                            break; 
                     }
                 }
                 else
@@ -194,26 +196,20 @@ public class BlindEnemy : Enemy
     public override void ListenSound(Vector3 pos, int lvlSound)
     {
         _SoundPos = pos;
-        //RaycastHit[] hits = Physics.RaycastAll(this.transform.position, _SoundPos - this.transform.position, Vector3.Distance(_SoundPos, this.transform.position));
+        RaycastHit[] hits = Physics.RaycastAll(this.transform.position, _SoundPos - this.transform.position, Vector3.Distance(_SoundPos, this.transform.position));
+
+        foreach (RaycastHit hit in hits)
+        {
+            if (hit.collider.TryGetComponent<IAtenuacio>(out IAtenuacio a))
+            {
+                lvlSound = a.atenuarSo(lvlSound);
+            }
+        }
 
         float dist = Vector3.Distance(this.transform.position, _SoundPos);
         Debug.Log($"Distància entre cec i punt de so: {dist}");
-        if (dist >= 10)
-        {
-            while (Mathf.Abs(dist) > 0)
-            {
-                if (dist > 10)
-                {
-                    dist -= 10;
-                    lvlSound -= 1;
-                }
-                else
-                {
-                    break;
-                }
-            }
-        }
-        else if (Physics.Raycast(this.transform.position, (_Player.transform.position - transform.position), out RaycastHit info, dist, _LayerObjectsAndPlayer))
+        
+        if (dist < 10 && Physics.Raycast(this.transform.position, (_Player.transform.position - transform.position), out RaycastHit info, dist, _LayerObjectsAndPlayer))
         {
             if (info.collider.TryGetComponent<Player>(out _))
             {
@@ -224,7 +220,7 @@ public class BlindEnemy : Enemy
                 lvlSound = 2;
             }
         }
-
+        
         Debug.Log($"Nivell so: {lvlSound}");
 
         if (lvlSound > 0 && _CurrentState == EnemyStates.PATROL)
@@ -304,22 +300,31 @@ public class BlindEnemy : Enemy
             if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 2.5f, _LayerDoor))
             {
                 Door door = hit.collider.GetComponentInChildren<Door>();
-                if (!door.isLocked && !door.isOpen)
+
+                if (!door.isLocked && !door.isOpen && !_OpeningDoor)
                 {
+                    door.onDoorOpen += Resume;
                     _NavMeshAgent.isStopped = true;
                     door.Open(transform.position);
-                    yield return new WaitForSeconds(0.4f);
-                    _NavMeshAgent.isStopped = false;
-                    StartCoroutine(CloseDoorAutomatic(door));   
+                    _OpeningDoor = true;
                 }
-                else if(!door.isLocked)
+                else if(door.isLocked)
                 {
                     _NavMeshAgent.SetDestination(transform.position);
+                    yield return new WaitForSeconds(2);
                 }
             }
 
             yield return new WaitForSeconds(0.1f);
         }
+    }
+
+    private void Resume(Door door)
+    {
+        _NavMeshAgent.isStopped = false;
+        StartCoroutine(CloseDoorAutomatic(door)); 
+        door.onDoorOpen -= Resume;
+        _OpeningDoor = false;
     }
 
     IEnumerator CloseDoorAutomatic(Door door)

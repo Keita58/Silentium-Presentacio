@@ -12,13 +12,14 @@ public class FatEnemy : Enemy
     [SerializeField] private LayerMask _LayerObjectsAndPlayer;
     [SerializeField] private LayerMask _LayerDoor;
     [SerializeField] private GameObject _DetectionSphere;
-    [SerializeField] private List<Vector3> _Waypoints;
+    [SerializeField] private List<GameObject> _Waypoints;
 
     private NavMeshAgent _NavMeshAgent;
     private Vector3 _SoundPos;
     private Vector3 _PointOfPatrol;
     [SerializeField] private bool _Patrolling;
     [SerializeField] private bool _Search;
+    private bool _OpeningDoor;
 
     private int _Hp;
     public override int hp => _Hp;
@@ -41,6 +42,7 @@ public class FatEnemy : Enemy
         _RangeSearchSound = 25;
         _Patrolling = false;
         _Search = false;
+        _OpeningDoor = false;
         _Hp = MAXHEALTH;
 
         _DetectionSphere.GetComponent<DetectionSphere>().OnEnter += ActivateAttackCoroutine;
@@ -121,7 +123,7 @@ public class FatEnemy : Enemy
                 {
                     while (true)
                     {
-                        point = _Waypoints[Random.Range(0, _Waypoints.Count)];
+                        point = _Waypoints[Random.Range(0, _Waypoints.Count)].transform.position;
                         if (point != _NavMeshAgent.destination)
                             break;
                     }
@@ -178,37 +180,25 @@ public class FatEnemy : Enemy
         _SoundPos = pos;
         RaycastHit[] hits = Physics.RaycastAll(this.transform.position, _SoundPos - this.transform.position, Vector3.Distance(_SoundPos, this.transform.position));
 
-        float dist = Vector3.Distance(this.transform.position, pos);
-
-        if (dist > 10)
+        foreach (RaycastHit hit in hits)
         {
-            while (Mathf.Abs(dist) > 0)
+            if (hit.collider.TryGetComponent<IAtenuacio>(out IAtenuacio a))
             {
-                if (dist > 10)
-                {
-                    dist -= 10;
-                    lvlSound -= 1;
-                }
-                else
-                {
-                    dist = 0;
-                }
-
-                if(dist <= 0)
-                {
-                    break;
-                }
+                lvlSound = a.atenuarSo(lvlSound);
             }
         }
-        else if(Physics.Raycast(this.transform.position, pos, out RaycastHit info))
+
+        float dist = Vector3.Distance(this.transform.position, _SoundPos);
+        Debug.Log($"Distància entre cec i punt de so: {dist}");
+        if (dist < 10 && Physics.Raycast(this.transform.position, (_Player.transform.position - transform.position), out RaycastHit info, dist, _LayerObjectsAndPlayer))
         {
-            if (info.collider.TryGetComponent<Player>(out Player player))
+            if (info.collider.TryGetComponent<Player>(out _))
             {
-                lvlSound *= 4;
+                lvlSound = 8;
             }
             else
             {
-                lvlSound = 8;
+                lvlSound = 3;
             }
         }
 
@@ -216,27 +206,23 @@ public class FatEnemy : Enemy
 
         if (lvlSound > 0 && _CurrentState == EnemyStates.PATROL)
         {
-            if (lvlSound > 0 && lvlSound <= 3)
+            if (lvlSound > 0 && lvlSound <= 2)
             {
                 _RangeSearchSound = 3;
-                Debug.Log("El mas bajo");
                 _Search = true;
             }
-            else if (lvlSound > 3 && lvlSound <= 7)
+            else if (lvlSound > 2 && lvlSound <= 4)
             {
-                Debug.Log("El bajo-Medio");
                 _RangeSearchSound = 2;
                 _Search = true;
             }
-            else if (lvlSound > 7 && lvlSound <= 10)
+            else if (lvlSound > 4 && lvlSound <= 7)
             {
-                Debug.Log("El medio-Alto (Aqui entra cuando el 8");
                 _RangeSearchSound = 1;
                 _Search = true;
             }
-            else if (lvlSound > 10)
+            else if (lvlSound > 7)
             {
-                Debug.Log("El mas alto");
                 _NavMeshAgent.SetDestination(_SoundPos);
             }
 
@@ -262,21 +248,32 @@ public class FatEnemy : Enemy
         {
             if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 2.5f, _LayerDoor))
             {
-                if (hit.collider.TryGetComponent<Door>(out Door door) && !door.isLocked)
+                Door door = hit.collider.GetComponentInChildren<Door>();
+
+                if (!door.isLocked && !door.isOpen && !_OpeningDoor)
                 {
-                    if (!door.isOpen)
-                    {
-                        _NavMeshAgent.isStopped = true;
-                        door.Open(transform.position);
-                        yield return new WaitForSeconds(0.4f);
-                        _NavMeshAgent.isStopped = false;
-                        StartCoroutine(CloseDoorAutomatic(door));
-                    }
+                    door.onDoorOpen += Resume;
+                    _NavMeshAgent.isStopped = true;
+                    door.Open(transform.position);
+                    _OpeningDoor = true;
+                }
+                else if (door.isLocked)
+                {
+                    _NavMeshAgent.SetDestination(transform.position);
+                    yield return new WaitForSeconds(2);
                 }
             }
 
             yield return new WaitForSeconds(0.5f);
         }
+    }
+
+    private void Resume(Door door)
+    {
+        _NavMeshAgent.isStopped = false;
+        StartCoroutine(CloseDoorAutomatic(door));
+        door.onDoorOpen -= Resume;
+        _OpeningDoor = false;
     }
 
     IEnumerator CloseDoorAutomatic(Door door)
