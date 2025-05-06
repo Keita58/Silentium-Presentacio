@@ -35,7 +35,7 @@ public class Player : MonoBehaviour
     float crouchedCenterCollider = -0.5f;
     float crouchedHeightCollider = 1;
     Vector3 cameraPositionBeforeCrouch = new Vector3(0, 0.627f, -0.198f);
-    int gunAmmo = 3;
+    int gunAmmo =20;
     int hp = 5;
 
     [SerializeField] GameObject cameraShenanigansGameObject;
@@ -101,6 +101,7 @@ public class Player : MonoBehaviour
         _inputActions.Player.Aim.performed += Aim;
         _inputActions.Player.PickUpItem.performed += Interact;
         _inputActions.Player.Inventory.performed += OpenInventory;
+        _inputActions.Player.Throw.performed += ThrowItem;
         _Rigidbody = GetComponent<Rigidbody>();
         _inputActions.Player.Enable();
         characterController = GetComponent<CharacterController>();
@@ -355,6 +356,28 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void ThrowItem(InputAction.CallbackContext context)
+    {
+        if (itemSlotOccuped)
+        {
+            equipedObject.transform.GetChild(0).TryGetComponent<ThrowObject>(out ThrowObject throwable);
+            if (throwable != null)
+            {
+                throwable.GetComponent<Rigidbody>().isKinematic = false;
+                throwable.camaraPrimera = _Camera;
+                throwable.Lanzar();
+                if (throwable.transform.parent == itemSlot)
+                {
+                    throwable.transform.parent = null;
+                }
+                else
+                {
+                    throwable.transform.parent.parent = null;
+                }
+            }
+        }
+    }
+
     public void UnequipItem()
     {
         itemSlotOccuped = false;
@@ -379,6 +402,7 @@ public class Player : MonoBehaviour
                 if (silencerUses > 0)
                 {
                     silencerUses--;
+                    Debug.Log("Silenciador usos: " + silencerUses);
                 }
                 else
                 {

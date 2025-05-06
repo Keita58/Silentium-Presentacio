@@ -286,6 +286,7 @@ public class InventoryManager : MonoBehaviour
     public void UseKeyItem(Item item)
     {
         inventory.UseItem(item);
+        inventoryUI.Show();
     }
 
     public void UseSilencer(Item item)
@@ -294,6 +295,7 @@ public class InventoryManager : MonoBehaviour
         {
             inventory.UseItem(item);
             player.UseSilencer();
+            inventoryUI.Show();
         }
     }
 

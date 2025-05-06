@@ -45,7 +45,7 @@ public class SilencerItem : Item
     public override void Combine(Item item)
     {
         Debug.Log("Rep aquest item per a combinar: " + item);
-        if (item.ItemType == ItemTypes.TAPE && this.itemType == ItemTypes.PLASTICBOTTLE)
+        if ((item.ItemType == ItemTypes.TAPE && this.itemType == ItemTypes.PLASTICBOTTLE) ||( item.ItemType == ItemTypes.PLASTICBOTTLE && this.itemType == ItemTypes.TAPE))
         {
             InventoryManager.instance.AddNewItemAfterCombine(silencer);
         }
