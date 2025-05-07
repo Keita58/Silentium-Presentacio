@@ -982,6 +982,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Paint"",
+                    ""type"": ""Button"",
+                    ""id"": ""875a774e-9437-46e7-bfde-d874e35d6fcc"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -993,6 +1002,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Exit"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""54fe1024-f2e7-4d72-8d52-e3134bfbd06c"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Paint"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1150,6 +1170,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         // Hieroglyphic
         m_Hieroglyphic = asset.FindActionMap("Hieroglyphic", throwIfNotFound: true);
         m_Hieroglyphic_Exit = m_Hieroglyphic.FindAction("Exit", throwIfNotFound: true);
+        m_Hieroglyphic_Paint = m_Hieroglyphic.FindAction("Paint", throwIfNotFound: true);
         // WeaponPuzzle
         m_WeaponPuzzle = asset.FindActionMap("WeaponPuzzle", throwIfNotFound: true);
         m_WeaponPuzzle_Unmount = m_WeaponPuzzle.FindAction("Unmount", throwIfNotFound: true);
@@ -1526,11 +1547,13 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Hieroglyphic;
     private List<IHieroglyphicActions> m_HieroglyphicActionsCallbackInterfaces = new List<IHieroglyphicActions>();
     private readonly InputAction m_Hieroglyphic_Exit;
+    private readonly InputAction m_Hieroglyphic_Paint;
     public struct HieroglyphicActions
     {
         private @InputSystem_Actions m_Wrapper;
         public HieroglyphicActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
         public InputAction @Exit => m_Wrapper.m_Hieroglyphic_Exit;
+        public InputAction @Paint => m_Wrapper.m_Hieroglyphic_Paint;
         public InputActionMap Get() { return m_Wrapper.m_Hieroglyphic; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1543,6 +1566,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Exit.started += instance.OnExit;
             @Exit.performed += instance.OnExit;
             @Exit.canceled += instance.OnExit;
+            @Paint.started += instance.OnPaint;
+            @Paint.performed += instance.OnPaint;
+            @Paint.canceled += instance.OnPaint;
         }
 
         private void UnregisterCallbacks(IHieroglyphicActions instance)
@@ -1550,6 +1576,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Exit.started -= instance.OnExit;
             @Exit.performed -= instance.OnExit;
             @Exit.canceled -= instance.OnExit;
+            @Paint.started -= instance.OnPaint;
+            @Paint.performed -= instance.OnPaint;
+            @Paint.canceled -= instance.OnPaint;
         }
 
         public void RemoveCallbacks(IHieroglyphicActions instance)
@@ -1739,6 +1768,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     public interface IHieroglyphicActions
     {
         void OnExit(InputAction.CallbackContext context);
+        void OnPaint(InputAction.CallbackContext context);
     }
     public interface IWeaponPuzzleActions
     {

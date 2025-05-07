@@ -12,7 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05fddcd6ae62fb44a8090a13224fa9b4, type: 3}
   m_Name: Nota3
   m_EditorClassIdentifier: 
-  Name: 
+  Name: Para mi hija Avril
   noteId: 3
-  noteContent: 
+  noteContent: "Esta nota es tuya Avril. No s\xE9 que decir la verdad, nunca he acostumbrado
+    a escribir notas.. Pero bueno, quiero que sepas que aunque no hayamos pasado
+    tantos momentos juntos como con tu hermano mayor, te quiero tanto como a \xE9l.
+    Tal vez hayas sido un poco rebelde, o incluso mucho, pero siempre has tenido
+    un coraz\xF3n enorme y una gratitud hacia la fam\xEDlia admirable. Le he dicho
+    a tu hermano que os cuide, pero porfavor, vosotras cuidad tambien de \xE9l, a
+    veces es un poco despistado como bien ya sabes. Confio en que al igual que el
+    os aportara conocimiento, tu ene\xF1ar\xE1s a los otros dos a guiarse por el
+    coraz\xF3n. Te quiero mucho hija mia."
   noteType: 2

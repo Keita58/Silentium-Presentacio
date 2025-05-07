@@ -2,10 +2,12 @@ using NavKeypad;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PuzzleManager : MonoBehaviour
 {
     public static PuzzleManager instance { get; private set; }
+    [Header("Clock Puzzle")]
     [SerializeField]
     private GameObject KeyClock;
     [SerializeField]
@@ -13,20 +15,29 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     private Camera cam_Player;
     private InputSystem_Actions inputActionPlayer;
+    [Header("Hieroglytphic Puzzle")]
     [SerializeField]
     private Camera cam_Hierogliphic;
     [SerializeField]
     private Camera cam_WeaponPuzzle;
     [SerializeField]
+    private AnimationClip doorsHieroglyphic;   
+    [SerializeField]
+    private Animator hieroglyphicAnimator;
+    [SerializeField]
     private Camera cam_HieroglyphicAnimation;
+
+    [Header("Book Puzzle")]
     [SerializeField]
     BookPuzzle bookPuzzle;
+    [Header("Poem Puzzle")]
     [SerializeField]
     private List<Picture> pictureList;
     [SerializeField]
     public List<Picture> picturesClicked;
     [SerializeField]
     Door DoorPoem3;
+    [Header("Morse Puzzle")]
     [SerializeField]
     Player player;
     [SerializeField]
@@ -38,11 +49,12 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     private AnimationClip doorsMorseAnimation;
     [SerializeField]
-    private AnimationClip doorsHieroglyphic;
+    private Animator animator;   
     [SerializeField]
     private Animator morseAnimator;
+    [Header("Weapon Puzzle")]
     [SerializeField]
-    private Animator hieroglyphicAnimator;
+    private BoxCollider allWeapon;
     float animationTime = 0f;
     bool isMorseCompleted = false;
     [SerializeField]
@@ -99,7 +111,8 @@ public class PuzzleManager : MonoBehaviour
         cam_Player.gameObject.SetActive(false);
         cam_Hierogliphic.gameObject.SetActive(true);
         player._inputActions.Player.Disable();
-        cam_Hierogliphic.transform.parent.GetComponent<Keypad>().inputActions.Hieroglyphic.Enable();
+        //cam_Hierogliphic.transform.parent.GetComponent<Keypad>().inputActions.Hieroglyphic.Enable();
+        cam_Hierogliphic.transform.parent.GetComponent<LineRendererExample>()._inputAction.Hieroglyphic.Enable();
         Cursor.visible = true;
     }
 
@@ -206,19 +219,20 @@ public class PuzzleManager : MonoBehaviour
     {
         cam_Player.gameObject.SetActive(false);
         cam_WeaponPuzzle.gameObject.SetActive(true);
-        cam_Player.transform.parent.position = new Vector3(-32.8191757f, 6.21000004f, -32.4704895f);
-        cam_Player.transform.parent.rotation = new Quaternion(0, -0.608760536f, 0, 0.793354094f);
+        cam_WeaponPuzzle.transform.parent.GetComponent<WeaponPuzzle>().inputAction.WeaponPuzzle.Enable();
         cam_Player.transform.parent.GetComponent<Player>()._inputActions.Player.Disable();
-        cam_WeaponPuzzle.transform.parent.GetComponent<WeaponPuzzle>().inputActions.WeaponPuzzle.Enable();
+        allWeapon.enabled = false;
+        Cursor.visible = true;
     }
     public void ExitWeaponPuzzle()
     {
+
+        cam_WeaponPuzzle.transform.parent.GetComponent<WeaponPuzzle>().inputAction.WeaponPuzzle.Disable();
+        cam_Player.transform.parent.GetComponent<Player>().ResumeInteract();
+        cam_Player.transform.parent.GetComponent<Player>()._inputActions.Player.Enable();      
         cam_Player.gameObject.SetActive(true);
         cam_WeaponPuzzle.gameObject.SetActive(false);
-        cam_Player.transform.parent.position = new Vector3(-32.8191757f, 6.21000004f, -32.4704895f);
-        cam_Player.transform.parent.rotation = new Quaternion(0, -0.608760536f, 0, 0.793354094f);
-        cam_Player.transform.parent.GetComponent<Player>()._inputActions.Player.Enable();
-        cam_WeaponPuzzle.transform.parent.GetComponent<WeaponPuzzle>().inputActions.WeaponPuzzle.Disable();
+        Cursor.visible = false;
     }
 
     void Update()

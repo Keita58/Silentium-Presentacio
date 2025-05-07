@@ -76,7 +76,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     bool morse = false;
     private GameObject clockGameObject;
-
+    private bool weaponPuzzle;
     //Coroutines
     private Coroutine coroutineRun;
     private Coroutine coroutineMove;
@@ -158,6 +158,7 @@ public class Player : MonoBehaviour
     {
         Cursor.visible = false;
         coroutineInteract = StartCoroutine(InteractuarRaycast());
+        inventoryOpened = false;
     }
 
     private void Update()
@@ -210,7 +211,7 @@ public class Player : MonoBehaviour
             }
             else
             {
-                if (!book && !door)
+                if (!book && !door && !weaponPuzzle)
                     interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
 
                 if (clockPuzzle)
@@ -219,6 +220,11 @@ public class Player : MonoBehaviour
                     StopCoroutine(coroutineInteract);
                     clockPuzzle = false;
 
+                }else if (weaponPuzzle)
+                {
+                    PuzzleManager.instance.InteractWeaponPuzzle();
+                    StopCoroutine(coroutineInteract);
+                    weaponPuzzle = false;
                 }
                 else if (note)
                 {
@@ -608,13 +614,13 @@ public class Player : MonoBehaviour
             if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask)){
                 if (!hit.collider.gameObject.Equals(interactiveGameObject) && hit.transform.gameObject.layer != 10)
                 {
-                    if (interactiveGameObject!=null && interactiveGameObject.transform.gameObject.layer != 15)
+                    if (interactiveGameObject!=null && interactiveGameObject.transform.gameObject.layer != 15 && interactiveGameObject.transform.gameObject.layer!=18)
                     {
                         interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
                         interactiveGameObject = null;
                     }
                     interactiveGameObject = hit.collider.gameObject;
-                    if (hit.transform.gameObject.layer != 15)
+                    if (hit.transform.gameObject.layer != 15 && hit.transform.gameObject.layer != 18)
                     {
                         baseMaterial = interactiveGameObject.GetComponent<MeshRenderer>().materials[0];
                         interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[]
@@ -624,7 +630,7 @@ public class Player : MonoBehaviour
                     material
                         };
                     }
-                    else
+                    else if(interactiveGameObject.layer != 18)
                     {
                         Transform child =interactiveGameObject.transform.GetChild(0);
                         if (child.childCount > 0)
@@ -664,9 +670,12 @@ public class Player : MonoBehaviour
                     {
                         book = true;
                     }
-                    else if (hit.transform.gameObject.layer == 14)
+                    else if (hit.transform.gameObject.layer == 23)
                     {
                         keypad = true;
+                    }else if (hit.transform.gameObject.layer == 18)
+                    {
+                        weaponPuzzle = true;
                     }else if (hit.transform.gameObject.layer == 20)
                     {
                         morse = true;
@@ -696,10 +705,11 @@ public class Player : MonoBehaviour
                 bookItem = false;
                 picture = false;
                 note = false;
+                weaponPuzzle = false;
                 chest = false;
                 if (interactiveGameObject != null)
                 {
-                    if (interactiveGameObject.transform.gameObject.layer != 15)
+                    if (interactiveGameObject.transform.gameObject.layer != 15 && interactiveGameObject.transform.gameObject.layer != 18)
                     {
                         interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
                         interactiveGameObject = null;

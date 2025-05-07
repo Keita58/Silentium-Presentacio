@@ -12,7 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05fddcd6ae62fb44a8090a13224fa9b4, type: 3}
   m_Name: Nota4
   m_EditorClassIdentifier: 
-  Name: 
+  Name: Para Carmen
   noteId: 4
-  noteContent: 
+  noteContent: "Bueno, finalmente escribo mi ultima nota. Carmen, a pesar de ser
+    la menor, siempre has demostrado tener una madurez incre\xEDble. Mas sin embargo,
+    sigues siendo demasiado joven para ir haciendo lo que te plazca, todavia tienes
+    mucho camino por delante y muchas piedras con las que tropezar, pero estate tranquila,
+    aunque yo ya no est\xE9 tus hermanos seguiran cuidando de ti. y te dar\xE1n los
+    consejos que yo no pueda darte llegado el momento. A\xFAn as\xED soy consciente
+    de que t\xFA sola ya te las apa\xF1as muy bien, aunque a veces deber\xEDas ser
+    menos terca y pedir ayuda de vez en cuando. Para ti tengo una misi\xF3n muy importante.
+    Al igual que tus hermanos te aportaran cosas, tu eres el mejor ejemplo para ense\xF1arles
+    a cuando poner los l\xEDmites. S\xE9 que lo har\xE1s bien. Sinceramente, me gustar\xEDa
+    ver como progresas, ver tu graduacion de la universidad y ver en la mujer en
+    la que te vas a convertir. Sin embargo, no creo que me d\xE9 tiempo. Porfavor
+    no dejeis que nada ni nadie separe ese vinculos tan hermoso que tenemos. Os quiero
+    mucho. "
   noteType: 2
