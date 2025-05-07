@@ -37,6 +37,8 @@ public class Player : MonoBehaviour
     Vector3 cameraPositionBeforeCrouch = new Vector3(0, 0.627f, -0.198f);
     int gunAmmo =20;
     int hp = 5;
+    [SerializeField]
+    GameObject flashlight;
 
     [SerializeField] GameObject cameraShenanigansGameObject;
 
@@ -102,6 +104,7 @@ public class Player : MonoBehaviour
         _inputActions.Player.PickUpItem.performed += Interact;
         _inputActions.Player.Inventory.performed += OpenInventory;
         _inputActions.Player.Throw.performed += ThrowItem;
+        _inputActions.Player.Flashlight.performed += Flashlight;
         _Rigidbody = GetComponent<Rigidbody>();
         _inputActions.Player.Enable();
         characterController = GetComponent<CharacterController>();
@@ -772,6 +775,11 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void Flashlight(InputAction.CallbackContext context)
+    {
+        if(!flashlight.activeSelf) flashlight.SetActive(true);
+        else flashlight.SetActive(false);
+    }
     private void OnDestroy()
     {
         _inputActions.Player.Shoot.performed -= Shoot;
