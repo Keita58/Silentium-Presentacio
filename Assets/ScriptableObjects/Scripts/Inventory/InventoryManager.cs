@@ -394,7 +394,7 @@ public class InventoryManager : MonoBehaviour
                     Debug.Log("Entro");
                     Debug.Log("La nota actual es: "+noteInventory.notes.ElementAt(i).name);
                     notesRoot.transform.GetChild(j).GetComponent<Button>().interactable = true;
-                    notesRoot.transform.GetChild(j).GetComponent<TextMeshProUGUI>().text = noteInventory.notes.ElementAt(i).name;
+                    notesRoot.transform.GetChild(j).GetChild(0).GetComponent<TextMeshProUGUI>().text = noteInventory.notes.ElementAt(i).name;
                 }
             }
         }
