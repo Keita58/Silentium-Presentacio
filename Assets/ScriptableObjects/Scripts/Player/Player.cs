@@ -112,6 +112,7 @@ public class Player : MonoBehaviour
             _inputActions.Player.Look.Disable();
             _inputActions.Player.Crouch.Disable();
             _inputActions.Player.PickUpItem.Disable();
+            _RunAction.Disable();
         }
         else
         {
@@ -122,6 +123,7 @@ public class Player : MonoBehaviour
             _inputActions.Player.Look.Enable();
             _inputActions.Player.Crouch.Enable();
             _inputActions.Player.PickUpItem.Enable();
+            _RunAction.Enable();
         }
         if (enableInventory) _inputActions.Player.Inventory.Enable();
         else _inputActions.Player.Inventory.Disable();
@@ -150,6 +152,7 @@ public class Player : MonoBehaviour
     {
         Cursor.visible = false;
         coroutineInteract = StartCoroutine(InteractuarRaycast());
+        inventoryOpened = false;
     }
 
     private void Update()
@@ -175,23 +178,29 @@ public class Player : MonoBehaviour
             if (item)
             {
                 Debug.Log("ENTRO DEFINITIVAMENTE");
-                InventoryManager.instance.AddItem(interactiveGameObject.GetComponent<PickItem>().item);
-                Debug.Log("QUE COJO?" + interactiveGameObject.GetComponent<PickItem>().item);
+                Item itemPicked = interactiveGameObject.GetComponent<PickItem>().item;
+                if (InventoryManager.instance.inventory.items.Count<6)
+                    InventoryManager.instance.AddItem(itemPicked);
+                else
+                    Debug.Log("Inventory full");
+                Debug.Log("QUE COJO?" + itemPicked);
 
                 Debug.Log("Entro Coger item");
                 if (bookItem)
                 {
-                    if (interactiveGameObject.GetComponent<Book>().placed)
+                    Book book = interactiveGameObject.GetComponent<Book>();
+                    if (book.placed)
                     {
-                        interactiveGameObject.GetComponent<Book>().placed = false;
-                        interactiveGameObject.GetComponent<Book>().collider.enabled = true;
-                        interactiveGameObject.GetComponent<Book>().collider.transform.GetComponent<CellBook>().SetBook(null);
-                        interactiveGameObject.GetComponent<Book>().collider = null;
+                        book.placed = false;
+                        book.collider.enabled = true;
+                        book.collider.transform.GetComponent<CellBook>().SetBook(null);
+                        book.collider = null;
                         bookItem = false;
                         item = false;
                     }
                 }
                 interactiveGameObject.gameObject.SetActive(false);
+                if (itemPicked is BookItem && itemPicked.ItemType == ItemTypes.BOOK2) PuzzleManager.instance.ChangePositionPlayerAfterHieroglyphic();
                 interactiveGameObject = null;
             }
             else
@@ -601,7 +610,7 @@ public class Player : MonoBehaviour
                     {
                         book = true;
                     }
-                    else if (hit.transform.gameObject.layer == 14)
+                    else if (hit.transform.gameObject.layer == 23)
                     {
                         keypad = true;
                     }else if (hit.transform.gameObject.layer == 18)
@@ -673,7 +682,7 @@ public class Player : MonoBehaviour
                     en.ListenSound(this.transform.position, 3);
                 }
             }
-            yield return new WaitForSeconds(3);
+            yield return new WaitForSeconds(0.5f);
         }
     }
 
@@ -691,7 +700,7 @@ public class Player : MonoBehaviour
                     en.ListenSound(this.transform.position, 7);
                 }
             }
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0.5f);
         }
     }
 
@@ -709,7 +718,7 @@ public class Player : MonoBehaviour
                     en.ListenSound(this.transform.position, 1);
                 }
             }
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0.5f);
         }
     }
     #endregion

@@ -34,6 +34,7 @@ public class BlindEnemy : Enemy
     private Coroutine _PatrolCoroutine;
     private Coroutine _ChangeStateToPatrol;
     private Coroutine _AttackCoroutine;
+    private Coroutine _RestoreCoroutine;
 
     private void Awake()
     {
@@ -63,7 +64,7 @@ public class BlindEnemy : Enemy
 
     private void ChangeState(EnemyStates newState)
     {
-        //if(_CurrentState == newState) return;
+        if(_CurrentState == newState) return;
 
         Debug.Log($"---------------------- Sortint de {_CurrentState} a {newState} ------------------------");
         ExitState(_CurrentState);
@@ -79,11 +80,7 @@ public class BlindEnemy : Enemy
         switch (_CurrentState)
         {
             case EnemyStates.PATROL:
-                if (_Search)
-                    _NavMeshAgent.speed = 4.5f;
-                else
-                    _NavMeshAgent.speed = 3f;
-                _PatrolCoroutine = StartCoroutine(Patrol(_RangeSearchSound, _PointOfPatrol));
+                _PatrolCoroutine = StartCoroutine(Patrol());
                 break;
             case EnemyStates.ATTACK:
                 _NavMeshAgent.isStopped = true;
@@ -121,7 +118,7 @@ public class BlindEnemy : Enemy
     #endregion 
 
     // Funci� per moure l'enemic pel mapa
-    IEnumerator Patrol(float range, Vector3 pointOfSearch)
+    IEnumerator Patrol()
     {
         Vector3 point = Vector3.zero;
         while (true)
@@ -144,7 +141,8 @@ public class BlindEnemy : Enemy
                     point = coord;
                 }
                 _Patrolling = true;
-                _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
+                if (_NavMeshAgent.remainingDistance < 5)
+                    _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
             }
 
             if (_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
@@ -181,8 +179,6 @@ public class BlindEnemy : Enemy
                 areaMask = _NavMeshAgent.areaMask,
             };
 
-            Debug.Log(_NavMeshAgent.areaMask);
-
             //Comprovem que el punt que hem agafat esta dins del NavMesh
             if (NavMesh.SamplePosition(point, out NavMeshHit hit, 1.0f, filter))
             {
@@ -198,10 +194,11 @@ public class BlindEnemy : Enemy
     public override void ListenSound(Vector3 pos, int lvlSound)
     {
         _SoundPos = pos;
-        RaycastHit[] hits = Physics.RaycastAll(this.transform.position, _SoundPos - this.transform.position, Vector3.Distance(_SoundPos, this.transform.position));
+        //RaycastHit[] hits = Physics.RaycastAll(this.transform.position, _SoundPos - this.transform.position, Vector3.Distance(_SoundPos, this.transform.position));
 
-        float dist = Vector3.Distance(this.transform.position, pos);
-        if (dist > 10)
+        float dist = Vector3.Distance(this.transform.position, _SoundPos);
+        Debug.Log($"Distància entre cec i punt de so: {dist}");
+        if (dist >= 10)
         {
             while (Mathf.Abs(dist) > 0)
             {
@@ -212,20 +209,15 @@ public class BlindEnemy : Enemy
                 }
                 else
                 {
-                    dist = 0;
-                }
-
-                if (dist <= 0)
-                {
                     break;
                 }
             }
         }
-        else if (Physics.Raycast(this.transform.position, pos, out RaycastHit info))
+        else if (Physics.Raycast(this.transform.position, (_Player.transform.position - transform.position), out RaycastHit info, dist, _LayerObjectsAndPlayer))
         {
-            if (info.collider.TryGetComponent<Player>(out Player player))
+            if (info.collider.TryGetComponent<Player>(out _))
             {
-                lvlSound = 5;
+                lvlSound = 8;
             }
             else
             {
@@ -241,19 +233,16 @@ public class BlindEnemy : Enemy
             {
                 _RangeSearchSound = 1.5f;
                 _Search = true;
-                ChangeState(EnemyStates.PATROL);
             }
             else if (lvlSound > 2 && lvlSound <= 3)
             {
                 _RangeSearchSound = 1;
                 _Search = true;
-                ChangeState(EnemyStates.PATROL);
             }
             else if (lvlSound > 3 && lvlSound <= 5)
             {
                 _RangeSearchSound = 0.5f;
                 _Search = true;
-                ChangeState(EnemyStates.PATROL);
             }
             else if (lvlSound > 5)
             {
@@ -270,27 +259,20 @@ public class BlindEnemy : Enemy
                     }
                 }
 
-                if (Vector3.Distance(_SoundPos, transform.position) > 1.5f && !wall)
+                if (Vector3.Distance(_SoundPos, transform.position) > 1.5f && Vector3.Distance(_SoundPos, transform.position) <= 4 && !wall)
                 {
-                    _NavMeshAgent.speed = 7;
-                    GameObject aux = new();
-                    NavMeshLink link = aux.AddComponent<NavMeshLink>();
-                    NavMesh.SamplePosition(_SoundPos, out NavMeshHit hit, 1.5f, NavMesh.AllAreas);
-                    link.endPoint = hit.position;
-                    NavMesh.SamplePosition(transform.position, out NavMeshHit hit2, 1.5f, NavMesh.AllAreas);
-                    link.startPoint = hit2.position;
-                    link.width = 3;
-                    link.agentTypeID = _NavMeshAgent.agentTypeID;
-                    link.area = 3;
-                    link.bidirectional = false;
-                    link.costModifier = 1;
-                    GetComponent<AgentLinkMover>().enabled = true;
+                    Debug.Log("Faig salt!");
+                    ExitState(_CurrentState);
+                    Vector3 start = transform.position;
+                    Vector3 end = _SoundPos;
+                    
+                    _NavMeshAgent.enabled = false;
+                    //GetComponent<Rigidbody>().isKinematic = false;
+                    GetComponent<Rigidbody>().AddForce((end - start) * 10);
 
-                    _NavMeshAgent.SetDestination(_SoundPos);
-
-                    StartCoroutine(DeleteLink(aux));
+                    _RestoreCoroutine = StartCoroutine(RecoverAgent());
                 }
-                else if (Vector3.Distance(_SoundPos, transform.position) > 1.5f)
+                else if (Vector3.Distance(_SoundPos, transform.position) > 4)
                 {
                     _NavMeshAgent.SetDestination(_SoundPos);
                 }
@@ -298,7 +280,7 @@ public class BlindEnemy : Enemy
         }
     }
 
-    public void TakeHealth()
+    public override void TakeHealth()
     {
         if (_CurrentState != EnemyStates.KNOCKED)
         {
@@ -319,18 +301,20 @@ public class BlindEnemy : Enemy
     {
         while (true)
         {
-            if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 3f, _LayerDoor))
+            if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 2.5f, _LayerDoor))
             {
-                if (hit.collider.TryGetComponent<Door>(out Door door) && !door.isLocked)
+                Door door = hit.collider.GetComponentInChildren<Door>();
+                if (!door.isLocked && !door.isOpen)
                 {
-                    if (!door.isOpen)
-                    {
-                        _NavMeshAgent.isStopped = true;
-                        door.Open(transform.position);
-                        yield return new WaitForSeconds(0.4f);
-                        _NavMeshAgent.isStopped = false;
-                        StartCoroutine(CloseDoorAutomatic(door));
-                    }
+                    _NavMeshAgent.isStopped = true;
+                    door.Open(transform.position);
+                    yield return new WaitForSeconds(0.4f);
+                    _NavMeshAgent.isStopped = false;
+                    StartCoroutine(CloseDoorAutomatic(door));   
+                }
+                else if(!door.isLocked)
+                {
+                    _NavMeshAgent.SetDestination(transform.position);
                 }
             }
 
@@ -344,16 +328,17 @@ public class BlindEnemy : Enemy
         door.Close();
     }
 
-    IEnumerator DeleteLink(GameObject go)
+    IEnumerator RecoverAgent()
     {
-        yield return new WaitForSeconds(2);
-        GetComponent<AgentLinkMover>().enabled = true;
-        Destroy(go);
+        yield return new WaitForSeconds(0.5f);
+        //GetComponent<Rigidbody>().isKinematic = true;
+        _NavMeshAgent.enabled = true;
+        if (_CurrentState != EnemyStates.ATTACK)
+            ChangeState(EnemyStates.PATROL);
     }
 
     IEnumerator Attack()
     {
-        _NavMeshAgent.isStopped = true;
         while (true)
         {
             Debug.Log("Entro a l'atac");
@@ -371,6 +356,10 @@ public class BlindEnemy : Enemy
             StopCoroutine(_ChangeStateToPatrol);
             _ChangeStateToPatrol = null;
         }
+
+        if (!_NavMeshAgent.enabled)
+            _NavMeshAgent.enabled = true;
+
         ChangeState(EnemyStates.ATTACK);
         if(_AttackCoroutine == null) 
             _AttackCoroutine = StartCoroutine(Attack());

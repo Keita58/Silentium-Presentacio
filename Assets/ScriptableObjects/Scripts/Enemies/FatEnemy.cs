@@ -179,11 +179,9 @@ public class FatEnemy : Enemy
         RaycastHit[] hits = Physics.RaycastAll(this.transform.position, _SoundPos - this.transform.position, Vector3.Distance(_SoundPos, this.transform.position));
 
         float dist = Vector3.Distance(this.transform.position, pos);
-        Debug.Log("DISTANCIA: "+dist);
 
         if (dist > 10)
         {
-            Debug.Log("dist>10");
             while (Mathf.Abs(dist) > 0)
             {
                 if (dist > 10)
@@ -206,13 +204,11 @@ public class FatEnemy : Enemy
         {
             if (info.collider.TryGetComponent<Player>(out Player player))
             {
-                Debug.Log("dist<10 y se multiplica");
                 lvlSound *= 4;
             }
             else
             {
                 lvlSound = 8;
-                Debug.Log("dist<10 y se PONE A 8");
             }
         }
 
@@ -250,7 +246,7 @@ public class FatEnemy : Enemy
         }
     }
 
-    public void TakeHealth()
+    public override void TakeHealth()
     {
         if (_CurrentState != EnemyStates.KNOCKED)
         {

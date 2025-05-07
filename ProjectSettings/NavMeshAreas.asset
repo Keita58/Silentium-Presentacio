@@ -16,7 +16,7 @@ NavMeshProjectSettings:
   - name: Blind-Wall
     cost: 7
   - name: Blind-Land
-    cost: 7
+    cost: 30
   - name: 
     cost: 1
   - name: 

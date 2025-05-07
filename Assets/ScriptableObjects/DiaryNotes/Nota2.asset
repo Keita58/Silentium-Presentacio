@@ -12,7 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05fddcd6ae62fb44a8090a13224fa9b4, type: 3}
   m_Name: Nota2
   m_EditorClassIdentifier: 
-  Name: Recuerda
+  Name: A mi hijo Alex
   noteId: 2
-  noteContent: En 1992 a mi abuelo le dio alzheimer
+  noteContent: "Esta es la primera nota que escribo hacia alguno de mis hijos, y
+    he pensado en hacerlo por orden de nacimiento as\xED recordar\xE9 por m\xE1s
+    tiempo quien es el mas mayor y quien el mas peque\xF1o. Quiero que sepas que
+    estoy muy orgulloso de ti, y de todo lo que has logrado en tu dia a dia. A partir
+    de ahora te tocar\xE1 a ti cuidar de tus hermanas, no me preocupa porque s\xE9
+    que te ir\xE1 bien, siempre has sido un gran hermano al igual que un gran hijo.
+    \\nTe quiero."
   noteType: 2

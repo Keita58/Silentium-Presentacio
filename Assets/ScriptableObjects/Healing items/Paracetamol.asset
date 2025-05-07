@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93a2625516f24b447be9ad1d9f42861e, type: 3}
   m_Name: Paracetamol
   m_EditorClassIdentifier: 
-  nom: Healing
-  description: A healign item
+  nom: Paracetamol
+  description: "Cura de peque\xF1o efecto."
   sprite: {fileID: 21300000, guid: fc301c0a06484a94c85499d3e0d6a6e1, type: 3}
   healing: 3
-  prefab: {fileID: 0}
+  prefab: {fileID: 8474635125787463359, guid: 46b7d683be7451646ad35bdeeaf63f5f, type: 3}
   itemsToCombine:
   - {fileID: 11400000}
   stackable: 1
