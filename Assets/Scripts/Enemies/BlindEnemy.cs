@@ -34,6 +34,7 @@ public class BlindEnemy : Enemy
     private Coroutine _PatrolCoroutine;
     private Coroutine _ChangeStateToPatrol;
     private Coroutine _AttackCoroutine;
+    private Coroutine _RestoreCoroutine;
 
     private void Awake()
     {
@@ -63,7 +64,7 @@ public class BlindEnemy : Enemy
 
     private void ChangeState(EnemyStates newState)
     {
-        //if(_CurrentState == newState) return;
+        if(_CurrentState == newState) return;
 
         Debug.Log($"---------------------- Sortint de {_CurrentState} a {newState} ------------------------");
         ExitState(_CurrentState);
@@ -79,7 +80,7 @@ public class BlindEnemy : Enemy
         switch (_CurrentState)
         {
             case EnemyStates.PATROL:
-                _PatrolCoroutine = StartCoroutine(Patrol(_RangeSearchSound, _PointOfPatrol));
+                _PatrolCoroutine = StartCoroutine(Patrol());
                 break;
             case EnemyStates.ATTACK:
                 _NavMeshAgent.isStopped = true;
@@ -117,7 +118,7 @@ public class BlindEnemy : Enemy
     #endregion 
 
     // Funci� per moure l'enemic pel mapa
-    IEnumerator Patrol(float range, Vector3 pointOfSearch)
+    IEnumerator Patrol()
     {
         Vector3 point = Vector3.zero;
         while (true)
@@ -140,7 +141,8 @@ public class BlindEnemy : Enemy
                     point = coord;
                 }
                 _Patrolling = true;
-                _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
+                if (_NavMeshAgent.remainingDistance < 5)
+                    _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
             }
 
             if (_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
@@ -231,19 +233,16 @@ public class BlindEnemy : Enemy
             {
                 _RangeSearchSound = 1.5f;
                 _Search = true;
-                ChangeState(EnemyStates.PATROL);
             }
             else if (lvlSound > 2 && lvlSound <= 3)
             {
                 _RangeSearchSound = 1;
                 _Search = true;
-                ChangeState(EnemyStates.PATROL);
             }
             else if (lvlSound > 3 && lvlSound <= 5)
             {
                 _RangeSearchSound = 0.5f;
                 _Search = true;
-                ChangeState(EnemyStates.PATROL);
             }
             else if (lvlSound > 5)
             {
@@ -268,26 +267,10 @@ public class BlindEnemy : Enemy
                     Vector3 end = _SoundPos;
                     
                     _NavMeshAgent.enabled = false;
+                    //GetComponent<Rigidbody>().isKinematic = false;
+                    GetComponent<Rigidbody>().AddForce((end - start) * 10);
 
-                    GetComponent<Rigidbody>().AddForce((end - start) * 3);
-
-                    /*
-                    GameObject aux = new();
-                    NavMeshLink link = aux.AddComponent<NavMeshLink>();
-                    NavMesh.SamplePosition(_SoundPos, out NavMeshHit hit, 1.5f, NavMesh.AllAreas);
-                    link.endPoint = hit.position;
-                    NavMesh.SamplePosition(transform.position, out NavMeshHit hit2, 1.5f, NavMesh.AllAreas);
-                    link.startPoint = hit2.position;
-                    link.width = 3;
-                    link.agentTypeID = _NavMeshAgent.agentTypeID;
-                    link.area = 3;
-                    link.bidirectional = false;
-                    link.costModifier = 1;
-                    GetComponent<AgentLinkMover>().enabled = true;
-
-                    _NavMeshAgent.SetDestination(_SoundPos);
-                    */
-                    StartCoroutine(RecoverAgent());
+                    _RestoreCoroutine = StartCoroutine(RecoverAgent());
                 }
                 else if (Vector3.Distance(_SoundPos, transform.position) > 4)
                 {
@@ -297,7 +280,7 @@ public class BlindEnemy : Enemy
         }
     }
 
-    public void TakeHealth()
+    public override void TakeHealth()
     {
         if (_CurrentState != EnemyStates.KNOCKED)
         {
@@ -318,18 +301,20 @@ public class BlindEnemy : Enemy
     {
         while (true)
         {
-            if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 1.5f, _LayerDoor))
+            if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 2.5f, _LayerDoor))
             {
-                if (hit.collider.TryGetComponent<Door>(out Door door) && !door.isLocked)
+                Door door = hit.collider.GetComponentInChildren<Door>();
+                if (!door.isLocked && !door.isOpen)
                 {
-                    if (!door.isOpen)
-                    {
-                        _NavMeshAgent.isStopped = true;
-                        door.Open(transform.position);
-                        yield return new WaitForSeconds(0.4f);
-                        _NavMeshAgent.isStopped = false;
-                        StartCoroutine(CloseDoorAutomatic(door));
-                    }
+                    _NavMeshAgent.isStopped = true;
+                    door.Open(transform.position);
+                    yield return new WaitForSeconds(0.4f);
+                    _NavMeshAgent.isStopped = false;
+                    StartCoroutine(CloseDoorAutomatic(door));   
+                }
+                else if(!door.isLocked)
+                {
+                    _NavMeshAgent.SetDestination(transform.position);
                 }
             }
 
@@ -345,7 +330,8 @@ public class BlindEnemy : Enemy
 
     IEnumerator RecoverAgent()
     {
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.5f);
+        //GetComponent<Rigidbody>().isKinematic = true;
         _NavMeshAgent.enabled = true;
         if (_CurrentState != EnemyStates.ATTACK)
             ChangeState(EnemyStates.PATROL);

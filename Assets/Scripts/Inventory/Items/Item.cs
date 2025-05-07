@@ -1,5 +1,3 @@
-using NUnit.Framework;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -46,4 +44,7 @@ public enum ItemTypes
     BOOK3,
     BOOK4,
     BOOK5,
+    PLASTICBOTTLE,
+    SILENCER,
+    SAVEIMAGE
 }
