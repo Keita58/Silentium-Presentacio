@@ -56,7 +56,7 @@ namespace NavKeypad
     public InputSystem_Actions inputActions { get; private set; }
         private void Awake()
         {
-            //door.SetLocked(true);
+            door.SetLocked(true);
             inputActions = new InputSystem_Actions();
             inputActions.Morse.Exit.started += ExitPuzzle;
             ClearInput();

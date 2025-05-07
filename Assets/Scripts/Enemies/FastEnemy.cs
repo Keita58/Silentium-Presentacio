@@ -77,7 +77,7 @@ public class FastEnemy : Enemy
         _CurrentState = newState;
         _StateTime = 0.0f;
 
-        switch(_CurrentState)
+        switch (_CurrentState)
         {
             case EnemyStates.PATROL:
                 _Patrolling = false;
@@ -109,7 +109,7 @@ public class FastEnemy : Enemy
 
     private void ExitState(EnemyStates exitState)
     {
-        switch(exitState)
+        switch (exitState)
         {
             case EnemyStates.PATROL:
                 StopCoroutine(_PatrolCoroutine);
@@ -136,12 +136,12 @@ public class FastEnemy : Enemy
     private void Update()
     {
         UpdateState(_CurrentState);
-    }  
+    }
 
     //Busca punt aleatori dins del NavMesh
     private bool RandomPoint(Vector3 center, float range, out Vector3 result)
     {
-        for(int i = 0; i < 50; i++) 
+        for (int i = 0; i < 50; i++)
         {
             //Agafa un punt aleatori dins de l'esfera amb el radi que passem per parametre
             Vector3 randomPoint = new Vector3(center.x, center.y, center.z) + Random.insideUnitSphere * range;
@@ -184,7 +184,7 @@ public class FastEnemy : Enemy
             }
         }
 
-        
+
         float dist = Vector3.Distance(this.transform.position, _SoundPos);
         Debug.Log($"Distància entre cec i punt de so: {dist}");
         if (dist < 10 && Physics.Raycast(this.transform.position, (_Player.transform.position - transform.position), out RaycastHit info, dist, _LayerObjectsAndPlayer))
@@ -198,7 +198,7 @@ public class FastEnemy : Enemy
                 lvlSound = 3;
             }
         }
-        
+
 
         if (lvlSound > 0 && _CurrentState == EnemyStates.PATROL)
         {
@@ -247,9 +247,9 @@ public class FastEnemy : Enemy
         {
             if (!_Patrolling)
             {
-                if(!_Search) 
+                if (!_Search)
                 {
-                    while(true)
+                    while (true)
                     {
                         point = _Waypoints[Random.Range(0, _Waypoints.Count)].transform.position;
                         if (point != _NavMeshAgent.destination)
@@ -296,7 +296,7 @@ public class FastEnemy : Enemy
 
     IEnumerator AttackPlayer()
     {
-        while(true)
+        while (true)
         {
             //Animation -> attack
             _Player.GetComponent<Player>().TakeDamage(1);
@@ -316,7 +316,7 @@ public class FastEnemy : Enemy
 
     IEnumerator OpenDoors()
     {
-        while(true)
+        while (true)
         {
             if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 3f, _LayerDoor))
             {
@@ -356,7 +356,7 @@ public class FastEnemy : Enemy
 
     IEnumerator LookingPlayer()
     {
-        while(true)
+        while (true)
         {
             Collider[] aux = Physics.OverlapSphere(transform.position, _RangeChaseAfterStop, _LayerPlayer);
             if (aux.Length > 0)
@@ -403,7 +403,7 @@ public class FastEnemy : Enemy
                                 }
                             }
                         }
-                        else 
+                        else
                         {
                             Debug.Log("No veig al jugador!");
                             if (_ChangeToPatrolCoroutine == null && _CurrentState != EnemyStates.PATROL)
@@ -419,7 +419,7 @@ public class FastEnemy : Enemy
                     }
                 }
             }
-            
+
             yield return new WaitForSeconds(0.5f);
         }
     }
