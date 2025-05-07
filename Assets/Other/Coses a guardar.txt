@@ -1,0 +1,9 @@
+Coses a guardar:
+- Inventari del jugador
+- Puzles realitzats
+- Quins objectes especials té
+- Objectes del cofre
+- Configuració
+- Valors post-render
+- Mirar si té silenciador
+- Estat del jugador (vida i bales equipades)
