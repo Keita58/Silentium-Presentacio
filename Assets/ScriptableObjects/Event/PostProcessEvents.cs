@@ -35,5 +35,13 @@ public class PostProcessEvents : ScriptableObject
     {
         OnIncreaseIntesityFilmGrain?.Invoke(intensity);
     }
+
+    //Events fog
+    public event Action<bool> OnToggleFog;
+
+    public void ToggleFog(bool enable)
+    {
+        OnToggleFog?.Invoke(enable);
+    }
     
 }

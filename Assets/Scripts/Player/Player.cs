@@ -418,7 +418,7 @@ public class Player : MonoBehaviour
             }
             if (Physics.Raycast(shootPosition.transform.position, -shootPosition.transform.right, out RaycastHit e, 5f, enemyLayerMask))
             {
-                //e.transform.GetComponent<Enemy>().TakeHealth();
+                e.transform.GetComponent<Enemy>().TakeHealth();
                 if (isSilencerEquipped)
                 {
                     Debug.Log("Hago sonido silenciador");
@@ -774,11 +774,15 @@ public class Player : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (_inputActions.Player.enabled)
+        {
         _inputActions.Player.Shoot.performed -= Shoot;
         _inputActions.Player.Aim.performed -= Aim;
         _inputActions.Player.PickUpItem.performed -= Interact;
         _inputActions.Player.Inventory.performed -= OpenInventory;
         _inputActions.Player.Crouch.performed -= Crouch;
+        _inputActions.Player.Throw.performed -= ThrowItem;
+        }
 
     }
 }

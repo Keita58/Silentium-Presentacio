@@ -12,9 +12,9 @@ public class ChromaticAberrationManager : MonoBehaviour
     {
         volume = GetComponent<Volume>();
         volume.profile.TryGet(out chAb);
+        chAb.active = false;    
         postProcessEvent.OnIncreaseIntensity += IncreaseChAbIntensity;
-        postProcessEvent.OnIncreaseSamples += IncreaseSample;
-        chAb.active = false;
+        postProcessEvent.OnIncreaseSamples += IncreaseSample;;
     }
 
     private void IncreaseChAbIntensity(float intensity)
