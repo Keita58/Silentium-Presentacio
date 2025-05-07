@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05fddcd6ae62fb44a8090a13224fa9b4, type: 3}
   m_Name: Nota5
   m_EditorClassIdentifier: 
-  Name: 
+  Name: Esto no es normal
   noteId: 5
-  noteContent: 
+  noteContent: "Hoy me he despertado y... me cuesta reconocer en donde me encuentro,
+    veo sombras y escucho ruidos, realmente no s\xE9 que est\xE1 ocurriendo y eso...
+    me aterra."
   noteType: 2

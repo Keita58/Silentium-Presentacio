@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05fddcd6ae62fb44a8090a13224fa9b4, type: 3}
   m_Name: Nota1
   m_EditorClassIdentifier: 
-  Name: REMEMBER
+  Name: RECUERDA
   noteId: 1
-  noteContent: "El eric ten\xEDa un culo muy bonito y el Marc se lo quer\xEDa comer."
+  noteContent: "Escribo esta nota porque no se cuanto tiempo faltar\xE1 para que
+    deje de recordar... Mis hijos... Sois lo mas preciado que el mundo me haya podido
+    dar jam\xE1s. No me voy a quejar, al final he tenido una buena vida... Lo unico
+    que me queda por hacer es esperar y luchar por no olvidar lo mas importante de
+    mi vida..."
   noteType: 2
