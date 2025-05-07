@@ -602,7 +602,7 @@ public class Player : MonoBehaviour
                     {
                         book = true;
                     }
-                    else if (hit.transform.gameObject.layer == 14)
+                    else if (hit.transform.gameObject.layer == 23)
                     {
                         keypad = true;
                     }else if (hit.transform.gameObject.layer == 20)
