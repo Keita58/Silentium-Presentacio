@@ -5621,8 +5621,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 8650615
-    m_Bits: 524151
+    m_Bits: 8912759
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -15547,7 +15546,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
-  m_IsActive: 0
 --- !u!4 &858300248
 Transform:
   m_ObjectHideFlags: 0
@@ -17933,7 +17931,6 @@ MonoBehaviour:
   cam_Player: {fileID: 257690617}
   cam_Hierogliphic: {fileID: 278105441}
   cam_WeaponPuzzle: {fileID: 858300251}
-  cam_HieroglyphicAnimation: {fileID: 0}
   doorsHieroglyphic: {fileID: 0}
   hieroglyphicAnimator: {fileID: 0}
   cam_HieroglyphicAnimation: {fileID: 0}
@@ -17950,24 +17947,16 @@ MonoBehaviour:
   morseKeypad: {fileID: 0}
   cam_doorsMorseAnimation: {fileID: 0}
   doorsMorseAnimation: {fileID: 0}
-  doorsHieroglyphic: {fileID: 0}
+  animator: {fileID: 0}
   morseAnimator: {fileID: 0}
-  hieroglyphicAnimator: {fileID: 0}
+  allWeapon: {fileID: 1774761171}
   isHieroglyphicCompleted: 0
   fadeOut: {fileID: 0}
   fadeAnimator: {fileID: 0}
   bookWall: {fileID: 0}
   positionAfterHieroglyphic: {fileID: 0}
   positionAfterBook: {fileID: 0}
-  player: {fileID: 0}
-  cam_morse: {fileID: 0}
-  morseKeypad: {fileID: 0}
-  cam_doorsMorseAnimation: {fileID: 0}
-  doorsMorseAnimation: {fileID: 0}
-  animator: {fileID: 0}
-  morseAnimator: {fileID: 0}
-  allWeapon: {fileID: 1774761171}
-  isHieroglyphicCompleted: 0
+  positionAfterPoem: {fileID: 0}
 --- !u!4 &1019975274
 Transform:
   m_ObjectHideFlags: 0
@@ -24159,8 +24148,6 @@ MonoBehaviour:
   itemDescriptionPanel: {fileID: 2008467617}
   notesPanel: {fileID: 890465459}
   notesPanelScroll: {fileID: 2008467617}
-  imagePanel: {fileID: 0}
-  bookPanel: {fileID: 0}
   imagePanel: {fileID: 0}
   bookPanel: {fileID: 0}
   actionState: 0
@@ -30821,7 +30808,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
-  m_IsActive: 1
 --- !u!114 &1782547399
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -30847,8 +30833,7 @@ MonoBehaviour:
     m_Bits: 256
   interactLayerMask:
     serializedVersion: 2
-    m_Bits: 8650240
-    m_Bits: 523776
+    m_Bits: 8912384
   weaponCamera: {fileID: 2080980908}
   interactiveGameObject: {fileID: 0}
   material: {fileID: 2100000, guid: 245be0caa7e11f441a60e9ec2a7f78e5, type: 2}
@@ -30857,18 +30842,12 @@ MonoBehaviour:
   equipedObject: {fileID: 0}
   itemSlot: {fileID: 464505096}
   door: 0
-  door: 0
   item: 0
-  note: 0
-  chest: 0
   note: 0
   chest: 0
   book: 0
   keypad: 0
-  keypad: 0
   bookItem: 0
-  picture: 0
-  morse: 0
   picture: 0
   morse: 0
   actualState: 0
@@ -30984,10 +30963,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1782547398}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.00010135399, y: 0.9980731, z: -0.04023761, w: -0.047233917}
-  m_LocalPosition: {x: -8.958564, y: 12.476706, z: -78.76253}
-  m_LocalRotation: {x: -0.028161624, y: -0.7116561, z: -0.019800792, w: 0.70168406}
-  m_LocalPosition: {x: -11.6761, y: 9.5616255, z: -44.71323}
+  m_LocalRotation: {x: -0.044858906, y: 0.6939631, z: -0.044196345, w: -0.7172515}
+  m_LocalPosition: {x: -8.430778, y: 11.488907, z: -46.634773}
   m_LocalScale: {x: 0.78, y: 0.78, z: 0.78}
   m_ConstrainProportionsScale: 1
   m_Children:
