@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05fddcd6ae62fb44a8090a13224fa9b4, type: 3}
   m_Name: Nota6
   m_EditorClassIdentifier: 
-  Name: 
+  Name: MONSTRUOS
   noteId: 6
-  noteContent: 
+  noteContent: "NO S\xC9 DONDE ESTOY, A VECES PIENSO QUE ESTOY VIVIENDO LO MISMO
+    UNA Y OTRA VEZ... HACE MUCHOS QUE NO VEO A MIS HIJOS Y ME PREOCUPA... SOLO ESPERO
+    QUE NO LES HAYAN COGIDO ESOS MONSTRUOS..."
   noteType: 2

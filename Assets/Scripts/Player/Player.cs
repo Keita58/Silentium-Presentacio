@@ -152,6 +152,7 @@ public class Player : MonoBehaviour
     {
         Cursor.visible = false;
         coroutineInteract = StartCoroutine(InteractuarRaycast());
+        inventoryOpened = false;
     }
 
     private void Update()
