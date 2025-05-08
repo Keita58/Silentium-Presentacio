@@ -37,7 +37,8 @@ public class BookItem : Item
     [SerializeField] private bool combinable;
     public override bool isCombinable => combinable;
 
-
+    [SerializeField] private int bookId;
+    public override int id => bookId;
 
     public override void Use()
     {

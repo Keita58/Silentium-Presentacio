@@ -35,8 +35,8 @@ public class Player : MonoBehaviour
     float crouchedCenterCollider = -0.5f;
     float crouchedHeightCollider = 1;
     Vector3 cameraPositionBeforeCrouch = new Vector3(0, 0.627f, -0.198f);
-    int gunAmmo =20;
-    int hp = 5;
+    public int gunAmmo { get; private set; }
+    public int hp { get; private set; }
 
     [SerializeField] GameObject cameraShenanigansGameObject;
 
@@ -87,8 +87,8 @@ public class Player : MonoBehaviour
 
     [SerializeField] GameObject silencer;
     public bool isSilencerEquipped { get; private set; }
-    int silencerUses;
-    int maxSilencerUses = 10;
+    public int silencerUses { get; private set; }
+    public int maxSilencerUses { get; private set; }
 
     private void Awake()
     {
@@ -159,6 +159,10 @@ public class Player : MonoBehaviour
         Cursor.visible = false;
         coroutineInteract = StartCoroutine(InteractuarRaycast());
         inventoryOpened = false;
+
+        hp = 5;
+        gunAmmo = 20;
+        maxSilencerUses = 10;
     }
 
     private void Update()

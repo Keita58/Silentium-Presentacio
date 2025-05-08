@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 [CreateAssetMenu(fileName = "InventorySO", menuName = "Scriptable Objects/Items/InventorySO")]
 public class InventorySO : ScriptableObject
 {
@@ -23,11 +24,33 @@ public class InventorySO : ScriptableObject
         [SerializeField]
         public bool stackable;
 
-
         public ItemSlot(Item obj)
         {
             item = obj;
             amount = 1;
+        }
+
+        public ItemSlot(Item item, int amount, bool stackable) : this(item)
+        {
+            this.amount = amount;
+            this.stackable = stackable;
+        }
+    }
+
+    [Serializable]
+    public class ItemSlotSave
+    {
+        [SerializeField] public int itemId;
+
+        [SerializeField] public int amount;
+
+        [SerializeField] public bool stackable;
+
+        public ItemSlotSave(int itemId, int amount, bool stackable)
+        {
+            this.itemId = itemId;
+            this.amount = amount;
+            this.stackable = stackable;
         }
     }
 

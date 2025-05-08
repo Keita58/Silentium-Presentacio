@@ -21,4 +21,5 @@ MonoBehaviour:
   usable: 1
   equipable: 1
   combinable: 0
+  ammoId: 8
   bales: 1

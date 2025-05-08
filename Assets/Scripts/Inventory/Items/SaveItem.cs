@@ -34,6 +34,9 @@ public class SaveItem : Item
     [SerializeField] private bool combinable;
     public override bool isCombinable => combinable;
 
+    [SerializeField] private int saveId;
+    public override int id => saveId;
+
     public override void Use()
     {
         throw new System.NotImplementedException();

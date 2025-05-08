@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6def871b41b14a243806b2681e8dda7f, type: 3}
   m_Name: FirstKey
   m_EditorClassIdentifier: 
-  nom: 
-  description: 
+  nom: Llave
+  description: Permite abrir puertas cerradas.
   sprite: {fileID: 0}
   prefab: {fileID: 0}
   stackable: 0
@@ -21,3 +21,4 @@ MonoBehaviour:
   usable: 0
   equipable: 0
   combinable: 0
+  keyId: 12

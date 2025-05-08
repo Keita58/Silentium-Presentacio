@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 [CreateAssetMenu(fileName = "NoteInventorySO", menuName = "Scriptable Objects/NoteInventorySO")]
 public class NoteInventorySO : ScriptableObject
 {

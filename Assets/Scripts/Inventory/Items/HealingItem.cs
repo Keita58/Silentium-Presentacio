@@ -40,6 +40,9 @@ public class HealingItem : Item
     [SerializeField] private bool combinable;
     public override bool isCombinable => combinable;
 
+    [SerializeField] private int healId;
+    public override int id => healId;
+
 
     [SerializeField] private Item itemAfterCombineParacetamol;
 
