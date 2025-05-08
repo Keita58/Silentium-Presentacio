@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering.HighDefinition;
 
 public class PuzzleManager : MonoBehaviour
 {
@@ -77,17 +78,6 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     private Transform positionAfterPoem;
 
-    [Header("Glitch")]
-    [SerializeField]
-    private Material material;
-    [SerializeField]
-    private float noiseAmount;
-    [SerializeField]
-    private float glitchStrength;
-    [SerializeField]
-    private float scanLinesStrength;
-    [SerializeField]
-    private float FlickeringStrength;
     private void Awake()
     {
         inputActionPlayer = new InputSystem_Actions();
