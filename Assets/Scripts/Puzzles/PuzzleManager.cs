@@ -60,11 +60,14 @@ public class PuzzleManager : MonoBehaviour
     bool isMorseCompleted = false;
     [SerializeField]
     private bool isHieroglyphicCompleted = false;
+
+    [Header("Glitch")]
     [SerializeField]
-    private AnimationClip fadeOut;
+    AnimationClip glitchEffect;
     [SerializeField]
-    private Animator fadeAnimator;
-    bool fadeOutStarted = false;
+    Animator glitchAnimator;
+    [SerializeField] bool glitchStarted = false;
+
     bool teleported = false;
     Transform positionToTeleport;
     [SerializeField]
@@ -185,8 +188,8 @@ public class PuzzleManager : MonoBehaviour
         bookWall.SetActive(false);
         player.ToggleInputPlayer(false, false);
         positionToTeleport = positionAfterBook;
-        fadeAnimator.Play("FadeOut");
-        fadeOutStarted = true;
+        glitchAnimator.Play("Glitch");
+        glitchStarted = true;
         animationTime = 0f;
     }
 
@@ -205,8 +208,8 @@ public class PuzzleManager : MonoBehaviour
                     DoorPoem3.isLocked = false;
                     player.ToggleInputPlayer(false, false);
                     positionToTeleport = positionAfterPoem;
-                    fadeAnimator.Play("FadeOut");
-                    fadeOutStarted = true;
+                    glitchAnimator.Play("Glitch");
+                    glitchStarted = true;
                     animationTime = 0f;
                 }
             }
@@ -258,7 +261,7 @@ public class PuzzleManager : MonoBehaviour
                 animationTime = 0f;
                 isHieroglyphicCompleted = false;
             }
-        }else if (fadeOutStarted)
+        }else if (glitchStarted)
         {
             animationTime += Time.deltaTime;
             if (animationTime >= 2f && !teleported)
@@ -269,10 +272,10 @@ public class PuzzleManager : MonoBehaviour
                 teleported = true;
                 positionToTeleport = null;
             }
-            if (animationTime >= fadeOut.length && teleported)
+            if (animationTime >= glitchEffect.length && teleported)
             {
                 animationTime = 0f;
-                fadeOutStarted = false;
+                glitchStarted = false;
                 player.ToggleInputPlayer(true, true);
             }
         }
@@ -281,8 +284,8 @@ public class PuzzleManager : MonoBehaviour
     public void ChangePositionPlayerAfterHieroglyphic()
     {
         player.ToggleInputPlayer(false, false);
-        fadeAnimator.Play("FadeOut");
-        fadeOutStarted = true;
+        glitchAnimator.Play("Glitch");
+        glitchStarted = true;
         animationTime = 0f;
         positionToTeleport = positionAfterHieroglyphic;
     }
