@@ -85,6 +85,17 @@ public class PuzzleManager : MonoBehaviour
     private bool teleported = false;
     private Transform positionToTeleport;
 
+    [Header("Glitch")]
+    [SerializeField]
+    private Material material;
+    [SerializeField]
+    private float noiseAmount;
+    [SerializeField]
+    private float glitchStrength;
+    [SerializeField]
+    private float scanLinesStrength;
+    [SerializeField]
+    private float FlickeringStrength;
     private void Awake()
     {
         inputActionPlayer = new InputSystem_Actions();
