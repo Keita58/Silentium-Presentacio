@@ -21,7 +21,7 @@ public class VignetteManager : MonoBehaviour
         vignette.active = false;
         postProcessEvents.OnVignetteActive += ActivateVignette;
         //ActivateVignette()
-        glitch.active = false;
+        //glitch.active = false;
         //glitch.intensity = 1.0f;
         
     }

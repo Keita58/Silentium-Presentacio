@@ -1,7 +1,5 @@
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using static InventorySO;
 
 [Serializable]
@@ -26,11 +24,16 @@ public class SaveInfo
     public bool MorsePuzzle;
     public bool WeaponPuzzle;
 
-    //Configuracio
-
-
-
     //Valors post-render
+    //Chromatic
+    public bool ChromaticAberration;
+    public float IntensityChromaticAberration;
+    public int Samples;
 
+    //Film Grain
+    public bool FilmGrain;
+    public float IntensityFilmGrain;
 
+    //Fog
+    public bool Fog;
 }
