@@ -8,7 +8,7 @@ Coses a guardar:
 - Configuració
 - Valors post-render
 
-**********
+********** (FET)
 Chormatic aberration:
 - Està actiu?
 - Intensitat
