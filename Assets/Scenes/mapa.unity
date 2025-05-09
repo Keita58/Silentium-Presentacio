@@ -16582,6 +16582,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cam: {fileID: 278105441}
   minDistance: 0.1
+  layer:
+    serializedVersion: 2
+    m_Bits: 8388608
 --- !u!65 &918527316
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -16697,6 +16700,7 @@ LineRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 2b1da1e3b0af14c48b46d11f8cf01695, type: 2}
+  - {fileID: -5149340809135135807, guid: 514803ff79a05d84cadc8d501594f21d, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
