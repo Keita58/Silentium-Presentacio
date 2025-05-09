@@ -71,4 +71,9 @@ public class Load : MonoBehaviour
             //Posar l'avís de que no hi ha un joc guardat
         }
     }
+
+    public void LoadConfig()
+    {
+
+    }
 }

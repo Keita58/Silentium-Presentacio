@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -6,6 +7,8 @@ public class Player : MonoBehaviour
     [SerializeField] GameObject _Camera;
 
     Rigidbody _Rigidbody;
+
+    public event Action onCameraClick;
 
     public InputSystem_Actions _inputActions { get; private set; }
 
@@ -90,6 +93,9 @@ public class Player : MonoBehaviour
     public int silencerUses { get; private set; }
     public int maxSilencerUses { get; private set; }
 
+    //Chest
+    private GameObject chestGO;
+
     private void Awake()
     {
         _inputActions = new InputSystem_Actions();
@@ -147,6 +153,8 @@ public class Player : MonoBehaviour
         }
         else
         {
+            if(chestGO != null)
+                chestGO.GetComponent<Animator>().Play("CloseChest");
             Cursor.visible = false;
             InventoryManager.instance.CloseInventory();
             inventoryOpened = false;
@@ -293,6 +301,7 @@ public class Player : MonoBehaviour
                 }
                 else if (chest)
                 {
+                    chestGO.GetComponent<Animator>().Play("OpenChest");
                     InventoryManager.instance.OpenChest();
                     chest = false;
                 }
@@ -649,6 +658,14 @@ public class Player : MonoBehaviour
                             };
                         }
                     }
+
+                    //if(hit.transform.TryGetComponent<Interactuable>(out Interactuable aux))
+                    if(hit.transform.gameObject.layer == 24)
+                    {
+                        onCameraClick?.Invoke();
+                    }
+
+                    //S'ha de canviar això per una sola layer
                     if (hit.transform.gameObject.layer == 9)
                     {
                         item = true;
@@ -669,6 +686,7 @@ public class Player : MonoBehaviour
                     else if (hit.transform.gameObject.layer == 13)
                     {
                         chest = true;
+                        chestGO = hit.transform.gameObject;
                     }
                     else if (hit.transform.gameObject.layer == 15)
                     {
@@ -711,6 +729,9 @@ public class Player : MonoBehaviour
                 note = false;
                 weaponPuzzle = false;
                 chest = false;
+
+                chestGO = null;
+
                 if (interactiveGameObject != null)
                 {
                     if (interactiveGameObject.transform.gameObject.layer != 15 && interactiveGameObject.transform.gameObject.layer != 18)

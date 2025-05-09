@@ -9,9 +9,14 @@ using static InventorySO;
 
 public class Save : MonoBehaviour
 {
+
     private const string _SavefileName = "silentium_savegame.json";
     private const string _SavefileNameConfig = "silentium_config.json";
 
+    [Header("Cameras")]
+    [SerializeField] private CameraSave _Camera1;
+    [SerializeField] private CameraSave _Camera2;
+    
     [Header("Inventories")]
     [SerializeField] private InventorySO _Inventory;
     [SerializeField] private InventorySO _ChestInventory;
@@ -26,6 +31,12 @@ public class Save : MonoBehaviour
 
     [Header("Shaders")]
     [SerializeField] private GameObject _Shaders;
+
+    private void Awake()
+    {
+        _Camera1.onSaveGame += SaveGame;
+        _Camera2.onSaveGame += SaveGame;
+    }
 
     public void SaveGame()
     {
