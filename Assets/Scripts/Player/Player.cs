@@ -1,9 +1,10 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 public class Player : MonoBehaviour
 {
-    [SerializeField] GameObject _Camera;
+    [SerializeField] Camera _Camera;
 
     Rigidbody _Rigidbody;
 
@@ -27,8 +28,6 @@ public class Player : MonoBehaviour
 
     float maxAngle = 45.0f;
     float minAngle = -45.0f;
-    float gravity = 9.8f;
-    float vSpeed = 0f;
 
     bool crouched = false;
     bool aim = false;
@@ -44,7 +43,7 @@ public class Player : MonoBehaviour
     [SerializeField] GameObject gunGameObject;
     [SerializeField] LayerMask enemyLayerMask;
     [SerializeField] LayerMask interactLayerMask;
-    [SerializeField] Camera weaponCamera;
+    //[SerializeField] Camera weaponCamera;
     [SerializeField] GameObject interactiveGameObject;
     [SerializeField] Material material;
     GameObject equippedItem;
@@ -82,13 +81,26 @@ public class Player : MonoBehaviour
     private Coroutine coroutineMove;
     private Coroutine coroutineCrouch;
     private Coroutine coroutineInteract;
+
+    //Character controller
     CharacterController characterController;
     Vector3 velocity;
+    float gravity = 9.8f;
+    float vSpeed = 0f;
 
+    [Header("Silencer")]
     [SerializeField] GameObject silencer;
     public bool isSilencerEquipped { get; private set; }
     int silencerUses;
     int maxSilencerUses = 10;
+
+    [Header("Gun")]
+    [SerializeField] private Transform gunAimPosition;
+    private Vector3 gunDefaultPosition = new Vector3(0.456f, -0.313f, 0.505f);
+    [SerializeField] private int gunAimFov;
+    [SerializeField] private float aimSpeed;
+    [SerializeField] private int currentFov;
+    [SerializeField] private Animator gunanimator;
 
     private void Awake()
     {
@@ -171,6 +183,18 @@ public class Player : MonoBehaviour
         _LookRotation.y = Mathf.Clamp(_LookRotation.y, minAngle, maxAngle);
         transform.rotation = Quaternion.Euler(0, _LookRotation.x, 0);
         _Camera.transform.localRotation = Quaternion.Euler(_LookRotation.y, 0, 0);
+
+        if (aim)
+        {
+            gunGameObject.transform.localPosition = Vector3.Lerp(gunGameObject.transform.localPosition, gunAimPosition.localPosition, aimSpeed * Time.deltaTime);
+            SetFieldOfView(Mathf.Lerp(_Camera.fieldOfView, gunAimFov, aimSpeed * Time.deltaTime));
+
+        }
+        else
+        {
+            gunGameObject.transform.localPosition = Vector3.Lerp(gunGameObject.transform.localPosition, gunDefaultPosition, aimSpeed * Time.deltaTime);
+            SetFieldOfView(Mathf.Lerp(_Camera.fieldOfView, currentFov, aimSpeed * Time.deltaTime));
+        }
 
         UpdateState();
 
@@ -370,7 +394,7 @@ public class Player : MonoBehaviour
             if (throwable != null)
             {
                 throwable.GetComponent<Rigidbody>().isKinematic = false;
-                throwable.camaraPrimera = _Camera;
+                throwable.camaraPrimera = _Camera.gameObject;
                 throwable.Lanzar();
                 if (throwable.transform.parent == itemSlot)
                 {
@@ -443,8 +467,14 @@ public class Player : MonoBehaviour
     private void Aim(InputAction.CallbackContext context)
     {
         aim = !aim;
-        gunGameObject.transform.localPosition = aim ? new Vector3(0.057f, -0.312999994f, 0.391000003f) : new Vector3(0.456f, -0.313f, 0.505f);
-        weaponCamera.transform.localPosition = aim ? new Vector3(0f, 0f, -0.28f) : Vector3.zero;
+        //gunGameObject.transform.localPosition = aim ? new Vector3(0.057f, -0.312999994f, 0.391000003f) : new Vector3(0.456f, -0.313f, 0.505f);
+        //_Camera.transform.localPosition = aim ? new Vector3(0f, 0f, -0.28f) : Vector3.zero;
+    }
+
+    private void SetFieldOfView(float fov)
+    {
+        _Camera.fieldOfView = fov;
+
     }
 
     public void UseSilencer()
@@ -518,7 +548,7 @@ public class Player : MonoBehaviour
                 if (movementInput == Vector2.zero)
                     ChangeState(PlayerStates.IDLE);
 
-                if (_RunAction.IsPressed() && !crouched)
+                if (_RunAction.IsPressed() && !crouched && !aim)
                 {
                     ChangeState(PlayerStates.RUN);
                 }
@@ -538,7 +568,7 @@ public class Player : MonoBehaviour
                   transform.forward * movementInput.y).normalized * _VelocityRun;
                 vSpeed -= gravity * Time.deltaTime;
                 velocity.y = vSpeed;
-                if (!_RunAction.IsPressed())
+                if (!_RunAction.IsPressed() || aim)
                     ChangeState(PlayerStates.MOVE);
                 break;
             case PlayerStates.CROUCH:

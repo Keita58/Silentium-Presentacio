@@ -12,7 +12,7 @@ public class VignetteManager : MonoBehaviour
     private Vignette vignette;
     [SerializeField] private PostProcessEvents postProcessEvents;
     //public DigitalGlitch glitch;
-    Glitch glitch;
+    //Glitch glitch;
 
     private void Start()
     {
@@ -21,7 +21,7 @@ public class VignetteManager : MonoBehaviour
         vignette.active = false;
         postProcessEvents.OnVignetteActive += ActivateVignette;
         //ActivateVignette()
-        glitch.active = false;
+        //glitch.active = false;
         //glitch.intensity = 1.0f;
         
     }
