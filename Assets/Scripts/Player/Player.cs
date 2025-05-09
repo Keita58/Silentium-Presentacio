@@ -34,7 +34,7 @@ public class Player : MonoBehaviour
     float crouchedCenterCollider = -0.5f;
     float crouchedHeightCollider = 1;
     Vector3 cameraPositionBeforeCrouch = new Vector3(0, 0.627f, -0.198f);
-    int gunAmmo =20;
+    int gunAmmo =5000;
     int hp = 5;
 
     [SerializeField] GameObject cameraShenanigansGameObject;
@@ -173,6 +173,8 @@ public class Player : MonoBehaviour
         inventoryOpened = false;
     }
 
+    bool cosa = false;
+    bool cosa2 = false;
     private void Update()
     {
         // To move the camera
@@ -422,8 +424,10 @@ public class Player : MonoBehaviour
 
     private void Shoot(InputAction.CallbackContext context)
     {
+
         if (gunAmmo >= 1)
         {
+            gunanimator.Play("Shoot");
             gunAmmo--;
             Debug.DrawRay(shootPosition.transform.position, -shootPosition.transform.right, Color.magenta, 5f);
             Debug.Log("TIRO DEBUGRAY");
