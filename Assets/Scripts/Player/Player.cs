@@ -173,8 +173,6 @@ public class Player : MonoBehaviour
         inventoryOpened = false;
     }
 
-    bool cosa = false;
-    bool cosa2 = false;
     private void Update()
     {
         // To move the camera
@@ -186,6 +184,13 @@ public class Player : MonoBehaviour
         transform.rotation = Quaternion.Euler(0, _LookRotation.x, 0);
         _Camera.transform.localRotation = Quaternion.Euler(_LookRotation.y, 0, 0);
 
+        UpdateState();
+
+    }
+
+
+    private void LateUpdate()
+    {
         if (aim)
         {
             gunGameObject.transform.localPosition = Vector3.Lerp(gunGameObject.transform.localPosition, gunAimPosition.localPosition, aimSpeed * Time.deltaTime);
@@ -194,12 +199,12 @@ public class Player : MonoBehaviour
         }
         else
         {
-            gunGameObject.transform.localPosition = Vector3.Lerp(gunGameObject.transform.localPosition, gunDefaultPosition, aimSpeed * Time.deltaTime);
-            SetFieldOfView(Mathf.Lerp(_Camera.fieldOfView, currentFov, aimSpeed * Time.deltaTime));
+            if (_Camera.fieldOfView != currentFov)
+            {
+                gunGameObject.transform.localPosition = Vector3.Lerp(gunGameObject.transform.localPosition, gunDefaultPosition, aimSpeed * Time.deltaTime);
+                SetFieldOfView(Mathf.Lerp(_Camera.fieldOfView, currentFov, aimSpeed * Time.deltaTime));
+            }
         }
-
-        UpdateState();
-
     }
 
     private void Interact(InputAction.CallbackContext context)
