@@ -81,6 +81,8 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     private Transform positionAfterPoem;
 
+    [SerializeField] PostProcessEvents events;
+
     private void Awake()
     {
         inputActionPlayer = new InputSystem_Actions();
@@ -188,6 +190,7 @@ public class PuzzleManager : MonoBehaviour
         bookWall.SetActive(false);
         player.ToggleInputPlayer(false, false);
         positionToTeleport = positionAfterBook;
+        events.ToggleCustomPass(false);
         glitchAnimator.Play("Glitch");
         glitchStarted = true;
         animationTime = 0f;
@@ -277,6 +280,7 @@ public class PuzzleManager : MonoBehaviour
                 animationTime = 0f;
                 glitchStarted = false;
                 player.ToggleInputPlayer(true, true);
+                events.ToggleCustomPass(true);
             }
         }
     }
