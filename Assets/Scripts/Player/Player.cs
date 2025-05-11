@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -102,6 +103,9 @@ public class Player : MonoBehaviour
     [SerializeField] private int currentFov;
     [SerializeField] private Animator gunanimator;
 
+    [Header("PostProcess")]
+    [SerializeField] private PostProcessEvents events;
+
     private void Awake()
     {
         _inputActions = new InputSystem_Actions();
@@ -171,6 +175,16 @@ public class Player : MonoBehaviour
         Cursor.visible = false;
         coroutineInteract = StartCoroutine(InteractuarRaycast());
         inventoryOpened = false;
+        StartCoroutine(EsperarIActuar(5f, ()=>TakeDamage(1)));
+    }
+
+    IEnumerator EsperarIActuar(float tempsDespera, Action accio)
+    {
+        if (tempsDespera > 0)
+            yield return new WaitForSeconds(tempsDespera);
+        else
+            yield return null;
+        accio();
     }
 
     private void Update()
@@ -324,8 +338,6 @@ public class Player : MonoBehaviour
                     chest = false;
                 }
             }
-
-
         }
         else
         {
@@ -470,20 +482,18 @@ public class Player : MonoBehaviour
     public void TakeDamage(int damage)
     {
         hp -= damage;
+        events.ActivateVignatteOnHurt();
     }
 
 
     private void Aim(InputAction.CallbackContext context)
     {
         aim = !aim;
-        //gunGameObject.transform.localPosition = aim ? new Vector3(0.057f, -0.312999994f, 0.391000003f) : new Vector3(0.456f, -0.313f, 0.505f);
-        //_Camera.transform.localPosition = aim ? new Vector3(0f, 0f, -0.28f) : Vector3.zero;
     }
 
     private void SetFieldOfView(float fov)
     {
         _Camera.fieldOfView = fov;
-
     }
 
     public void UseSilencer()

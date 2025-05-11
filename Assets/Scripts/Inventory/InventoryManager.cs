@@ -388,6 +388,7 @@ public class InventoryManager : MonoBehaviour
         player.ToggleInputPlayer(true, true);
     }
 
+    //pasar este metodo al ui.
     public void ShowDiscoveredNotes()
     {
         for (int i = 0; i < noteInventory.notes.Count; i++)
