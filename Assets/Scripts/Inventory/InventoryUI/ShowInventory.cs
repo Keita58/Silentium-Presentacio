@@ -61,7 +61,6 @@ public class ShowInventory : MonoBehaviour
             GameObject displayedItem = Instantiate(chestSlot, chestRootGameObject.transform.GetChild(i).transform);
             displayedItem.GetComponent<ShowChestItem>().Load(chestInventory.items[i]);
         }
-
     }
     public void Hide()
     {

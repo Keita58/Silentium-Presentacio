@@ -2,6 +2,8 @@ using NavKeypad;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.Rendering.HighDefinition;
 
 public class PuzzleManager : MonoBehaviour
 {
@@ -66,6 +68,22 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     private BoxCollider allWeapon;
     public bool weaponPuzzleCompleted { get; private set; }
+    float animationTime = 0f;
+    bool isMorseCompleted = false;
+    [SerializeField]
+    private bool isHieroglyphicCompleted = false;
+
+    [Header("Glitch")]
+    [SerializeField]
+    AnimationClip glitchEffect;
+    [SerializeField]
+    Animator glitchAnimator;
+    [SerializeField] bool glitchStarted = false;
+
+    bool teleported = false;
+    Transform positionToTeleport;
+    [SerializeField]
+    GameObject bookWall;
 
     [Header("Positions after puzzles")]
     [SerializeField]
@@ -96,6 +114,8 @@ public class PuzzleManager : MonoBehaviour
     private float scanLinesStrength;
     [SerializeField]
     private float FlickeringStrength;
+    [SerializeField] PostProcessEvents events;
+
     private void Awake()
     {
         inputActionPlayer = new InputSystem_Actions();
@@ -216,8 +236,9 @@ public class PuzzleManager : MonoBehaviour
         bookWall.SetActive(false);
         player.ToggleInputPlayer(false, false);
         positionToTeleport = positionAfterBook;
-        fadeAnimator.Play("FadeOut");
-        fadeOutStarted = true;
+        events.ToggleCustomPass(false);
+        glitchAnimator.Play("Glitch");
+        glitchStarted = true;
         animationTime = 0f;
         bookPuzzleCompleted = true;
     }
@@ -237,8 +258,8 @@ public class PuzzleManager : MonoBehaviour
                     DoorPoem3.isLocked = false;
                     player.ToggleInputPlayer(false, false);
                     positionToTeleport = positionAfterPoem;
-                    fadeAnimator.Play("FadeOut");
-                    fadeOutStarted = true;
+                    glitchAnimator.Play("Glitch");
+                    glitchStarted = true;
                     animationTime = 0f;
                     poemPuzzleCompleted = true;
                 }
@@ -292,7 +313,7 @@ public class PuzzleManager : MonoBehaviour
                 animationTime = 0f;
                 isHieroglyphicCompleted = false;
             }
-        }else if (fadeOutStarted)
+        }else if (glitchStarted)
         {
             animationTime += Time.deltaTime;
             if (animationTime >= 2f && !teleported)
@@ -303,11 +324,12 @@ public class PuzzleManager : MonoBehaviour
                 teleported = true;
                 positionToTeleport = null;
             }
-            if (animationTime >= fadeOut.length && teleported)
+            if (animationTime >= glitchEffect.length && teleported)
             {
                 animationTime = 0f;
-                fadeOutStarted = false;
+                glitchStarted = false;
                 player.ToggleInputPlayer(true, true);
+                events.ToggleCustomPass(true);
             }
         }
     }
@@ -315,8 +337,8 @@ public class PuzzleManager : MonoBehaviour
     public void ChangePositionPlayerAfterHieroglyphic()
     {
         player.ToggleInputPlayer(false, false);
-        fadeAnimator.Play("FadeOut");
-        fadeOutStarted = true;
+        glitchAnimator.Play("Glitch");
+        glitchStarted = true;
         animationTime = 0f;
         positionToTeleport = positionAfterHieroglyphic;
     }

@@ -12,7 +12,7 @@ public class VignetteManager : MonoBehaviour
     private Vignette vignette;
     [SerializeField] private PostProcessEvents postProcessEvents;
     //public DigitalGlitch glitch;
-    Glitch glitch;
+    //Glitch glitch;
 
     private void Start()
     {
@@ -20,9 +20,6 @@ public class VignetteManager : MonoBehaviour
         volume.profile.TryGet(out vignette);
         vignette.active = false;
         postProcessEvents.OnVignetteActive += ActivateVignette;
-        //ActivateVignette()
-        //glitch.active = false;
-        //glitch.intensity = 1.0f;
         
     }
 
@@ -34,7 +31,7 @@ public class VignetteManager : MonoBehaviour
 
     private IEnumerator DeactivateVignette()
     {
-        yield return new WaitForSeconds(10f);
+        yield return new WaitForSeconds(0.5f);
         while (vignette.intensity.value > 0)
         {
             vignette.intensity.value -= 0.1f;

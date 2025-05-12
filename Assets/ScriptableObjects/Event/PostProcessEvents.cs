@@ -43,5 +43,13 @@ public class PostProcessEvents : ScriptableObject
     {
         OnToggleFog?.Invoke(enable);
     }
-    
+
+    //Events customPass
+
+    public event Action<bool> OnToggleCustomPass;
+    public void ToggleCustomPass(bool enable)
+    {
+        OnToggleCustomPass?.Invoke(enable);
+    }
+
 }

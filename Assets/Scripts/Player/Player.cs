@@ -1,10 +1,11 @@
 using System;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 public class Player : MonoBehaviour
 {
-    [SerializeField] GameObject _Camera;
+    [SerializeField] Camera _Camera;
 
     Rigidbody _Rigidbody;
 
@@ -30,8 +31,6 @@ public class Player : MonoBehaviour
 
     float maxAngle = 45.0f;
     float minAngle = -45.0f;
-    float gravity = 9.8f;
-    float vSpeed = 0f;
 
     bool crouched = false;
     bool aim = false;
@@ -47,7 +46,7 @@ public class Player : MonoBehaviour
     [SerializeField] GameObject gunGameObject;
     [SerializeField] LayerMask enemyLayerMask;
     [SerializeField] LayerMask interactLayerMask;
-    [SerializeField] Camera weaponCamera;
+    //[SerializeField] Camera weaponCamera;
     [SerializeField] GameObject interactiveGameObject;
     [SerializeField] Material material;
     GameObject equippedItem;
@@ -85,9 +84,14 @@ public class Player : MonoBehaviour
     private Coroutine coroutineMove;
     private Coroutine coroutineCrouch;
     private Coroutine coroutineInteract;
+
+    //Character controller
     CharacterController characterController;
     Vector3 velocity;
+    float gravity = 9.8f;
+    float vSpeed = 0f;
 
+    [Header("Silencer")]
     [SerializeField] GameObject silencer;
     public bool isSilencerEquipped { get; private set; }
     public int silencerUses { get; private set; }
@@ -95,6 +99,20 @@ public class Player : MonoBehaviour
 
     //Chest
     private GameObject chestGO;
+
+    [Header("Gun")]
+    [SerializeField] private Transform gunAimPosition;
+    private Vector3 gunDefaultPosition = new Vector3(0.456f, -0.313f, 0.505f);
+    [SerializeField] private int gunAimFov;
+    [SerializeField] private float aimSpeed;
+    [SerializeField] private int currentFov;
+    [SerializeField] private Animator gunanimator;
+
+    [Header("PostProcess")]
+    [SerializeField] private PostProcessEvents events;
+
+    [Header("General")]
+    [SerializeField] MenuUI menuManager;
 
     private void Awake()
     {
@@ -108,6 +126,7 @@ public class Player : MonoBehaviour
         _inputActions.Player.PickUpItem.performed += Interact;
         _inputActions.Player.Inventory.performed += OpenInventory;
         _inputActions.Player.Throw.performed += ThrowItem;
+        _inputActions.Player.Pause.performed += OpenMenu;
         _Rigidbody = GetComponent<Rigidbody>();
         _inputActions.Player.Enable();
         characterController = GetComponent<CharacterController>();
@@ -162,6 +181,13 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void OpenMenu(InputAction.CallbackContext context)
+    {
+        menuManager.OpenMenu();
+        ToggleInputPlayer(false, false);
+        StopCoroutine(InteractuarRaycast());
+    }
+
     void Start()
     {
         Cursor.visible = false;
@@ -171,6 +197,16 @@ public class Player : MonoBehaviour
         hp = 5;
         gunAmmo = 20;
         maxSilencerUses = 10;
+        StartCoroutine(EsperarIActuar(5f, ()=>TakeDamage(1)));
+    }
+
+    IEnumerator EsperarIActuar(float tempsDespera, Action accio)
+    {
+        if (tempsDespera > 0)
+            yield return new WaitForSeconds(tempsDespera);
+        else
+            yield return null;
+        accio();
     }
 
     private void Update()
@@ -186,6 +222,25 @@ public class Player : MonoBehaviour
 
         UpdateState();
 
+    }
+
+
+    private void LateUpdate()
+    {
+        if (aim)
+        {
+            gunGameObject.transform.localPosition = Vector3.Lerp(gunGameObject.transform.localPosition, gunAimPosition.localPosition, aimSpeed * Time.deltaTime);
+            SetFieldOfView(Mathf.Lerp(_Camera.fieldOfView, gunAimFov, aimSpeed * Time.deltaTime));
+
+        }
+        else
+        {
+            if (_Camera.fieldOfView != currentFov)
+            {
+                gunGameObject.transform.localPosition = Vector3.Lerp(gunGameObject.transform.localPosition, gunDefaultPosition, aimSpeed * Time.deltaTime);
+                SetFieldOfView(Mathf.Lerp(_Camera.fieldOfView, currentFov, aimSpeed * Time.deltaTime));
+            }
+        }
     }
 
     private void Interact(InputAction.CallbackContext context)
@@ -306,8 +361,6 @@ public class Player : MonoBehaviour
                     chest = false;
                 }
             }
-
-
         }
         else
         {
@@ -383,7 +436,7 @@ public class Player : MonoBehaviour
             if (throwable != null)
             {
                 throwable.GetComponent<Rigidbody>().isKinematic = false;
-                throwable.camaraPrimera = _Camera;
+                throwable.camaraPrimera = _Camera.gameObject;
                 throwable.Lanzar();
                 if (throwable.transform.parent == itemSlot)
                 {
@@ -411,8 +464,10 @@ public class Player : MonoBehaviour
 
     private void Shoot(InputAction.CallbackContext context)
     {
+
         if (gunAmmo >= 1)
         {
+            gunanimator.Play("Shoot");
             gunAmmo--;
             Debug.DrawRay(shootPosition.transform.position, -shootPosition.transform.right, Color.magenta, 5f);
             Debug.Log("TIRO DEBUGRAY");
@@ -450,14 +505,18 @@ public class Player : MonoBehaviour
     public void TakeDamage(int damage)
     {
         hp -= damage;
+        events.ActivateVignatteOnHurt();
     }
 
 
     private void Aim(InputAction.CallbackContext context)
     {
         aim = !aim;
-        gunGameObject.transform.localPosition = aim ? new Vector3(0.057f, -0.312999994f, 0.391000003f) : new Vector3(0.456f, -0.313f, 0.505f);
-        weaponCamera.transform.localPosition = aim ? new Vector3(0f, 0f, -0.28f) : Vector3.zero;
+    }
+
+    private void SetFieldOfView(float fov)
+    {
+        _Camera.fieldOfView = fov;
     }
 
     public void UseSilencer()
@@ -531,7 +590,7 @@ public class Player : MonoBehaviour
                 if (movementInput == Vector2.zero)
                     ChangeState(PlayerStates.IDLE);
 
-                if (_RunAction.IsPressed() && !crouched)
+                if (_RunAction.IsPressed() && !crouched && !aim)
                 {
                     ChangeState(PlayerStates.RUN);
                 }
@@ -551,7 +610,7 @@ public class Player : MonoBehaviour
                   transform.forward * movementInput.y).normalized * _VelocityRun;
                 vSpeed -= gravity * Time.deltaTime;
                 velocity.y = vSpeed;
-                if (!_RunAction.IsPressed())
+                if (!_RunAction.IsPressed() || aim)
                     ChangeState(PlayerStates.MOVE);
                 break;
             case PlayerStates.CROUCH:
@@ -665,7 +724,7 @@ public class Player : MonoBehaviour
                         onCameraClick?.Invoke();
                     }
 
-                    //S'ha de canviar això per una sola layer
+                    //S'ha de canviar aixï¿½ per una sola layer
                     if (hit.transform.gameObject.layer == 9)
                     {
                         item = true;
@@ -795,6 +854,11 @@ public class Player : MonoBehaviour
                 en.ListenSound(this.transform.position, noiseQuantity);
             }
         }
+    }
+
+    public void SetCurrentFOV(int fovLevel)
+    {
+        currentFov = fovLevel;
     }
 
     private void OnDestroy()
