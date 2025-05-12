@@ -106,6 +106,9 @@ public class Player : MonoBehaviour
     [Header("PostProcess")]
     [SerializeField] private PostProcessEvents events;
 
+    [Header("General")]
+    [SerializeField] MenuUI menuManager;
+
     private void Awake()
     {
         _inputActions = new InputSystem_Actions();
@@ -118,6 +121,7 @@ public class Player : MonoBehaviour
         _inputActions.Player.PickUpItem.performed += Interact;
         _inputActions.Player.Inventory.performed += OpenInventory;
         _inputActions.Player.Throw.performed += ThrowItem;
+        _inputActions.Player.Pause.performed += OpenMenu;
         _Rigidbody = GetComponent<Rigidbody>();
         _inputActions.Player.Enable();
         characterController = GetComponent<CharacterController>();
@@ -168,6 +172,13 @@ public class Player : MonoBehaviour
             inventoryOpened = false;
             ToggleInputPlayer(true, true);
         }
+    }
+
+    private void OpenMenu(InputAction.CallbackContext context)
+    {
+        menuManager.OpenMenu();
+        ToggleInputPlayer(false, false);
+        StopCoroutine(InteractuarRaycast());
     }
 
     void Start()
@@ -819,6 +830,11 @@ public class Player : MonoBehaviour
                 en.ListenSound(this.transform.position, noiseQuantity);
             }
         }
+    }
+
+    public void SetCurrentFOV(int fovLevel)
+    {
+        currentFov = fovLevel;
     }
 
     private void OnDestroy()
