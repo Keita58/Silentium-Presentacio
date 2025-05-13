@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class Settings : MonoBehaviour
 {
+    [Header("UI Components")]
     [SerializeField] AudioMixer audioMixer;
     [SerializeField] Player player;
     [SerializeField] Toggle vSyncToggle;
@@ -13,12 +14,15 @@ public class Settings : MonoBehaviour
     [SerializeField] Slider musicSlider;
     [SerializeField] Slider sfxSlider;
 
+    [Header("General")]
+    //booleano que controla si es la escena inicial o no.
+    public bool isInitialScene;
     //Variables temporales para guardar el valor actual
-    private float currentVolumeValue;
-    private float currentSfxValue;
-    private int currentFpsValue;
-    private int currentVSyncState;
-    private float currentFOVValue;
+    [SerializeField] private float currentVolumeValue;
+    [SerializeField] private float currentSfxValue;
+    [SerializeField] private int currentFpsValue;
+    [SerializeField] private int currentVSyncState;
+    [SerializeField] private float currentFOVValue;
 
     private void Awake()
     {
@@ -82,8 +86,11 @@ public class Settings : MonoBehaviour
 
     public void SetFOV()
     {
-        Camera.main.fieldOfView = fovSlider.value;
-        player.SetCurrentFOV((int)fovSlider.value);
+        if (!isInitialScene)
+        {
+            Camera.main.fieldOfView = fovSlider.value;
+            player.SetCurrentFOV((int)fovSlider.value);
+        }
     }
 
     //Si se le da al botón de aplicar actualizamos las variables temporales.
