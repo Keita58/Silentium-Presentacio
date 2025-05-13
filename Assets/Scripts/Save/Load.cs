@@ -8,6 +8,7 @@ using UnityEngine.Rendering;
 public class Load : MonoBehaviour
 {
     private const string _SavefileName = "silentium_savegame.json";
+    private const string _SavefileNameConfig = "silentium_config.json";
 
     [Header("Inventories")]
     [SerializeField] private InventorySO _Inventory;
@@ -20,6 +21,15 @@ public class Load : MonoBehaviour
 
     [Header("Shaders")]
     [SerializeField] private GameObject _Shaders;
+
+    [Header("Player")]
+    [SerializeField] private Player _Player;
+
+    [Header("Puzzle manager")]
+    [SerializeField] private PuzzleManager _PuzzleManager;
+
+    [Header("Settings")]
+    [SerializeField] private Settings _Settings;
 
     public void LoadGame()
     {
@@ -63,17 +73,40 @@ public class Load : MonoBehaviour
             VolumeInfo.profile.TryGet(out Fog Fog);
             Fog.active = info.Fog;
 
-            //Carregar el mapa
-            //SceneManager.LoadScene("Map");
-        }
-        else
-        {
-            //Posar l'avís de que no hi ha un joc guardat
+            //Info del jugador
+            _Player.hp = info.Hp;
+            _Player.isSilencerEquipped = info.Silencer;
+            _Player.silencerUses = info.SilencerUses;
+            _Player.gunAmmo = info.Ammo;
+
+            //Puzles
+            _PuzzleManager.clockPuzzleCompleted = info.ClockPuzzle;
+            _PuzzleManager.isHieroglyphicCompleted = info.HieroglyphicPuzzle;
+            _PuzzleManager.bookPuzzleCompleted = info .BookPuzzle;
+            _PuzzleManager.poemPuzzleCompleted = info.PoemPuzzle;
+            _PuzzleManager.isMorseCompleted = info .MorsePuzzle;
+            _PuzzleManager.weaponPuzzleCompleted = info.WeaponPuzzle;
+
+            _PuzzleManager.LoadGame();
         }
     }
 
     public void LoadConfig()
     {
+        string existingFile = Application.persistentDataPath + "/" + _SavefileNameConfig;
 
+        if (File.Exists(existingFile))
+        {
+            string jsonContent = File.ReadAllText(existingFile);
+            SaveConfig info = JsonUtility.FromJson<SaveConfig>(jsonContent);
+
+            _Settings.musicSlider.value = info.MusicValue;
+            _Settings.sfxSlider.value = info.SFXValue;
+            _Settings.fpsDropdown.value = info.FPSValue;
+            _Settings.fovSlider.value = info.FOVValue;
+            _Settings.vSyncToggle.enabled = info.VSync;
+        }
+
+        //Posar booleà a true i actualitzar amb el load
     }
 }

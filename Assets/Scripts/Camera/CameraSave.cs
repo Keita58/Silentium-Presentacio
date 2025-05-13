@@ -26,7 +26,7 @@ public class CameraSave : MonoBehaviour
             if(item.GetType() == typeof(SaveItem))
             {
                 if (item.amount >= 2)
-                    item.amount--;
+                    _Inventory.UseItem(item.item);
                 else
                     _Inventory.items.Remove(item);
 

@@ -5,13 +5,13 @@ using UnityEngine.UI;
 
 public class Settings : MonoBehaviour
 {
-    [SerializeField] AudioMixer audioMixer;
-    [SerializeField] Player player;
-    [SerializeField] Toggle vSyncToggle;
-    [SerializeField] TMP_Dropdown fpsDropdown;
-    [SerializeField] Slider fovSlider;
-    [SerializeField] Slider musicSlider;
-    [SerializeField] Slider sfxSlider;
+    [SerializeField] private AudioMixer audioMixer;
+    [SerializeField] private Player player;
+    [SerializeField] public Toggle vSyncToggle;
+    [SerializeField] public TMP_Dropdown fpsDropdown;
+    [SerializeField] public Slider fovSlider;
+    [SerializeField] public Slider musicSlider;
+    [SerializeField] public Slider sfxSlider;
 
     public void SetVolume()
     {

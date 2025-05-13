@@ -16,7 +16,8 @@ MonoBehaviour:
   description: "Foto donde aparece una familia feliz. Cuando la ves te invade una
     sesaci\xF3n de haber vivido ese momento."
   sprite: {fileID: 0}
-  prefab: {fileID: 2912784060675606810, guid: eb36d61e4f97cab4aa94f2c91f0ac2fc, type: 3}
+  prefab: {fileID: 0}
+  prefabInst: {fileID: 2912784060675606810, guid: eb36d61e4f97cab4aa94f2c91f0ac2fc, type: 3}
   itemsToCombine: []
   stackable: 0
   itemType: 14

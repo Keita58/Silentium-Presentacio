@@ -9,7 +9,6 @@ using static InventorySO;
 
 public class Save : MonoBehaviour
 {
-
     private const string _SavefileName = "silentium_savegame.json";
     private const string _SavefileNameConfig = "silentium_config.json";
 
@@ -31,6 +30,13 @@ public class Save : MonoBehaviour
 
     [Header("Shaders")]
     [SerializeField] private GameObject _Shaders;
+
+    [Header("Settings")]
+    [SerializeField] private Settings _Settings;
+
+    [Header("Spawn items")]
+    [SerializeField] private GameObject[] ImportantSpawns;
+    [SerializeField] private GameObject[] NormalSpawns;
 
     private void Awake()
     {
@@ -83,7 +89,9 @@ public class Save : MonoBehaviour
             Samples = Chromatic.maxSamples,
             FilmGrain = Film.active,
             IntensityFilmGrain = Film.intensity.value,
-            Fog = Fog.active
+            Fog = Fog.active,
+            ImportantSpawns = ImportantSpawns,
+            NormalSpawns = NormalSpawns,
         };
 
         string infoToSave = JsonUtility.ToJson(info, true);
@@ -96,7 +104,11 @@ public class Save : MonoBehaviour
 
         SaveConfig config = new()
         {
-            //Info de la configuracio
+            MusicValue = _Settings.musicSlider.value,
+            SFXValue = _Settings.sfxSlider.value,
+            FPSValue = _Settings.fpsDropdown.value,
+            FOVValue = _Settings.fovSlider.value,
+            VSync = _Settings.vSyncToggle.enabled
         };
 
         string infoToSave = JsonUtility.ToJson(config, true);

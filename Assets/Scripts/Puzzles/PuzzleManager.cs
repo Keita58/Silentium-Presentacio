@@ -7,7 +7,7 @@ using UnityEngine.Rendering.HighDefinition;
 
 public class PuzzleManager : MonoBehaviour
 {
-    public static PuzzleManager instance { get; private set; }
+    public static PuzzleManager instance { get; set; }
 
     [Header("Clock Puzzle")]
     [SerializeField]
@@ -17,7 +17,7 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     private Camera cam_Player;
     private InputSystem_Actions inputActionPlayer;
-    public bool clockPuzzleCompleted { get; private set; }
+    public bool clockPuzzleCompleted { get; set; }
 
     [Header("Hieroglyphic Puzzle")]
     [SerializeField]
@@ -29,14 +29,14 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     private Camera cam_HieroglyphicAnimation;
     [SerializeField]
-    public bool isHieroglyphicCompleted { get; private set; }
+    public bool isHieroglyphicCompleted { get; set; }
 
     [Header("Book Puzzle")]
     [SerializeField]
     private BookPuzzle bookPuzzle;
     [SerializeField]
     private GameObject bookWall;
-    public bool bookPuzzleCompleted { get; private set; }
+    public bool bookPuzzleCompleted { get; set; }
 
     [Header("Poem Puzzle")]
     [SerializeField]
@@ -45,7 +45,7 @@ public class PuzzleManager : MonoBehaviour
     public List<Picture> picturesClicked;
     [SerializeField]
     private Door DoorPoem3;
-    public bool poemPuzzleCompleted { get; private set; }
+    public bool poemPuzzleCompleted { get; set; }
 
     [Header("Morse Puzzle")]
     [SerializeField]
@@ -60,18 +60,14 @@ public class PuzzleManager : MonoBehaviour
     private AnimationClip doorsMorseAnimation;
     [SerializeField]
     private Animator morseAnimator;
-    public bool isMorseCompleted { get; private set; }
+    public bool isMorseCompleted { get; set; }
 
     [Header("Weapon Puzzle")]
     [SerializeField]
     private Camera cam_WeaponPuzzle;
     [SerializeField]
     private BoxCollider allWeapon;
-    public bool weaponPuzzleCompleted { get; private set; }
-    float animationTime = 0f;
-    bool isMorseCompleted = false;
-    [SerializeField]
-    private bool isHieroglyphicCompleted = false;
+    public bool weaponPuzzleCompleted { get; set; }
 
     [Header("Glitch")]
     [SerializeField]
@@ -79,11 +75,6 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     Animator glitchAnimator;
     [SerializeField] bool glitchStarted = false;
-
-    bool teleported = false;
-    Transform positionToTeleport;
-    [SerializeField]
-    GameObject bookWall;
 
     [Header("Positions after puzzles")]
     [SerializeField]
@@ -343,4 +334,8 @@ public class PuzzleManager : MonoBehaviour
         positionToTeleport = positionAfterHieroglyphic;
     }
 
+    public void LoadGame()
+    {
+
+    }
 }

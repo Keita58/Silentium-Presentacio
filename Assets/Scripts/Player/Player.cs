@@ -37,8 +37,8 @@ public class Player : MonoBehaviour
     float crouchedCenterCollider = -0.5f;
     float crouchedHeightCollider = 1;
     Vector3 cameraPositionBeforeCrouch = new Vector3(0, 0.627f, -0.198f);
-    public int gunAmmo { get; private set; }
-    public int hp { get; private set; }
+    public int gunAmmo { get; set; }
+    public int hp { get; set; }
 
     [SerializeField] GameObject cameraShenanigansGameObject;
 
@@ -93,9 +93,9 @@ public class Player : MonoBehaviour
 
     [Header("Silencer")]
     [SerializeField] GameObject silencer;
-    public bool isSilencerEquipped { get; private set; }
-    public int silencerUses { get; private set; }
-    public int maxSilencerUses { get; private set; }
+    public bool isSilencerEquipped { get; set; }
+    public int silencerUses { get; set; }
+    public int maxSilencerUses { get; set; }
 
     //Chest
     private GameObject chestGO;
@@ -113,6 +113,8 @@ public class Player : MonoBehaviour
 
     [Header("General")]
     [SerializeField] MenuUI menuManager;
+
+    public event Action onPickItem;
 
     private void Awake()
     {
@@ -271,6 +273,7 @@ public class Player : MonoBehaviour
                     }
                 }
                 interactiveGameObject.gameObject.SetActive(false);
+                onPickItem?.Invoke();
                 if (itemPicked is BookItem && itemPicked.ItemType == ItemTypes.BOOK2) PuzzleManager.instance.ChangePositionPlayerAfterHieroglyphic();
                 interactiveGameObject = null;
             }
@@ -371,16 +374,16 @@ public class Player : MonoBehaviour
                     {
                         if (door.isLocked)
                         {
-                            InventorySO.ItemSlot aux = null;
+                            //InventorySO.ItemSlot aux = null;
                             foreach (InventorySO.ItemSlot item in InventoryManager.instance.inventory.items)
                             {
                                 if (item.item == door.itemNeededToOpen)
                                 {
                                     door.isLocked = false;
-                                    aux = item;
+                                    //aux = item;
+                                    InventoryManager.instance.inventory.items.Remove(item);
                                 }
                             }
-                            InventoryManager.instance.inventory.items.Remove(aux);
                             if (door.isOpen)
                             {
                                 door.Close();

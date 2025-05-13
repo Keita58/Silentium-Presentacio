@@ -17,6 +17,9 @@ public class KeyItem : Item
     [SerializeField] private GameObject prefab;
     public override GameObject prefabToEquip => prefab;
 
+    [SerializeField] private GameObject prefabInst;
+    public override GameObject prefabToInstantiate => prefabInst;
+
     [SerializeField] private bool stackable;
     public override bool isStackable => stackable;
 

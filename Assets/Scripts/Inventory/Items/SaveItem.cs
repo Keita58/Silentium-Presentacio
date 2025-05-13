@@ -16,6 +16,9 @@ public class SaveItem : Item
     [SerializeField] private GameObject prefab;
     public override GameObject prefabToEquip => prefab;
 
+    [SerializeField] private GameObject prefabInst;
+    public override GameObject prefabToInstantiate => prefabInst;
+
     [SerializeField] private List<Item> itemsToCombine;
     public override List<Item> combinableItems => itemsToCombine;
 
