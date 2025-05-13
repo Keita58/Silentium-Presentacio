@@ -184,8 +184,6 @@ public class Player : MonoBehaviour
     private void OpenMenu(InputAction.CallbackContext context)
     {
         menuManager.OpenMenu();
-        ToggleInputPlayer(false, false);
-        StopCoroutine(InteractuarRaycast());
     }
 
     void Start()
