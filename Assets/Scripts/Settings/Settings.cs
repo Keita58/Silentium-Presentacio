@@ -13,6 +13,35 @@ public class Settings : MonoBehaviour
     [SerializeField] Slider musicSlider;
     [SerializeField] Slider sfxSlider;
 
+    //Variables temporales para guardar el valor actual
+    private float currentVolumeValue;
+    private float currentSfxValue;
+    private int currentFpsValue;
+    private int currentVSyncState;
+    private float currentFOVValue;
+
+    private void Awake()
+    {
+        //Las iniciamos a los valores mínimos de cada componente.
+        currentFOVValue = 60;
+        currentVSyncState = 0;
+        currentFpsValue = 0;
+    }
+
+    //Cuando el usuario abre el menu de opciones se ponen los valores de los componentes según el valor de las variables temporales
+    //si no se ha modificado nada, pues se quedan los valores mínimos, si no se ponen los valores guardados anteriormente.
+    private void OnEnable()
+    {
+        StartOptions();
+    }
+
+    private void StartOptions()
+    {
+        fovSlider.value = currentFOVValue;
+        vSyncToggle.isOn = currentVSyncState == 1 ? true:false;
+        fpsDropdown.value = currentFpsValue;
+    }
+
     public void SetVolume()
     {
         audioMixer.SetFloat("Volume", musicSlider.value);
@@ -22,11 +51,13 @@ public class Settings : MonoBehaviour
     {
     }
 
+    public void ToggleCheckVSync()
+    {
+        vSyncToggle.enabled = fpsDropdown.value == 0 ? true : false;
+    }
+
     public void SetFPS()
     {
-        //quiero descheckear el toggle como lo hago?
-        vSyncToggle.isOn = fpsDropdown.value == 0 ? true : false; // If FPS is set to unlimited, enable VSync toggle
-        vSyncToggle.enabled = fpsDropdown.value == 0 ? true : false;
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = fpsDropdown.value switch
         {
@@ -36,18 +67,41 @@ public class Settings : MonoBehaviour
             3=> 120,
             _ => -1 //default
         };
+
+    }
+
+    public void ChangeTextVSync()
+    {
+        vSyncToggle.transform.GetChild(1).GetComponent<Text>().text = vSyncToggle.isOn ? "Activado" : "Desactivado";
     }
 
     public void SetVSync()
     {
-        QualitySettings.vSyncCount= vSyncToggle.isOn ? 1 : 0;
-        vSyncToggle.transform.GetChild(1).GetComponent<Text>().text = vSyncToggle.isOn ? "Activado" : "Desactivado";
+        QualitySettings.vSyncCount = vSyncToggle.isOn ? 1 : 0;
     }
 
     public void SetFOV()
     {
         Camera.main.fieldOfView = fovSlider.value;
         player.SetCurrentFOV((int)fovSlider.value);
+    }
+
+    //Si se le da al botón de aplicar actualizamos las variables temporales.
+    private void UpdateCurrentValues()
+    {
+        currentFOVValue = fovSlider.value;
+        currentVSyncState = QualitySettings.vSyncCount;
+        currentFpsValue = fpsDropdown.value;
+    }
+
+    public void ApplySettings()
+    {
+        SetFPS();
+        SetFOV();
+        SetVSync();
+        UpdateCurrentValues();
+        //SetVolume();
+        //SetSfxValue();
     }
 
 }
