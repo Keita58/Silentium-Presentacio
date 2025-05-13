@@ -413,9 +413,18 @@ public class Player : MonoBehaviour
 
     }
 
-    public void ResumeInteract()
+    public void ResumeInteract(bool resume)
     {
-        coroutineInteract = StartCoroutine(InteractuarRaycast());
+        if (resume)
+        {
+            if (coroutineInteract == null)
+                coroutineInteract = StartCoroutine(InteractuarRaycast());
+        }
+        else
+        {
+            StopCoroutine(coroutineInteract);
+            coroutineInteract = null;
+        }
     }
 
     public void EquipItem(GameObject itemAEquipar)
