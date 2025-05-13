@@ -18,11 +18,11 @@ public class Settings : MonoBehaviour
     //booleano que controla si es la escena inicial o no.
     public bool isInitialScene;
     //Variables temporales para guardar el valor actual
-    [SerializeField] private float currentVolumeValue;
-    [SerializeField] private float currentSfxValue;
-    [SerializeField] private int currentFpsValue;
-    [SerializeField] private int currentVSyncState;
-    [SerializeField] private float currentFOVValue;
+    [SerializeField] public float currentVolumeValue;
+    [SerializeField] public float currentSfxValue;
+    [SerializeField] public int currentFpsValue;
+    [SerializeField] public int currentVSyncState;
+    [SerializeField] public float currentFOVValue;
 
     private void Awake()
     {
@@ -39,7 +39,7 @@ public class Settings : MonoBehaviour
         StartOptions();
     }
 
-    private void StartOptions()
+    public void StartOptions()
     {
         fovSlider.value = currentFOVValue;
         vSyncToggle.isOn = currentVSyncState == 1 ? true:false;

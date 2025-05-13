@@ -104,11 +104,11 @@ public class Save : MonoBehaviour
 
         SaveConfig config = new()
         {
-            MusicValue = _Settings.musicSlider.value,
-            SFXValue = _Settings.sfxSlider.value,
-            FPSValue = _Settings.fpsDropdown.value,
-            FOVValue = _Settings.fovSlider.value,
-            VSync = _Settings.vSyncToggle.enabled
+            MusicValue = _Settings.currentVolumeValue,
+            SFXValue = _Settings.currentSfxValue,
+            FPSValue = _Settings.currentFpsValue,
+            FOVValue = _Settings.currentFOVValue,
+            VSync = _Settings.currentVSyncState
         };
 
         string infoToSave = JsonUtility.ToJson(config, true);

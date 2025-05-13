@@ -5,7 +5,7 @@ public class StartMenuButtons : MonoBehaviour
 {
     public void NewGame()
     {
-        SceneManager.LoadScene("MapaHector");
+        GameManager.instance.SceneNewGame();
     }
 
     public void Exit()
@@ -15,6 +15,6 @@ public class StartMenuButtons : MonoBehaviour
 
     public void Load()
     {
-        //Codigo load.
+        GameManager.instance.LoadScene();
     }
 }

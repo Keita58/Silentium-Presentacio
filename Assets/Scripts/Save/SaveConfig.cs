@@ -8,5 +8,5 @@ public class SaveConfig
     public float SFXValue;
     public int FPSValue;
     public float FOVValue;
-    public bool VSync;
+    public int VSync;
 }

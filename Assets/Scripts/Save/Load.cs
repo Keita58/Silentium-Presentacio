@@ -31,6 +31,15 @@ public class Load : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private Settings _Settings;
 
+
+    private void Awake()
+    {
+        GameManager.instance.onLoadedScene += LoadGame;
+        GameManager.instance.onLoadedScene += LoadConfig;
+
+        GameManager.instance.onNewScene += LoadConfig;
+    }
+
     public void LoadGame()
     {
         string existingFile = Application.persistentDataPath + "/" + _SavefileName;
@@ -89,6 +98,8 @@ public class Load : MonoBehaviour
 
             _PuzzleManager.LoadGame();
         }
+
+        GameManager.instance.onLoadedScene -= LoadGame;
     }
 
     public void LoadConfig()
@@ -100,13 +111,17 @@ public class Load : MonoBehaviour
             string jsonContent = File.ReadAllText(existingFile);
             SaveConfig info = JsonUtility.FromJson<SaveConfig>(jsonContent);
 
-            _Settings.musicSlider.value = info.MusicValue;
-            _Settings.sfxSlider.value = info.SFXValue;
-            _Settings.fpsDropdown.value = info.FPSValue;
-            _Settings.fovSlider.value = info.FOVValue;
-            _Settings.vSyncToggle.enabled = info.VSync;
+            _Settings.currentVolumeValue = info.MusicValue;
+            _Settings.currentSfxValue = info.SFXValue;
+            _Settings.currentFpsValue = info.FPSValue;
+            _Settings.currentFOVValue = info.FOVValue;
+            _Settings.currentVSyncState = info.VSync;
         }
 
-        //Posar booleà a true i actualitzar amb el load
+        _Settings.isInitialScene = true;
+        _Settings.StartOptions();
+
+        GameManager.instance.onLoadedScene -= LoadConfig;
+        GameManager.instance.onNewScene -= LoadConfig;
     }
 }
