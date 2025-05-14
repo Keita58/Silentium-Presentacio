@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using static InventorySO;
+using static PickObject;
 
 [Serializable]
 public class SaveInfo
@@ -16,7 +17,7 @@ public class SaveInfo
     public bool Silencer;
     public int SilencerUses;
     public int Ammo;
-    public Transform Position;
+    public Vector3 Position;
 
     //Puzles
     public bool ClockPuzzle;
@@ -40,11 +41,11 @@ public class SaveInfo
     public bool Fog;
 
     //Enemics
-    public Transform BlindEnemy;
-    public Transform FastEnemy;
-    public Transform FatEnemy;
+    public Vector3 BlindEnemy;
+    public Vector3 FastEnemy;
+    public Vector3 FatEnemy;
 
     //Spawn items
-    public GameObject[] ImportantSpawns;
-    public GameObject[] NormalSpawns;
+    public List<PickObjectSave> ImportantSpawns;
+    public List<PickObjectSave> NormalSpawns;
 }

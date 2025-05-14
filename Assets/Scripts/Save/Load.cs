@@ -31,6 +31,14 @@ public class Load : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private Settings _Settings;
 
+    [Header("Monsters")]
+    [SerializeField] private Transform _Blind;
+    [SerializeField] private Transform _Fast;
+    [SerializeField] private Transform _Fat;
+
+    [Header("Spawn items")]
+    [SerializeField] private List<PickObject> ImportantSpawns;
+    [SerializeField] private List<PickObject> NormalSpawns;
 
     private void Awake()
     {
@@ -63,6 +71,25 @@ public class Load : MonoBehaviour
                 ChestInventory.Add(new ItemSlot(_Items.FromID(item.itemId), item.amount, item.stackable));
             }
 
+            foreach(var item in ImportantSpawns)
+            {
+                foreach (var item2 in info.ImportantSpawns)
+                {
+                    if (item.Id == item2.Id)
+                        item.Picked = item2.Picked;
+                }
+            }
+
+            foreach(var item in NormalSpawns)
+            {
+                foreach (var item2 in info.NormalSpawns)
+                {
+                    if (item.Id == item2.Id)
+                        item.Picked = item2.Picked;
+                }
+            }
+
+
             _Inventory.items = Inventory;
             _ChestInventory.items = ChestInventory;
             _NotesInventory.notes = _Notes.FromIDs(info.NotesInventory);
@@ -87,6 +114,7 @@ public class Load : MonoBehaviour
             _Player.isSilencerEquipped = info.Silencer;
             _Player.silencerUses = info.SilencerUses;
             _Player.gunAmmo = info.Ammo;
+            _Player.transform.position = info.Position;
 
             //Puzles
             _PuzzleManager.clockPuzzleCompleted = info.ClockPuzzle;
@@ -97,6 +125,11 @@ public class Load : MonoBehaviour
             _PuzzleManager.weaponPuzzleCompleted = info.WeaponPuzzle;
 
             _PuzzleManager.LoadGame();
+
+            //Enemics
+            _Fat.position = info.FatEnemy;
+            _Fast.position = info.FastEnemy;
+            _Blind.position = info.BlindEnemy;
         }
 
         GameManager.instance.onLoadedScene -= LoadGame;

@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
 using static InventorySO;
+using static PickObject;
 
 public class Save : MonoBehaviour
 {
@@ -38,6 +39,11 @@ public class Save : MonoBehaviour
     [SerializeField] private GameObject[] ImportantSpawns;
     [SerializeField] private GameObject[] NormalSpawns;
 
+    [Header("Monsters")]
+    [SerializeField] private Transform _Blind;
+    [SerializeField] private Transform _Fast;
+    [SerializeField] private Transform _Fat;
+
     private void Awake()
     {
         _Camera1.onSaveGame += SaveGame;
@@ -63,6 +69,20 @@ public class Save : MonoBehaviour
             ChestInventory.Add(new ItemSlotSave(item.item.id, item.amount, item.stackable));
         }
 
+        List<PickObjectSave> ImportantSpawnsList = new List<PickObjectSave>();
+
+        foreach(GameObject item in ImportantSpawns)
+        {
+            ImportantSpawnsList.Add(new PickObjectSave(item.GetComponent<PickObject>().Id, item.GetComponent<PickObject>().Picked));
+        }
+
+        List<PickObjectSave> NormalSpawnsList = new List<PickObjectSave>();
+
+        foreach (GameObject item in NormalSpawns)
+        {
+            NormalSpawnsList.Add(new PickObjectSave(item.GetComponent<PickObject>().Id, item.GetComponent<PickObject>().Picked));
+        }
+
         //Treure la info del Volume
         Volume VolumeInfo = _Shaders.GetComponent<Volume>();
         VolumeInfo.profile.TryGet(out ChromaticAberration Chromatic);
@@ -78,6 +98,7 @@ public class Save : MonoBehaviour
             Silencer = _Player.isSilencerEquipped,
             SilencerUses = _Player.silencerUses,
             Ammo = _Player.gunAmmo,
+            Position = _Player.transform.position,
             ClockPuzzle = _PuzzleManager.clockPuzzleCompleted,
             HieroglyphicPuzzle = _PuzzleManager.isHieroglyphicCompleted,
             BookPuzzle = _PuzzleManager.bookPuzzleCompleted,
@@ -90,8 +111,11 @@ public class Save : MonoBehaviour
             FilmGrain = Film.active,
             IntensityFilmGrain = Film.intensity.value,
             Fog = Fog.active,
-            ImportantSpawns = ImportantSpawns,
-            NormalSpawns = NormalSpawns,
+            FastEnemy = _Fast.position,
+            FatEnemy = _Fat.position,
+            BlindEnemy = _Blind.position,
+            ImportantSpawns = ImportantSpawnsList,
+            NormalSpawns = NormalSpawnsList
         };
 
         string infoToSave = JsonUtility.ToJson(info, true);

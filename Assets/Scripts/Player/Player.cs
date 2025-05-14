@@ -117,7 +117,7 @@ public class Player : MonoBehaviour
     [Header("General")]
     [SerializeField] MenuUI menuManager;
 
-    public event Action onPickItem;
+    public event Action<int> onPickItem;
 
     private void Awake()
     {
@@ -277,7 +277,7 @@ public class Player : MonoBehaviour
                     }
                 }
                 interactiveGameObject.gameObject.SetActive(false);
-                onPickItem?.Invoke();
+                onPickItem?.Invoke(interactiveGameObject.GetComponentInParent<PickObject>().Id);
                 if (itemPicked is BookItem && itemPicked.ItemType == ItemTypes.BOOK2) PuzzleManager.instance.ChangePositionPlayerAfterHieroglyphic();
                 interactiveGameObject = null;
             }
@@ -446,7 +446,7 @@ public class Player : MonoBehaviour
     {
         if (itemSlotOccuped)
         {
-            equipedObject.transform.GetChild(0).TryGetComponent<ThrowObject>(out ThrowObject throwable);
+            equipedObject.transform.TryGetComponent<ThrowObject>(out ThrowObject throwable);
             if (throwable != null)
             {
                 throwable.GetComponent<Rigidbody>().isKinematic = false;
