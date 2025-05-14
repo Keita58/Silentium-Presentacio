@@ -23,7 +23,7 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     private Camera cam_Hierogliphic;
     [SerializeField]
-    private AnimationClip doorsHieroglyphic;   
+    private AnimationClip doorsHieroglyphic;
     [SerializeField]
     private Animator hieroglyphicAnimator;
     [SerializeField]
@@ -280,7 +280,7 @@ public class PuzzleManager : MonoBehaviour
     {
         cam_WeaponPuzzle.transform.parent.GetComponent<WeaponPuzzle>().inputAction.WeaponPuzzle.Disable();
         player.ResumeInteract(true);
-        player._inputActions.Player.Enable();      
+        player._inputActions.Player.Enable();
         cam_Player.gameObject.SetActive(true);
         cam_WeaponPuzzle.gameObject.SetActive(false);
         Cursor.visible = false;
@@ -308,7 +308,8 @@ public class PuzzleManager : MonoBehaviour
                 animationTime = 0f;
                 isHieroglyphicCompleted = false;
             }
-        }else if (glitchStarted)
+        }
+        else if (glitchStarted)
         {
             animationTime += Time.deltaTime;
             if (animationTime >= 2f && !teleported)
