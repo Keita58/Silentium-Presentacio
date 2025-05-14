@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using static InventorySO;
 
 [Serializable]
@@ -15,6 +16,7 @@ public class SaveInfo
     public bool Silencer;
     public int SilencerUses;
     public int Ammo;
+    public Transform Position;
 
     //Puzles
     public bool ClockPuzzle;
@@ -36,4 +38,13 @@ public class SaveInfo
 
     //Fog
     public bool Fog;
+
+    //Enemics
+    public Transform BlindEnemy;
+    public Transform FastEnemy;
+    public Transform FatEnemy;
+
+    //Spawn items
+    public GameObject[] ImportantSpawns;
+    public GameObject[] NormalSpawns;
 }

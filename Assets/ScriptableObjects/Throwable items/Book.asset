@@ -15,7 +15,8 @@ MonoBehaviour:
   nom: Libro
   description: Un libro en no muy buen estado. No se puede leer el contenido.
   sprite: {fileID: 21300000, guid: 232884e72799e5e4ab5d7720cd5b925f, type: 3}
-  prefab: {fileID: 2980271291394529540, guid: 3d919e2df39cd7e46ac1817e4223cb01, type: 3}
+  prefab: {fileID: 0}
+  prefabInst: {fileID: 2980271291394529540, guid: 3d919e2df39cd7e46ac1817e4223cb01, type: 3}
   stackable: 0
   itemType: 3
   usable: 0

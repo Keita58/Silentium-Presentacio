@@ -15,7 +15,8 @@ MonoBehaviour:
   nom: Botella
   description: "Botella vac\xEDa."
   sprite: {fileID: 21300000, guid: 4fa87b6845b1c914983a7defa5da3009, type: 3}
-  prefab: {fileID: 527328402319472984, guid: cf044dabaec7e06489adf568c5b24f3d, type: 3}
+  prefab: {fileID: 0}
+  prefabInst: {fileID: 3801060951032027894, guid: 900442d0284e2994f8905463ef36855e, type: 3}
   stackable: 0
   itemType: 3
   usable: 0

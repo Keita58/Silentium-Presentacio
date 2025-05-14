@@ -11,6 +11,8 @@ public abstract class Item : ScriptableObject
 
     public abstract GameObject prefabToEquip { get; }
 
+    public abstract GameObject prefabToInstantiate { get; }
+
     public abstract List<Item> combinableItems { get; }
 
     public abstract ItemTypes ItemType { get; }
