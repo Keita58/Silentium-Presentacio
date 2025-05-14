@@ -41,8 +41,11 @@ public class GameManager : MonoBehaviour
         {
             case "MapaHector":
                 //Posar aquí pantalla de càrrega
-                if(_Load)
+                if (_Load)
+                {
+                    Debug.Log("Invoke");
                     onLoadedScene?.Invoke();
+                }
                 else
                     onNewScene?.Invoke();
                 break;
