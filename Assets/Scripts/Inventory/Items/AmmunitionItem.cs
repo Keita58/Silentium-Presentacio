@@ -33,6 +33,9 @@ public class AmmunitionItem : Item
     [SerializeField] private bool combinable;
     public override bool isCombinable => combinable;
 
+    [SerializeField] private int ammoId;
+    public override int id => ammoId;
+
 
     [Header("Specific values")]
     [SerializeField] public int bales;

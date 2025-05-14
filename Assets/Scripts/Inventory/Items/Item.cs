@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 public abstract class Item : ScriptableObject
 {
     public abstract string Name { get; }
@@ -21,7 +23,7 @@ public abstract class Item : ScriptableObject
 
     public abstract bool isCombinable { get; }
 
-    public int  id {get; }
+    public abstract int id { get; }
     
     public abstract void Use();
 

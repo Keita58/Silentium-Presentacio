@@ -1,0 +1,39 @@
+using System;
+using System.Collections.Generic;
+using static InventorySO;
+
+[Serializable]
+public class SaveInfo
+{
+    //Inventari
+    public List<ItemSlotSave> Inventory;
+    public List<ItemSlotSave> ChestInventory;
+    public int[] NotesInventory;
+
+    //Jugador
+    public int Hp;
+    public bool Silencer;
+    public int SilencerUses;
+    public int Ammo;
+
+    //Puzles
+    public bool ClockPuzzle;
+    public bool HieroglyphicPuzzle;
+    public bool BookPuzzle;
+    public bool PoemPuzzle;
+    public bool MorsePuzzle;
+    public bool WeaponPuzzle;
+
+    //Valors post-render
+    //Chromatic
+    public bool ChromaticAberration;
+    public float IntensityChromaticAberration;
+    public int Samples;
+
+    //Film Grain
+    public bool FilmGrain;
+    public float IntensityFilmGrain;
+
+    //Fog
+    public bool Fog;
+}

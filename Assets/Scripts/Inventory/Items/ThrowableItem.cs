@@ -33,6 +33,9 @@ public class ThrowableItem : Item
     [SerializeField] private bool combinable;
     public override bool isCombinable => combinable;
 
+    [SerializeField] private int throwableId;
+    public override int id => throwableId;
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public override void Use()

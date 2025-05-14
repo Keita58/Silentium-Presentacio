@@ -9,6 +9,8 @@ public class Player : MonoBehaviour
 
     Rigidbody _Rigidbody;
 
+    public event Action onCameraClick;
+
     public InputSystem_Actions _inputActions { get; private set; }
 
     InputAction _MoveAction;
@@ -35,8 +37,8 @@ public class Player : MonoBehaviour
     float crouchedCenterCollider = -0.5f;
     float crouchedHeightCollider = 1;
     Vector3 cameraPositionBeforeCrouch = new Vector3(0, 0.627f, -0.198f);
-    int gunAmmo =5000;
-    int hp = 5;
+    public int gunAmmo { get; private set; }
+    public int hp { get; private set; }
 
     [SerializeField] GameObject cameraShenanigansGameObject;
 
@@ -92,8 +94,11 @@ public class Player : MonoBehaviour
     [Header("Silencer")]
     [SerializeField] GameObject silencer;
     public bool isSilencerEquipped { get; private set; }
-    int silencerUses;
-    int maxSilencerUses = 10;
+    public int silencerUses { get; private set; }
+    public int maxSilencerUses { get; private set; }
+
+    //Chest
+    private GameObject chestGO;
 
     [Header("Gun")]
     [SerializeField] private Transform gunAimPosition;
@@ -167,6 +172,8 @@ public class Player : MonoBehaviour
         }
         else
         {
+            if(chestGO != null)
+                chestGO.GetComponent<Animator>().Play("CloseChest");
             Cursor.visible = false;
             InventoryManager.instance.CloseInventory();
             inventoryOpened = false;
@@ -184,6 +191,10 @@ public class Player : MonoBehaviour
         Cursor.visible = false;
         coroutineInteract = StartCoroutine(InteractuarRaycast());
         inventoryOpened = false;
+
+        hp = 5;
+        gunAmmo = 20;
+        maxSilencerUses = 10;
         StartCoroutine(EsperarIActuar(5f, ()=>TakeDamage(1)));
     }
 
@@ -343,6 +354,7 @@ public class Player : MonoBehaviour
                 }
                 else if (chest)
                 {
+                    chestGO.GetComponent<Animator>().Play("OpenChest");
                     InventoryManager.instance.OpenChest();
                     chest = false;
                 }
@@ -712,6 +724,14 @@ public class Player : MonoBehaviour
                             };
                         }
                     }
+
+                    //if(hit.transform.TryGetComponent<Interactuable>(out Interactuable aux))
+                    if(hit.transform.gameObject.layer == 24)
+                    {
+                        onCameraClick?.Invoke();
+                    }
+
+                    //S'ha de canviar aix� per una sola layer
                     if (hit.transform.gameObject.layer == 9)
                     {
                         item = true;
@@ -732,6 +752,7 @@ public class Player : MonoBehaviour
                     else if (hit.transform.gameObject.layer == 13)
                     {
                         chest = true;
+                        chestGO = hit.transform.gameObject;
                     }
                     else if (hit.transform.gameObject.layer == 15)
                     {
@@ -774,6 +795,9 @@ public class Player : MonoBehaviour
                 note = false;
                 weaponPuzzle = false;
                 chest = false;
+
+                chestGO = null;
+
                 if (interactiveGameObject != null)
                 {
                     if (interactiveGameObject.transform.gameObject.layer != 15 && interactiveGameObject.transform.gameObject.layer != 18)

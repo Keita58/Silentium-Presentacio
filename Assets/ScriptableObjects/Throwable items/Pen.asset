@@ -21,3 +21,4 @@ MonoBehaviour:
   usable: 0
   equipable: 1
   combinable: 0
+  throwableId: 15

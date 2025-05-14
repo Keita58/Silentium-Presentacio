@@ -1,5 +1,7 @@
+using System;
 using UnityEngine;
 
+[Serializable]
 [CreateAssetMenu(fileName = "NotesSO", menuName = "Scriptable Objects/NotesSO")]
 public class NotesSO : ScriptableObject
 {

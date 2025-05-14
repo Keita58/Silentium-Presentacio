@@ -34,6 +34,9 @@ public class SilencerItem : Item
     [SerializeField] private bool combinable;
     public override bool isCombinable => combinable;
 
+    [SerializeField] private int silencerId;
+    public override int id => silencerId;
+
     [Header("Item resulting of combination")]
     [SerializeField] private Item silencer;
 

@@ -24,4 +24,5 @@ MonoBehaviour:
   usable: 0
   equipable: 0
   combinable: 1
+  silencerId: 11
   silencer: {fileID: 11400000, guid: 6f84b6f5e8d320540bb3093a9c3f96fb, type: 2}

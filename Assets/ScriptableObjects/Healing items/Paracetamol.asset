@@ -24,4 +24,5 @@ MonoBehaviour:
   usable: 1
   equipable: 0
   combinable: 1
+  healId: 6
   itemAfterCombineParacetamol: {fileID: 11400000, guid: 4a930a82e1db5ed4db7bb072b980d6c1, type: 2}

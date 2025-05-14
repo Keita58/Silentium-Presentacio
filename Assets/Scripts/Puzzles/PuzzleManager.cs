@@ -8,6 +8,7 @@ using UnityEngine.Rendering.HighDefinition;
 public class PuzzleManager : MonoBehaviour
 {
     public static PuzzleManager instance { get; private set; }
+
     [Header("Clock Puzzle")]
     [SerializeField]
     private GameObject KeyClock;
@@ -16,28 +17,36 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     private Camera cam_Player;
     private InputSystem_Actions inputActionPlayer;
-    [Header("Hieroglytphic Puzzle")]
+    public bool clockPuzzleCompleted { get; private set; }
+
+    [Header("Hieroglyphic Puzzle")]
     [SerializeField]
     private Camera cam_Hierogliphic;
-    [SerializeField]
-    private Camera cam_WeaponPuzzle;
     [SerializeField]
     private AnimationClip doorsHieroglyphic;   
     [SerializeField]
     private Animator hieroglyphicAnimator;
     [SerializeField]
     private Camera cam_HieroglyphicAnimation;
+    [SerializeField]
+    public bool isHieroglyphicCompleted { get; private set; }
 
     [Header("Book Puzzle")]
     [SerializeField]
-    BookPuzzle bookPuzzle;
+    private BookPuzzle bookPuzzle;
+    [SerializeField]
+    private GameObject bookWall;
+    public bool bookPuzzleCompleted { get; private set; }
+
     [Header("Poem Puzzle")]
     [SerializeField]
     private List<Picture> pictureList;
     [SerializeField]
     public List<Picture> picturesClicked;
     [SerializeField]
-    Door DoorPoem3;
+    private Door DoorPoem3;
+    public bool poemPuzzleCompleted { get; private set; }
+
     [Header("Morse Puzzle")]
     [SerializeField]
     Player player;
@@ -50,12 +59,15 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     private AnimationClip doorsMorseAnimation;
     [SerializeField]
-    private Animator animator;   
-    [SerializeField]
     private Animator morseAnimator;
+    public bool isMorseCompleted { get; private set; }
+
     [Header("Weapon Puzzle")]
     [SerializeField]
+    private Camera cam_WeaponPuzzle;
+    [SerializeField]
     private BoxCollider allWeapon;
+    public bool weaponPuzzleCompleted { get; private set; }
     float animationTime = 0f;
     bool isMorseCompleted = false;
     [SerializeField]
@@ -81,6 +93,27 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     private Transform positionAfterPoem;
 
+    [Header("All puzzles")]
+    private float animationTime;
+    [SerializeField]
+    private AnimationClip fadeOut;
+    [SerializeField]
+    private Animator fadeAnimator;
+    private bool fadeOutStarted = false;
+    private bool teleported = false;
+    private Transform positionToTeleport;
+
+    [Header("Glitch")]
+    [SerializeField]
+    private Material material;
+    [SerializeField]
+    private float noiseAmount;
+    [SerializeField]
+    private float glitchStrength;
+    [SerializeField]
+    private float scanLinesStrength;
+    [SerializeField]
+    private float FlickeringStrength;
     [SerializeField] PostProcessEvents events;
 
     private void Awake()
@@ -89,6 +122,18 @@ public class PuzzleManager : MonoBehaviour
         if (instance == null)
             instance = this;
     }
+
+    private void Start()
+    {
+        clockPuzzleCompleted = false;
+        isHieroglyphicCompleted = false;
+        bookPuzzleCompleted = false;
+        poemPuzzleCompleted = false;
+        isMorseCompleted = false;
+        weaponPuzzleCompleted = false;
+        animationTime = 0f;
+    }
+
     public void InteractClockPuzzle()
     {
         cam_Player.gameObject.SetActive(false);
@@ -112,6 +157,7 @@ public class PuzzleManager : MonoBehaviour
         ExitClockPuzzle();
         player.ResumeInteract(true);
         this.KeyClock.SetActive(true);
+        clockPuzzleCompleted = true;
     }
 
     public void InteractHieroglyphicPuzzle()
@@ -169,7 +215,7 @@ public class PuzzleManager : MonoBehaviour
         player.ResumeInteract(true);
         cam_Player.gameObject.SetActive(true);
         Cursor.visible = false;
-
+        isMorseCompleted = true;
     }
 
     public void InteractMorsePuzzle()
@@ -197,6 +243,7 @@ public class PuzzleManager : MonoBehaviour
         glitchAnimator.Play("Glitch");
         glitchStarted = true;
         animationTime = 0f;
+        bookPuzzleCompleted = true;
     }
 
     public void TakePoemPart()
@@ -217,6 +264,7 @@ public class PuzzleManager : MonoBehaviour
                     glitchAnimator.Play("Glitch");
                     glitchStarted = true;
                     animationTime = 0f;
+                    poemPuzzleCompleted = true;
                 }
             }
             else
@@ -236,15 +284,16 @@ public class PuzzleManager : MonoBehaviour
         Cursor.visible = true;
         player.ResumeInteract(false);
     }
+
     public void ExitWeaponPuzzle()
     {
-
         cam_WeaponPuzzle.transform.parent.GetComponent<WeaponPuzzle>().inputAction.WeaponPuzzle.Disable();
         player.ResumeInteract(true);
         player._inputActions.Player.Enable();      
         cam_Player.gameObject.SetActive(true);
         cam_WeaponPuzzle.gameObject.SetActive(false);
         Cursor.visible = false;
+        weaponPuzzleCompleted = true;
     }
 
     void Update()
