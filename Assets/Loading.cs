@@ -6,6 +6,7 @@ public class Loading : MonoBehaviour
     [SerializeField] Animator animator;
     private void Awake()
     {
+        Debug.Log("Awaken");
         animator = GetComponent<Animator>();
         GameManager.instance.onLoadedScene += ActivateLoading;
     }
