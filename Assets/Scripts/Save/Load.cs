@@ -10,6 +10,7 @@ using static UnityEditor.Progress;
 public class Load : MonoBehaviour
 {
     private const string _SavefileName = "silentium_savegame.json";
+    private const string _TemporalSavefileName = "silentium_temp_savegame.json";
     private const string _SavefileNameConfig = "silentium_config.json";
 
     [Header("Inventories")]
@@ -52,11 +53,19 @@ public class Load : MonoBehaviour
 
     public void LoadGame()
     {
+        string temporalExistingFile = Application.persistentDataPath + "/" + _TemporalSavefileName;
         string existingFile = Application.persistentDataPath + "/" + _SavefileName;
 
-        if(File.Exists(existingFile))
+        string jsonContent = "";
+
+        if (File.Exists(temporalExistingFile)) 
+            jsonContent = File.ReadAllText(temporalExistingFile);
+        else if (File.Exists(existingFile))
+            jsonContent = File.ReadAllText(existingFile);
+
+
+        if (jsonContent != "")
         {
-            string jsonContent = File.ReadAllText(existingFile);
             SaveInfo info = JsonUtility.FromJson<SaveInfo>(jsonContent);
 
             List<ItemSlot> Inventory = new List<ItemSlot>();
@@ -125,6 +134,9 @@ public class Load : MonoBehaviour
             _Fat.position = info.FatEnemy;
             _Fast.position = info.FastEnemy;
             _Blind.position = info.BlindEnemy;
+
+            if(File.Exists(temporalExistingFile))
+                File.Delete(temporalExistingFile);
         }
 
         GameManager.instance.onLoadedScene -= LoadGame;

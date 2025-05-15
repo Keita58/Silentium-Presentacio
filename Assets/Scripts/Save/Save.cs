@@ -11,6 +11,7 @@ using static PickObject;
 public class Save : MonoBehaviour
 {
     private const string _SavefileName = "silentium_savegame.json";
+    private const string _TemporalSavefileName = "silentium_temp_savegame.json";
     private const string _SavefileNameConfig = "silentium_config.json";
 
     [Header("Cameras")]
@@ -72,6 +73,78 @@ public class Save : MonoBehaviour
         List<PickObjectSave> ImportantSpawnsList = new List<PickObjectSave>();
 
         foreach(GameObject item in ImportantSpawns)
+        {
+            ImportantSpawnsList.Add(new PickObjectSave(item.GetComponent<PickObject>().Object.id, item.GetComponent<PickObject>().Id, item.GetComponent<PickObject>().Picked));
+        }
+
+        List<PickObjectSave> NormalSpawnsList = new List<PickObjectSave>();
+
+        foreach (GameObject item in NormalSpawns)
+        {
+            NormalSpawnsList.Add(new PickObjectSave(item.GetComponent<PickObject>().Object.id, item.GetComponent<PickObject>().Id, item.GetComponent<PickObject>().Picked));
+        }
+
+        //Treure la info del Volume
+        Volume VolumeInfo = _Shaders.GetComponent<Volume>();
+        VolumeInfo.profile.TryGet(out ChromaticAberration Chromatic);
+        VolumeInfo.profile.TryGet(out FilmGrain Film);
+        VolumeInfo.profile.TryGet(out Fog Fog);
+
+        SaveInfo info = new()
+        {
+            Inventory = Inventory,
+            ChestInventory = ChestInventory,
+            NotesInventory = _Notes.ToIDs(_NotesInventory.notes.AsReadOnly()),
+            Hp = _Player.hp,
+            Silencer = _Player.isSilencerEquipped,
+            SilencerUses = _Player.silencerUses,
+            Ammo = _Player.gunAmmo,
+            Position = _Player.transform.position,
+            ClockPuzzle = _PuzzleManager.clockPuzzleCompleted,
+            HieroglyphicPuzzle = _PuzzleManager.isHieroglyphicCompleted,
+            BookPuzzle = _PuzzleManager.bookPuzzleCompleted,
+            PoemPuzzle = _PuzzleManager.poemPuzzleCompleted,
+            MorsePuzzle = _PuzzleManager.isMorseCompleted,
+            WeaponPuzzle = _PuzzleManager.weaponPuzzleCompleted,
+            ChromaticAberration = Chromatic.active,
+            IntensityChromaticAberration = Chromatic.intensity.value,
+            Samples = Chromatic.maxSamples,
+            FilmGrain = Film.active,
+            IntensityFilmGrain = Film.intensity.value,
+            Fog = Fog.active,
+            FastEnemy = _Fast.position,
+            FatEnemy = _Fat.position,
+            BlindEnemy = _Blind.position,
+            ImportantSpawns = ImportantSpawnsList,
+            NormalSpawns = NormalSpawnsList
+        };
+
+        string infoToSave = JsonUtility.ToJson(info, true);
+        File.WriteAllText(filePath, infoToSave);
+    }
+
+    public void TemporalSaveGame()
+    {
+        string filePath = Application.persistentDataPath + "/" + _TemporalSavefileName;
+
+        //Canviem el tipus de la llista per poder guardar tota la info
+        List<ItemSlotSave> Inventory = new List<ItemSlotSave>();
+
+        foreach (ItemSlot item in _Inventory.items)
+        {
+            Inventory.Add(new ItemSlotSave(item.item.id, item.amount, item.stackable));
+        }
+
+        List<ItemSlotSave> ChestInventory = new List<ItemSlotSave>();
+
+        foreach (ItemSlot item in _ChestInventory.items)
+        {
+            ChestInventory.Add(new ItemSlotSave(item.item.id, item.amount, item.stackable));
+        }
+
+        List<PickObjectSave> ImportantSpawnsList = new List<PickObjectSave>();
+
+        foreach (GameObject item in ImportantSpawns)
         {
             ImportantSpawnsList.Add(new PickObjectSave(item.GetComponent<PickObject>().Object.id, item.GetComponent<PickObject>().Id, item.GetComponent<PickObject>().Picked));
         }
