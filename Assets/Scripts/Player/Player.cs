@@ -113,6 +113,7 @@ public class Player : MonoBehaviour
 
     [Header("General")]
     [SerializeField] MenuUI menuManager;
+    [SerializeField] Waves waves;
 
     public event Action onPickItem;
 
@@ -586,6 +587,7 @@ public class Player : MonoBehaviour
         {
 
             case PlayerStates.IDLE:
+                waves.MakeSound(0);
                 if (movementInput != Vector2.zero && !crouched)
                 {
                     ChangeState(PlayerStates.MOVE);
@@ -828,6 +830,7 @@ public class Player : MonoBehaviour
         while (true)
         {
             MakeNoise(30, 3);
+            waves.MakeSound(3);
             yield return new WaitForSeconds(0.5f);
         }
     }
@@ -838,6 +841,7 @@ public class Player : MonoBehaviour
         {
             Debug.Log("CORUTINACORRER");
             MakeNoise(37, 7);
+            waves.MakeSound(7);
             yield return new WaitForSeconds(0.5f);
         }
     }

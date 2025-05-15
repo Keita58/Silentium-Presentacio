@@ -7,6 +7,7 @@ public class Loading : MonoBehaviour
     private void Awake()
     {
         Debug.Log("Awaken");
+        this.gameObject.SetActive(false);
         animator = GetComponent<Animator>();
         GameManager.instance.onLoadedScene += ActivateLoading;
     }
@@ -14,12 +15,12 @@ public class Loading : MonoBehaviour
     private void ActivateLoading()
     {
         animator.Play("Loading");
+        this.gameObject.SetActive(true);
         StartCoroutine(LoadingCoroutine());
     }
 
     private IEnumerator LoadingCoroutine()
     {
-        this.gameObject.SetActive(true);
         yield return new WaitForSeconds(5f);
         this.gameObject.SetActive(false);
     }
