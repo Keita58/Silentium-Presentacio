@@ -57,14 +57,14 @@ public class Save : MonoBehaviour
         //Canviem el tipus de la llista per poder guardar tota la info
         List<ItemSlotSave> Inventory = new List<ItemSlotSave>();
 
-        foreach (var item in _Inventory.items)
+        foreach (ItemSlot item in _Inventory.items)
         {
             Inventory.Add(new ItemSlotSave(item.item.id, item.amount, item.stackable));
         }
 
         List<ItemSlotSave> ChestInventory = new List<ItemSlotSave>();
 
-        foreach (var item in _ChestInventory.items)
+        foreach (ItemSlot item in _ChestInventory.items)
         {
             ChestInventory.Add(new ItemSlotSave(item.item.id, item.amount, item.stackable));
         }
@@ -73,14 +73,14 @@ public class Save : MonoBehaviour
 
         foreach(GameObject item in ImportantSpawns)
         {
-            ImportantSpawnsList.Add(new PickObjectSave(item.GetComponent<PickObject>().Id, item.GetComponent<PickObject>().Picked));
+            ImportantSpawnsList.Add(new PickObjectSave(item.GetComponent<PickObject>().Object.id, item.GetComponent<PickObject>().Id, item.GetComponent<PickObject>().Picked));
         }
 
         List<PickObjectSave> NormalSpawnsList = new List<PickObjectSave>();
 
         foreach (GameObject item in NormalSpawns)
         {
-            NormalSpawnsList.Add(new PickObjectSave(item.GetComponent<PickObject>().Id, item.GetComponent<PickObject>().Picked));
+            NormalSpawnsList.Add(new PickObjectSave(item.GetComponent<PickObject>().Object.id, item.GetComponent<PickObject>().Id, item.GetComponent<PickObject>().Picked));
         }
 
         //Treure la info del Volume

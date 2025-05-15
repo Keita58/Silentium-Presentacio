@@ -66,7 +66,7 @@ public class SpawnObjects : MonoBehaviour
                     pos = 2; // Foto per guardar
 
                 GameObject spawnObject = Instantiate(_ImportantObjects[pos].prefabToInstantiate, spawn.transform);
-                spawn.GetComponent<PickObject>().Object = spawnObject;
+                spawn.GetComponent<PickObject>().Object = _ImportantObjects[pos];
             }
         }
 
@@ -136,7 +136,7 @@ public class SpawnObjects : MonoBehaviour
                 }
 
                 GameObject spawnObject2 = Instantiate(_NormalObjects[pos].prefabToInstantiate, spawn.transform);
-                spawn.GetComponent<PickObject>().Object = spawnObject2;
+                spawn.GetComponent<PickObject>().Object = _NormalObjects[pos];
             }
         }
     }

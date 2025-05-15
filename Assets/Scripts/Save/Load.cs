@@ -2,8 +2,10 @@ using System.IO;
 using UnityEngine;
 using System.Collections.Generic;
 using static InventorySO;
+using static PickObject;
 using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.Rendering;
+using static UnityEditor.Progress;
 
 public class Load : MonoBehaviour
 {
@@ -71,24 +73,17 @@ public class Load : MonoBehaviour
                 ChestInventory.Add(new ItemSlot(_Items.FromID(item.itemId), item.amount, item.stackable));
             }
 
-            foreach(var item in ImportantSpawns)
+            for (int i = 0; i < ImportantSpawns.Count; i++) 
             {
-                foreach (var item2 in info.ImportantSpawns)
-                {
-                    if (item.Id == item2.Id)
-                        item.Picked = item2.Picked;
-                }
+                ImportantSpawns[i].Picked = info.ImportantSpawns[i].Picked;
+                ImportantSpawns[i].Object = _Items.FromID(info.ImportantSpawns[i].ObjectId);
             }
 
-            foreach(var item in NormalSpawns)
+            for (int i = 0; i < NormalSpawns.Count; i++)
             {
-                foreach (var item2 in info.NormalSpawns)
-                {
-                    if (item.Id == item2.Id)
-                        item.Picked = item2.Picked;
-                }
+                NormalSpawns[i].Picked = info.NormalSpawns[i].Picked;
+                NormalSpawns[i].Object = _Items.FromID(info.NormalSpawns[i].ObjectId);
             }
-
 
             _Inventory.items = Inventory;
             _ChestInventory.items = ChestInventory;

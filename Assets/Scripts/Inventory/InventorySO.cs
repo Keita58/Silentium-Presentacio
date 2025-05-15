@@ -24,13 +24,14 @@ public class InventorySO : ScriptableObject
         [SerializeField]
         public bool stackable;
 
-        public ItemSlot(Item obj)
+        public ItemSlot(Item obj, bool stackable)
         {
             item = obj;
             amount = 1;
+            this.stackable = stackable;
         }
 
-        public ItemSlot(Item item, int amount, bool stackable) : this(item)
+        public ItemSlot(Item item, int amount, bool stackable) : this(item, item.isStackable)
         {
             this.amount = amount;
             this.stackable = stackable;
@@ -71,11 +72,11 @@ public class InventorySO : ScriptableObject
         ItemSlot item = GetItem(usedItem);
         if (item == null)
         {
-            items.Add(new ItemSlot(usedItem));
+            items.Add(new ItemSlot(usedItem, usedItem.isStackable));
         }
         else if (!usedItem.isStackable)
         {
-            items.Add(new ItemSlot(usedItem));
+            items.Add(new ItemSlot(usedItem, usedItem.isStackable));
         }
         else
         {

@@ -277,7 +277,8 @@ public class Player : MonoBehaviour
                     }
                 }
                 interactiveGameObject.gameObject.SetActive(false);
-                onPickItem?.Invoke(interactiveGameObject.GetComponentInParent<PickObject>().Id);
+                if(itemPicked is ThrowableItem || itemPicked is SilencerItem || itemPicked is SaveItem || itemPicked is HealingItem || itemPicked is AmmunitionItem)
+                    onPickItem?.Invoke(interactiveGameObject.GetComponentInParent<PickObject>().Id);
                 if (itemPicked is BookItem && itemPicked.ItemType == ItemTypes.BOOK2) PuzzleManager.instance.ChangePositionPlayerAfterHieroglyphic();
                 interactiveGameObject = null;
             }

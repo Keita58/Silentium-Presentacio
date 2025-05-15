@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 592312795309154974, guid: b516b9ea884261c47933da8e088c36b8, type: 3}
       propertyPath: m_Mass
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 592312795309154974, guid: b516b9ea884261c47933da8e088c36b8, type: 3}
       propertyPath: m_IsKinematic

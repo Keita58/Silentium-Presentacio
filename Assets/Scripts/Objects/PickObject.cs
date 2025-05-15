@@ -5,7 +5,7 @@ using UnityEngine;
 public class PickObject : MonoBehaviour
 {
     [SerializeField] private Player _Player;
-    public GameObject Object;
+    public Item Object;
     [SerializeField] public bool Picked;
     [SerializeField] public int Id; 
 
@@ -25,19 +25,20 @@ public class PickObject : MonoBehaviour
     {
         if(id == this.Id)
             Picked = true;
-        _Player.onPickItem -= SetPicked;
     }
 
     [Serializable]
     public class PickObjectSave
     {
+        [SerializeField] public int ObjectId;
         [SerializeField] public int Id;
         [SerializeField] public bool Picked;
 
-        public PickObjectSave(int id, bool picked)
+        public PickObjectSave(int ObjectId, int id, bool picked)
         {
             this.Id = id;
             this.Picked = picked;
+            this.ObjectId = ObjectId;
         }
     }
 }
