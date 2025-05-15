@@ -270,7 +270,7 @@ public class Player : MonoBehaviour
                     {
                         book.placed = false;
                         book.collider.enabled = true;
-                        book.collider.transform.GetComponent<CellBook>().SetBook(null);
+                        book.collider.transform.GetComponent<CellBook>().SetBook(null, null);
                         book.collider = null;
                         bookItem = false;
                         item = false;
@@ -330,13 +330,13 @@ public class Player : MonoBehaviour
                     {
                         if (equipedObject.GetComponent<PickItem>().item is BookItem)
                         {
-                            interactiveGameObject.GetComponent<CellBook>().SetBook(equipedObject.GetComponent<Book>());
+                            interactiveGameObject.GetComponent<CellBook>().SetBook(equipedObject.GetComponent<Book>(), equipedObject);
                             equipedObject.GetComponent<Book>().collider = interactiveGameObject.GetComponent<CellBook>().GetComponent<BoxCollider>();
                             equipedObject.GetComponent<Book>().placed = true;
                             PuzzleManager.instance.CheckBookPuzzle();
                             interactiveGameObject.GetComponent<CellBook>().GetComponent<BoxCollider>().enabled = false;
                             equipedObject.transform.rotation = Quaternion.identity;
-                            equipedObject.transform.parent = null;
+                            equipedObject.transform.parent = interactiveGameObject.transform;
                             equipedObject.transform.position = interactiveGameObject.transform.GetChild(0).transform.position;
                             equipedObject = null;
                             itemSlotOccuped = false;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static InventorySO;
 using static PickObject;
+using static CellBook;
 
 [Serializable]
 public class SaveInfo
@@ -26,6 +27,9 @@ public class SaveInfo
     public bool PoemPuzzle;
     public bool MorsePuzzle;
     public bool WeaponPuzzle;
+
+    //Puzle llibres
+    public List<CellBookSave> CellBooks;
 
     //Valors post-render
     //Chromatic
