@@ -8,7 +8,8 @@ using UnityEngine.InputSystem;
 
 public class LineRendererExample : MonoBehaviour
 {
-
+    [SerializeField]
+    private AI ocr;
     [SerializeField]
     Camera cam;
     private List<LineRenderer> lineRenderer;
@@ -26,8 +27,9 @@ public class LineRendererExample : MonoBehaviour
         _inputAction = new InputSystem_Actions();
         _inputAction.Hieroglyphic.Paint.performed += ClickRay;
         _inputAction.Hieroglyphic.Paint.canceled += ClickRay;
-       // _inputAction.Hieroglyphic.Paint.canceled += a; // crea dos quad por esto.
-       lineRenderer = new List<LineRenderer>();
+        _inputAction.Hieroglyphic.Finish.performed += PaintingFinished;
+        // _inputAction.Hieroglyphic.Paint.canceled += a; // crea dos quad por esto.
+        lineRenderer = new List<LineRenderer>();
         // Set the material
         previousPosition = transform.position;
         lr = this.gameObject.AddComponent<LineRenderer>();
@@ -82,7 +84,8 @@ public class LineRendererExample : MonoBehaviour
         {
             isHeld = false;
             GameObject lineObject = new GameObject("Line");
-
+            lineObject.transform.parent = this.transform;
+            lineObject.layer = 23;
             // Añade un LineRenderer a ese nuevo;
             lr = lineObject.AddComponent<LineRenderer>();
             lr.SetColors(Color.black, Color.black);
@@ -107,5 +110,19 @@ public class LineRendererExample : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
 
+    }
+
+    void PaintingFinished(InputAction.CallbackContext context)
+    {
+        ocr.CaptureDrawing();
+        for(int i = 0; i <  this.transform.childCount; i++)
+        {
+            if(!this.transform.GetChild(i).gameObject.TryGetComponent<Camera>(out Camera cam))
+                Destroy(this.transform.GetChild(i).gameObject);
+        }
+        this.GetComponent<LineRenderer>().positionCount = 0;
+        this.GetComponent<LineRenderer>().positionCount = 2;
+        lineRenderer.Clear();
+        lineRenderer.Add(this.GetComponent<LineRenderer>());
     }
 }
