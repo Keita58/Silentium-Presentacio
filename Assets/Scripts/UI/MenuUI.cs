@@ -13,6 +13,7 @@ public class MenuUI : MonoBehaviour
             optionsPanel.SetActive(false);
         }else if (!optionsPanel.activeSelf && panelParent.activeSelf)
         {
+            Time.timeScale = 1;
             player.ToggleInputPlayer(true, true);
             player.ResumeInteract(true  );
             panelParent.SetActive(false);
@@ -21,7 +22,7 @@ public class MenuUI : MonoBehaviour
         {
            panelParent.SetActive(true);
            player.ToggleInputPlayer(false, false);
-            player.ResumeInteract(false);
+           player.ResumeInteract(false);
         }
     }
 }

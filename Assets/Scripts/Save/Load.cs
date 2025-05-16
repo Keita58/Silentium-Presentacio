@@ -156,23 +156,7 @@ public class Load : MonoBehaviour
             _Fast.position = info.FastEnemy;
             _Blind.position = info.BlindEnemy;
 
-            //Puzle llibres
-            bookCell.SetBook(_Items.FromID(info.CellBook.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook.bookGO).id));
-            bookCell2.SetBook(_Items.FromID(info.CellBook2.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook2.bookGO).id));
-            bookCell3.SetBook(_Items.FromID(info.CellBook3.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook3.bookGO).id));
-            bookCell4.SetBook(_Items.FromID(info.CellBook4.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook4.bookGO).id));
-            bookCell5.SetBook(_Items.FromID(info.CellBook5.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook5.bookGO).id));
-            bookCell6.SetBook(_Items.FromID(info.CellBook6.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook6.bookGO).id));
-            bookCell7.SetBook(_Items.FromID(info.CellBook7.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook7.bookGO).id));
-            bookCell8.SetBook(_Items.FromID(info.CellBook8.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook8.bookGO).id));
-            bookCell9.SetBook(_Items.FromID(info.CellBook9.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook9.bookGO).id));
-            bookCell10.SetBook(_Items.FromID(info.CellBook10.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook10.bookGO).id));
-            bookCell11.SetBook(_Items.FromID(info.CellBook11.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook11.bookGO).id));
-            bookCell12.SetBook(_Items.FromID(info.CellBook12.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook12.bookGO).id));
-            bookCell13.SetBook(_Items.FromID(info.CellBook13.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook13.bookGO).id));
-            bookCell14.SetBook(_Items.FromID(info.CellBook14.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook14.bookGO).id));
-            bookCell15.SetBook(_Items.FromID(info.CellBook15.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook15.bookGO).id));
-            bookCell16.SetBook(_Items.FromID(info.CellBook16.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook16.bookGO).id));
+            //Puzle ll
 
             if (File.Exists(temporalExistingFile))
                 File.Delete(temporalExistingFile);

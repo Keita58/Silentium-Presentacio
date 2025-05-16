@@ -189,6 +189,7 @@ public class Player : MonoBehaviour
 
     private void OpenMenu(InputAction.CallbackContext context)
     {
+        Time.timeScale = 0;
         menuManager.OpenMenu();
     }
 

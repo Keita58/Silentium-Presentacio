@@ -37,7 +37,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 953beb541740ddc499d005ee80c9ff29, type: 3}
   m_Name: Fog
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   quality:
     m_OverrideState: 1
     m_Value: 2
@@ -133,7 +133,6 @@ MonoBehaviour:
   - {fileID: 1872277326555435814}
   - {fileID: 7461877537500253709}
   - {fileID: -1975048886233948518}
-  - {fileID: 8609252997998381825}
 --- !u!114 &1872277326555435814
 MonoBehaviour:
   m_ObjectHideFlags: 3
