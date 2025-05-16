@@ -37,7 +37,7 @@ public class ThrowObject : MonoBehaviour
                     en.ListenSound(this.transform.position, soundIntensity);
                 }
             }
-            this.transform.parent.gameObject.SetActive(false);
+            this.transform.gameObject.SetActive(false);
         }
     }
 

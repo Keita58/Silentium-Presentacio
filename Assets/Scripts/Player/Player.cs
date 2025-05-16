@@ -1,11 +1,15 @@
+using System;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 public class Player : MonoBehaviour
 {
-    [SerializeField] GameObject _Camera;
+    [SerializeField] Camera _Camera;
 
     Rigidbody _Rigidbody;
+
+    public event Action onCameraClick;
 
     public InputSystem_Actions _inputActions { get; private set; }
 
@@ -27,16 +31,15 @@ public class Player : MonoBehaviour
 
     float maxAngle = 45.0f;
     float minAngle = -45.0f;
-    float gravity = 9.8f;
-    float vSpeed = 0f;
 
     bool crouched = false;
     bool aim = false;
     float crouchedCenterCollider = -0.5f;
     float crouchedHeightCollider = 1;
     Vector3 cameraPositionBeforeCrouch = new Vector3(0, 0.627f, -0.198f);
-    int gunAmmo =20;
-    int hp = 5;
+    public int gunAmmo { get; set; }
+    public int hp { get; set; }
+    
     [SerializeField]
     GameObject flashlight;
 
@@ -46,7 +49,7 @@ public class Player : MonoBehaviour
     [SerializeField] GameObject gunGameObject;
     [SerializeField] LayerMask enemyLayerMask;
     [SerializeField] LayerMask interactLayerMask;
-    [SerializeField] Camera weaponCamera;
+    //[SerializeField] Camera weaponCamera;
     [SerializeField] GameObject interactiveGameObject;
     [SerializeField] Material material;
     GameObject equippedItem;
@@ -84,13 +87,37 @@ public class Player : MonoBehaviour
     private Coroutine coroutineMove;
     private Coroutine coroutineCrouch;
     private Coroutine coroutineInteract;
+
+    //Character controller
     CharacterController characterController;
     Vector3 velocity;
+    float gravity = 9.8f;
+    float vSpeed = 0f;
 
+    [Header("Silencer")]
     [SerializeField] GameObject silencer;
-    public bool isSilencerEquipped { get; private set; }
-    int silencerUses;
-    int maxSilencerUses = 10;
+    public bool isSilencerEquipped { get; set; }
+    public int silencerUses { get; set; }
+    public int maxSilencerUses { get; set; }
+
+    //Chest
+    private GameObject chestGO;
+
+    [Header("Gun")]
+    [SerializeField] private Transform gunAimPosition;
+    private Vector3 gunDefaultPosition = new Vector3(0.456f, -0.313f, 0.505f);
+    [SerializeField] private int gunAimFov;
+    [SerializeField] private float aimSpeed;
+    [SerializeField] private int currentFov;
+    [SerializeField] private Animator gunanimator;
+
+    [Header("PostProcess")]
+    [SerializeField] private PostProcessEvents events;
+
+    [Header("General")]
+    [SerializeField] MenuUI menuManager;
+
+    public event Action<int> onPickItem;
 
     private void Awake()
     {
@@ -104,6 +131,7 @@ public class Player : MonoBehaviour
         _inputActions.Player.PickUpItem.performed += Interact;
         _inputActions.Player.Inventory.performed += OpenInventory;
         _inputActions.Player.Throw.performed += ThrowItem;
+        _inputActions.Player.Pause.performed += OpenMenu;
         _inputActions.Player.Flashlight.performed += Flashlight;
         _Rigidbody = GetComponent<Rigidbody>();
         _inputActions.Player.Enable();
@@ -150,6 +178,8 @@ public class Player : MonoBehaviour
         }
         else
         {
+            if(chestGO != null)
+                chestGO.GetComponent<Animator>().Play("CloseChest");
             Cursor.visible = false;
             InventoryManager.instance.CloseInventory();
             inventoryOpened = false;
@@ -157,11 +187,30 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void OpenMenu(InputAction.CallbackContext context)
+    {
+        menuManager.OpenMenu();
+    }
+
     void Start()
     {
         Cursor.visible = false;
         coroutineInteract = StartCoroutine(InteractuarRaycast());
         inventoryOpened = false;
+
+        hp = 5;
+        gunAmmo = 20;
+        maxSilencerUses = 10;
+        StartCoroutine(EsperarIActuar(5f, ()=>TakeDamage(1)));
+    }
+
+    IEnumerator EsperarIActuar(float tempsDespera, Action accio)
+    {
+        if (tempsDespera > 0)
+            yield return new WaitForSeconds(tempsDespera);
+        else
+            yield return null;
+        accio();
     }
 
     private void Update()
@@ -177,6 +226,25 @@ public class Player : MonoBehaviour
 
         UpdateState();
 
+    }
+
+
+    private void LateUpdate()
+    {
+        if (aim)
+        {
+            gunGameObject.transform.localPosition = Vector3.Lerp(gunGameObject.transform.localPosition, gunAimPosition.localPosition, aimSpeed * Time.deltaTime);
+            SetFieldOfView(Mathf.Lerp(_Camera.fieldOfView, gunAimFov, aimSpeed * Time.deltaTime));
+
+        }
+        else
+        {
+            if (_Camera.fieldOfView != currentFov)
+            {
+                gunGameObject.transform.localPosition = Vector3.Lerp(gunGameObject.transform.localPosition, gunDefaultPosition, aimSpeed * Time.deltaTime);
+                SetFieldOfView(Mathf.Lerp(_Camera.fieldOfView, currentFov, aimSpeed * Time.deltaTime));
+            }
+        }
     }
 
     private void Interact(InputAction.CallbackContext context)
@@ -202,13 +270,15 @@ public class Player : MonoBehaviour
                     {
                         book.placed = false;
                         book.collider.enabled = true;
-                        book.collider.transform.GetComponent<CellBook>().SetBook(null);
+                        book.collider.transform.GetComponent<CellBook>().SetBook(null, null);
                         book.collider = null;
                         bookItem = false;
                         item = false;
                     }
                 }
                 interactiveGameObject.gameObject.SetActive(false);
+                if(itemPicked is ThrowableItem || itemPicked is SilencerItem || itemPicked is SaveItem || itemPicked is HealingItem || itemPicked is AmmunitionItem)
+                    onPickItem?.Invoke(interactiveGameObject.GetComponentInParent<PickObject>().Id);
                 if (itemPicked is BookItem && itemPicked.ItemType == ItemTypes.BOOK2) PuzzleManager.instance.ChangePositionPlayerAfterHieroglyphic();
                 interactiveGameObject = null;
             }
@@ -260,13 +330,13 @@ public class Player : MonoBehaviour
                     {
                         if (equipedObject.GetComponent<PickItem>().item is BookItem)
                         {
-                            interactiveGameObject.GetComponent<CellBook>().SetBook(equipedObject.GetComponent<Book>());
+                            interactiveGameObject.GetComponent<CellBook>().SetBook(equipedObject.GetComponent<Book>(), equipedObject);
                             equipedObject.GetComponent<Book>().collider = interactiveGameObject.GetComponent<CellBook>().GetComponent<BoxCollider>();
                             equipedObject.GetComponent<Book>().placed = true;
                             PuzzleManager.instance.CheckBookPuzzle();
                             interactiveGameObject.GetComponent<CellBook>().GetComponent<BoxCollider>().enabled = false;
                             equipedObject.transform.rotation = Quaternion.identity;
-                            equipedObject.transform.parent = null;
+                            equipedObject.transform.parent = interactiveGameObject.transform;
                             equipedObject.transform.position = interactiveGameObject.transform.GetChild(0).transform.position;
                             equipedObject = null;
                             itemSlotOccuped = false;
@@ -292,12 +362,11 @@ public class Player : MonoBehaviour
                 }
                 else if (chest)
                 {
+                    chestGO.GetComponent<Animator>().Play("OpenChest");
                     InventoryManager.instance.OpenChest();
                     chest = false;
                 }
             }
-
-
         }
         else
         {
@@ -310,16 +379,16 @@ public class Player : MonoBehaviour
                     {
                         if (door.isLocked)
                         {
-                            InventorySO.ItemSlot aux = null;
+                            //InventorySO.ItemSlot aux = null;
                             foreach (InventorySO.ItemSlot item in InventoryManager.instance.inventory.items)
                             {
                                 if (item.item == door.itemNeededToOpen)
                                 {
                                     door.isLocked = false;
-                                    aux = item;
+                                    //aux = item;
+                                    InventoryManager.instance.inventory.items.Remove(item);
                                 }
                             }
-                            InventoryManager.instance.inventory.items.Remove(aux);
                             if (door.isOpen)
                             {
                                 door.Close();
@@ -349,9 +418,18 @@ public class Player : MonoBehaviour
 
     }
 
-    public void ResumeInteract()
+    public void ResumeInteract(bool resume)
     {
-        coroutineInteract = StartCoroutine(InteractuarRaycast());
+        if (resume)
+        {
+            if (coroutineInteract == null)
+                coroutineInteract = StartCoroutine(InteractuarRaycast());
+        }
+        else
+        {
+            StopCoroutine(coroutineInteract);
+            coroutineInteract = null;
+        }
     }
 
     public void EquipItem(GameObject itemAEquipar)
@@ -369,11 +447,11 @@ public class Player : MonoBehaviour
     {
         if (itemSlotOccuped)
         {
-            equipedObject.transform.GetChild(0).TryGetComponent<ThrowObject>(out ThrowObject throwable);
+            equipedObject.transform.TryGetComponent<ThrowObject>(out ThrowObject throwable);
             if (throwable != null)
             {
                 throwable.GetComponent<Rigidbody>().isKinematic = false;
-                throwable.camaraPrimera = _Camera;
+                throwable.camaraPrimera = _Camera.gameObject;
                 throwable.Lanzar();
                 if (throwable.transform.parent == itemSlot)
                 {
@@ -401,8 +479,10 @@ public class Player : MonoBehaviour
 
     private void Shoot(InputAction.CallbackContext context)
     {
+
         if (gunAmmo >= 1)
         {
+            gunanimator.Play("Shoot");
             gunAmmo--;
             Debug.DrawRay(shootPosition.transform.position, -shootPosition.transform.right, Color.magenta, 5f);
             Debug.Log("TIRO DEBUGRAY");
@@ -421,7 +501,7 @@ public class Player : MonoBehaviour
             }
             if (Physics.Raycast(shootPosition.transform.position, -shootPosition.transform.right, out RaycastHit e, 5f, enemyLayerMask))
             {
-                //e.transform.GetComponent<Enemy>().TakeHealth();
+                e.transform.GetComponent<Enemy>().TakeHealth();
                 if (isSilencerEquipped)
                 {
                     Debug.Log("Hago sonido silenciador");
@@ -440,14 +520,18 @@ public class Player : MonoBehaviour
     public void TakeDamage(int damage)
     {
         hp -= damage;
+        events.ActivateVignatteOnHurt();
     }
 
 
     private void Aim(InputAction.CallbackContext context)
     {
         aim = !aim;
-        gunGameObject.transform.localPosition = aim ? new Vector3(0.057f, -0.312999994f, 0.391000003f) : new Vector3(0.456f, -0.313f, 0.505f);
-        weaponCamera.transform.localPosition = aim ? new Vector3(0f, 0f, -0.28f) : Vector3.zero;
+    }
+
+    private void SetFieldOfView(float fov)
+    {
+        _Camera.fieldOfView = fov;
     }
 
     public void UseSilencer()
@@ -521,7 +605,7 @@ public class Player : MonoBehaviour
                 if (movementInput == Vector2.zero)
                     ChangeState(PlayerStates.IDLE);
 
-                if (_RunAction.IsPressed() && !crouched)
+                if (_RunAction.IsPressed() && !crouched && !aim)
                 {
                     ChangeState(PlayerStates.RUN);
                 }
@@ -541,7 +625,7 @@ public class Player : MonoBehaviour
                   transform.forward * movementInput.y).normalized * _VelocityRun;
                 vSpeed -= gravity * Time.deltaTime;
                 velocity.y = vSpeed;
-                if (!_RunAction.IsPressed())
+                if (!_RunAction.IsPressed() || aim)
                     ChangeState(PlayerStates.MOVE);
                 break;
             case PlayerStates.CROUCH:
@@ -648,6 +732,14 @@ public class Player : MonoBehaviour
                             };
                         }
                     }
+
+                    //if(hit.transform.TryGetComponent<Interactuable>(out Interactuable aux))
+                    if(hit.transform.gameObject.layer == 24)
+                    {
+                        onCameraClick?.Invoke();
+                    }
+
+                    //S'ha de canviar aix� per una sola layer
                     if (hit.transform.gameObject.layer == 9)
                     {
                         item = true;
@@ -668,6 +760,7 @@ public class Player : MonoBehaviour
                     else if (hit.transform.gameObject.layer == 13)
                     {
                         chest = true;
+                        chestGO = hit.transform.gameObject;
                     }
                     else if (hit.transform.gameObject.layer == 15)
                     {
@@ -710,6 +803,9 @@ public class Player : MonoBehaviour
                 note = false;
                 weaponPuzzle = false;
                 chest = false;
+
+                chestGO = null;
+
                 if (interactiveGameObject != null)
                 {
                     if (interactiveGameObject.transform.gameObject.layer != 15 && interactiveGameObject.transform.gameObject.layer != 18)
@@ -775,6 +871,11 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void SetCurrentFOV(int fovLevel)
+    {
+        currentFov = fovLevel;
+    }
+
     public void Flashlight(InputAction.CallbackContext context)
     {
         if(!flashlight.activeSelf) flashlight.SetActive(true);
@@ -782,11 +883,15 @@ public class Player : MonoBehaviour
     }
     private void OnDestroy()
     {
+        if (_inputActions.Player.enabled)
+        {
         _inputActions.Player.Shoot.performed -= Shoot;
         _inputActions.Player.Aim.performed -= Aim;
         _inputActions.Player.PickUpItem.performed -= Interact;
         _inputActions.Player.Inventory.performed -= OpenInventory;
         _inputActions.Player.Crouch.performed -= Crouch;
+        _inputActions.Player.Throw.performed -= ThrowItem;
+        }
 
     }
 }

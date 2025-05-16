@@ -27,6 +27,7 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] GameObject notesPanelScroll;
     [SerializeField] private GameObject imagePanel;
     [SerializeField] private GameObject bookPanel;
+    [SerializeField] private PostProcessEvents postProcessEvents;
 
     private Item equippedItem;
 
@@ -322,6 +323,9 @@ public class InventoryManager : MonoBehaviour
     public void DiscoverNote(NotesSO note)
     {
         noteInventory.AddNote(note);
+        postProcessEvents.IncreaseIntensityChAb(0.167f);
+        postProcessEvents.IncreaseSampleChAb(3);
+        postProcessEvents.IncreaseIntensityFilmGrain(0.167f);
     }
 
     public void ShowNoteScroll(NotesSO note)
@@ -375,6 +379,7 @@ public class InventoryManager : MonoBehaviour
     {
         imagePanel.SetActive(false);
         player.ToggleInputPlayer(true, true);
+        player.ToggleInputPlayer(true, true);
     }
 
     public void CloseBookNote()
@@ -383,6 +388,7 @@ public class InventoryManager : MonoBehaviour
         player.ToggleInputPlayer(true, true);
     }
 
+    //pasar este metodo al ui.
     public void ShowDiscoveredNotes()
     {
         for (int i = 0; i < noteInventory.notes.Count; i++)
