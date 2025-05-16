@@ -116,6 +116,8 @@ public class Player : MonoBehaviour
     [SerializeField] Waves waves;
 
     public event Action onPickItem;
+    public event Action<int> onMakeSound;
+    public event Action<int> onMakeImpactSound;
 
     private void Awake()
     {
@@ -195,10 +197,10 @@ public class Player : MonoBehaviour
         coroutineInteract = StartCoroutine(InteractuarRaycast());
         inventoryOpened = false;
 
-        hp = 5;
+        hp = 3;
         gunAmmo = 20;
         maxSilencerUses = 10;
-        StartCoroutine(EsperarIActuar(5f, ()=>TakeDamage(1)));
+        //StartCoroutine(EsperarIActuar(5f, ()=>TakeDamage(1)));
     }
 
     IEnumerator EsperarIActuar(float tempsDespera, Action accio)
@@ -224,15 +226,12 @@ public class Player : MonoBehaviour
         UpdateState();
 
     }
-
-
     private void LateUpdate()
     {
         if (aim)
         {
             gunGameObject.transform.localPosition = Vector3.Lerp(gunGameObject.transform.localPosition, gunAimPosition.localPosition, aimSpeed * Time.deltaTime);
             SetFieldOfView(Mathf.Lerp(_Camera.fieldOfView, gunAimFov, aimSpeed * Time.deltaTime));
-
         }
         else
         {
@@ -443,9 +442,10 @@ public class Player : MonoBehaviour
     {
         if (itemSlotOccuped)
         {
-            equipedObject.transform.GetChild(0).TryGetComponent<ThrowObject>(out ThrowObject throwable);
+            equipedObject.transform.GetChild(0).TryGetComponent(out ThrowObject throwable);
             if (throwable != null)
             {
+                events.onHit += MakeSoundThrowable;
                 throwable.GetComponent<Rigidbody>().isKinematic = false;
                 throwable.camaraPrimera = _Camera.gameObject;
                 throwable.Lanzar();
@@ -459,6 +459,12 @@ public class Player : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void MakeSoundThrowable()
+    {
+        
+        onMakeImpactSound?.Invoke(8);
     }
 
     public void UnequipItem()
@@ -486,6 +492,9 @@ public class Player : MonoBehaviour
             {
                 if (silencerUses > 0)
                 {
+                    Debug.Log("Hago sonido silenciador");
+                    onMakeImpactSound?.Invoke(5);
+                    MakeNoise(5, 5);
                     silencerUses--;
                     Debug.Log("Silenciador usos: " + silencerUses);
                 }
@@ -495,19 +504,14 @@ public class Player : MonoBehaviour
                     silencer.SetActive(false);
                 }
             }
+            else
+            {
+                MakeNoise(10, 10);
+                onMakeImpactSound?.Invoke(8);
+            }
             if (Physics.Raycast(shootPosition.transform.position, -shootPosition.transform.right, out RaycastHit e, 5f, enemyLayerMask))
             {
                 e.transform.GetComponent<Enemy>().TakeHealth();
-                if (isSilencerEquipped)
-                {
-                    Debug.Log("Hago sonido silenciador");
-                    MakeNoise(5, 5);
-                }
-                else
-                {
-                    MakeNoise(10, 10);
-                }
-                Debug.Log("Enemy hit");
             }
             //OnDisparar?.Invoke();
         }
@@ -517,6 +521,7 @@ public class Player : MonoBehaviour
     {
         hp -= damage;
         events.ActivateVignatteOnHurt();
+
     }
 
 
@@ -542,7 +547,7 @@ public class Player : MonoBehaviour
 
     #region FSM
 
-    enum PlayerStates { IDLE, MOVE, RUN, HURT, RUNMOVE, CROUCH }
+    enum PlayerStates { IDLE, MOVE, RUN, HURT, RUNMOVE, CROUCH, CROUCH_IDLE }
     [SerializeField] PlayerStates actualState;
     [SerializeField] float stateTime;
 
@@ -561,6 +566,7 @@ public class Player : MonoBehaviour
         switch (actualState)
         {
             case PlayerStates.IDLE:
+                onMakeSound?.Invoke(2);
                 break;
             case PlayerStates.MOVE:
                 coroutineMove = StartCoroutine(MakeNoiseMove());
@@ -576,6 +582,14 @@ public class Player : MonoBehaviour
                 _VelocityMove /= 2;
                 coroutineCrouch = StartCoroutine(MakeNoiseCrouch());
                 break;
+            case PlayerStates.CROUCH_IDLE:
+                if (coroutineCrouch != null)
+                {
+                    StopCoroutine(coroutineCrouch);
+                    coroutineCrouch = null;
+                    onMakeSound?.Invoke(2);
+                }
+                break;
             default:
                 break;
         }
@@ -587,7 +601,6 @@ public class Player : MonoBehaviour
         {
 
             case PlayerStates.IDLE:
-                waves.MakeSound(0);
                 if (movementInput != Vector2.zero && !crouched)
                 {
                     ChangeState(PlayerStates.MOVE);
@@ -639,11 +652,7 @@ public class Player : MonoBehaviour
                     ChangeState(PlayerStates.MOVE);
                 }else if (crouched && movementInput == Vector2.zero)
                 {
-                   if (coroutineCrouch != null)
-                    {
-                        StopCoroutine(coroutineCrouch);
-                        coroutineCrouch = null;
-                    }
+                    ChangeState(PlayerStates.CROUCH_IDLE);
                 }
                 else
                 {
@@ -653,12 +662,17 @@ public class Player : MonoBehaviour
                     }
                 }
                 break;
+            case PlayerStates.CROUCH_IDLE:
+                if (crouched && movementInput != Vector2.zero)
+                {
+                    ChangeState(PlayerStates.CROUCH);
+                }
+                break;
             default:
                 break;
         }
         characterController.Move(velocity * Time.deltaTime);
     }
-
 
     private void ExitState(PlayerStates exitState)
     {
@@ -675,11 +689,24 @@ public class Player : MonoBehaviour
             case PlayerStates.CROUCH:
                 if (coroutineCrouch != null)
                     StopCoroutine(coroutineCrouch);
-                this.GetComponent<CharacterController>().center = Vector3.zero;
-                this.GetComponent<CharacterController>().height = 2;
-                _Camera.transform.localPosition = cameraPositionBeforeCrouch;
-                cameraShenanigansGameObject.transform.localPosition = new Vector3(0f, _Camera.transform.localPosition.y, 0f);
-                _VelocityMove *= 2;
+                if (!crouched)
+                {
+                    this.GetComponent<CharacterController>().center = Vector3.zero;
+                    this.GetComponent<CharacterController>().height = 2;
+                    _Camera.transform.localPosition = cameraPositionBeforeCrouch;
+                    cameraShenanigansGameObject.transform.localPosition = new Vector3(0f, _Camera.transform.localPosition.y, 0f);
+                    _VelocityMove *= 2;
+                }
+                break;
+            case PlayerStates.CROUCH_IDLE:
+                if (!crouched)
+                {
+                    this.GetComponent<CharacterController>().center = Vector3.zero;
+                    this.GetComponent<CharacterController>().height = 2;
+                    _Camera.transform.localPosition = cameraPositionBeforeCrouch;
+                    cameraShenanigansGameObject.transform.localPosition = new Vector3(0f, _Camera.transform.localPosition.y, 0f);
+                    _VelocityMove *= 2;
+                }
                 break;
             default:
                 break;
@@ -736,7 +763,7 @@ public class Player : MonoBehaviour
                         onCameraClick?.Invoke();
                     }
 
-                    //S'ha de canviar aix� per una sola layer
+                    //S'ha de canviar aixo per una sola layer
                     if (hit.transform.gameObject.layer == 9)
                     {
                         item = true;
@@ -830,7 +857,7 @@ public class Player : MonoBehaviour
         while (true)
         {
             MakeNoise(30, 3);
-            waves.MakeSound(3);
+            onMakeSound?.Invoke(4);
             yield return new WaitForSeconds(0.5f);
         }
     }
@@ -841,7 +868,7 @@ public class Player : MonoBehaviour
         {
             Debug.Log("CORUTINACORRER");
             MakeNoise(37, 7);
-            waves.MakeSound(7);
+            onMakeSound?.Invoke(7);
             yield return new WaitForSeconds(0.5f);
         }
     }
@@ -852,14 +879,13 @@ public class Player : MonoBehaviour
         {
             Debug.Log("CORUTINACROUCH");
             MakeNoise(5, 1);
+            onMakeSound?.Invoke(3);
             yield return new WaitForSeconds(0.5f);
         }
     }
-    #endregion
-
     private void MakeNoise(int radius, int noiseQuantity)
     {
-        Collider[] colliderHits = Physics.OverlapSphere(this.transform.position,radius);
+        Collider[] colliderHits = Physics.OverlapSphere(this.transform.position, radius);
         foreach (Collider collider in colliderHits)
         {
             if (collider.gameObject.TryGetComponent<Enemy>(out Enemy en))
@@ -869,6 +895,7 @@ public class Player : MonoBehaviour
             }
         }
     }
+    #endregion
 
     public void SetCurrentFOV(int fovLevel)
     {
@@ -879,13 +906,13 @@ public class Player : MonoBehaviour
     {
         if (_inputActions.Player.enabled)
         {
-        _inputActions.Player.Shoot.performed -= Shoot;
-        _inputActions.Player.Aim.performed -= Aim;
-        _inputActions.Player.PickUpItem.performed -= Interact;
-        _inputActions.Player.Inventory.performed -= OpenInventory;
-        _inputActions.Player.Crouch.performed -= Crouch;
-        _inputActions.Player.Throw.performed -= ThrowItem;
+            _inputActions.Player.Shoot.performed -= Shoot;
+            _inputActions.Player.Aim.performed -= Aim;
+            _inputActions.Player.PickUpItem.performed -= Interact;
+            _inputActions.Player.Inventory.performed -= OpenInventory;
+            _inputActions.Player.Crouch.performed -= Crouch;
+            _inputActions.Player.Throw.performed -= ThrowItem;
+            _inputActions.Player.Pause.performed -= OpenMenu;
         }
-
     }
 }

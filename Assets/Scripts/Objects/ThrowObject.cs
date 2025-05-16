@@ -1,3 +1,4 @@
+using System;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -5,6 +6,7 @@ public class ThrowObject : MonoBehaviour
 {
     [SerializeField] private int soundIntensity;
     [SerializeField] public GameObject camaraPrimera;
+    [SerializeField] private PostProcessEvents events;
     void Start()
     {  
         this.AddComponent<CapsuleCollider>();
@@ -37,6 +39,7 @@ public class ThrowObject : MonoBehaviour
                     en.ListenSound(this.transform.position, soundIntensity);
                 }
             }
+            events.MakeThrowImpactSound();
             this.transform.parent.gameObject.SetActive(false);
         }
     }
