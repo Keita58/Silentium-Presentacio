@@ -16,6 +16,9 @@ public class ThrowableItem : Item
     [SerializeField] private GameObject prefab;
     public override GameObject prefabToEquip => prefab;
 
+    [SerializeField] private GameObject prefabInst;
+    public override GameObject prefabToInstantiate => prefabInst;
+
     [SerializeField] private bool stackable;
     public override bool isStackable => stackable;
 
@@ -33,6 +36,8 @@ public class ThrowableItem : Item
     [SerializeField] private bool combinable;
     public override bool isCombinable => combinable;
 
+    [SerializeField] private int throwableId;
+    public override int id => throwableId;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public override void Use()

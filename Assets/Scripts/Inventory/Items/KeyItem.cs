@@ -17,6 +17,9 @@ public class KeyItem : Item
     [SerializeField] private GameObject prefab;
     public override GameObject prefabToEquip => prefab;
 
+    [SerializeField] private GameObject prefabInst;
+    public override GameObject prefabToInstantiate => prefabInst;
+
     [SerializeField] private bool stackable;
     public override bool isStackable => stackable;
 
@@ -33,6 +36,9 @@ public class KeyItem : Item
 
     [SerializeField] private bool combinable;
     public override bool isCombinable => combinable;
+
+    [SerializeField] private int keyId;
+    public override int id => keyId;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created

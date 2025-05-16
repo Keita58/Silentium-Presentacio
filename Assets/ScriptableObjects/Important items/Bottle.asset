@@ -16,7 +16,8 @@ MonoBehaviour:
   description: "Botella de pl\xE1stico. Si la combinase con algo m\xE1s podr\xEDa
     hacer que la pistla hiciese menos ruido para no atraer a los monstruos..."
   sprite: {fileID: 21300000, guid: 877d643155b453f41b16b32c4f55ca36, type: 3}
-  prefab: {fileID: 4504090505060479967, guid: 4b8e732d5c5b7e74c82dd4270d5ed196, type: 3}
+  prefab: {fileID: 0}
+  prefabInst: {fileID: 9169805650554429789, guid: 68429bf8f0973cb46b16b81bd2f6f53d, type: 3}
   itemsToCombine:
   - {fileID: 11400000, guid: f3a7a77011dab4c43b33531315afd136, type: 2}
   stackable: 1
@@ -24,4 +25,5 @@ MonoBehaviour:
   usable: 0
   equipable: 0
   combinable: 1
+  silencerId: 7
   silencer: {fileID: 11400000, guid: 6f84b6f5e8d320540bb3093a9c3f96fb, type: 2}

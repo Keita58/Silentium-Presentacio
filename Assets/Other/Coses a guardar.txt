@@ -1,0 +1,22 @@
+Coses a guardar:
+- Inventari del jugador (fet)
+- Puzles realitzats (fet)
+- Objectes del cofre (fet)
+- Mirar si té silenciador (fet)
+- Estat del jugador (vida i bales equipades) (fet)
+- Notes conseguides (fet)
+- Configuració
+- Valors post-render
+
+********** (FET)
+Chormatic aberration:
+- Està actiu?
+- Intensitat
+- Samples
+
+Film Grain
+- Està actiu?
+- Intensitat
+
+Fog
+- Està activa?

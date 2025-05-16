@@ -22,3 +22,4 @@ MonoBehaviour:
   usable: 0
   equipable: 1
   combinable: 0
+  bookId: 3

@@ -19,6 +19,9 @@ public class BookItem : Item
     [SerializeField] private GameObject prefab;
     public override GameObject prefabToEquip => prefab;
 
+    [SerializeField] private GameObject prefabInst;
+    public override GameObject prefabToInstantiate => prefabInst;
+
     [SerializeField] private List<Item> itemsToCombine;
     public override List<Item> combinableItems => itemsToCombine;
 
@@ -37,7 +40,8 @@ public class BookItem : Item
     [SerializeField] private bool combinable;
     public override bool isCombinable => combinable;
 
-
+    [SerializeField] private int bookId;
+    public override int id => bookId;
 
     public override void Use()
     {
