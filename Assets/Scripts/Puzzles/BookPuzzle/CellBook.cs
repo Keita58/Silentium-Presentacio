@@ -10,6 +10,9 @@ public class CellBook : MonoBehaviour
     [SerializeField]
     public GameObject bookGO;
 
+    [SerializeField]
+    public int cellId;
+
     public void SetBook(Book b, GameObject go)
     {
         this.book = b;
@@ -25,10 +28,12 @@ public class CellBook : MonoBehaviour
     public class CellBookSave
     {
         [SerializeField] public int bookGO;
+        [SerializeField] public int cellId;
 
-        public CellBookSave(int bookGO) 
+        public CellBookSave(int bookGO, int cellId) 
         {
             this.bookGO = bookGO;
+            this.cellId = cellId;
         }
     }
 }

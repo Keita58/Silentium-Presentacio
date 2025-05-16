@@ -2,10 +2,9 @@ using System.IO;
 using UnityEngine;
 using System.Collections.Generic;
 using static InventorySO;
-using static PickObject;
+using static CellBook;
 using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.Rendering;
-using static UnityEditor.Progress;
 using Unity.VisualScripting;
 
 public class Load : MonoBehaviour
@@ -46,22 +45,7 @@ public class Load : MonoBehaviour
     [SerializeField] private List<PickObject> NormalSpawns;
 
     [Header("Books puzzle")]
-    [SerializeField] private CellBook bookCell;
-    [SerializeField] private CellBook bookCell2;
-    [SerializeField] private CellBook bookCell3;
-    [SerializeField] private CellBook bookCell4;
-    [SerializeField] private CellBook bookCell5;
-    [SerializeField] private CellBook bookCell6;
-    [SerializeField] private CellBook bookCell7;
-    [SerializeField] private CellBook bookCell8;
-    [SerializeField] private CellBook bookCell9;
-    [SerializeField] private CellBook bookCell10;
-    [SerializeField] private CellBook bookCell11;
-    [SerializeField] private CellBook bookCell12;
-    [SerializeField] private CellBook bookCell13;
-    [SerializeField] private CellBook bookCell14;
-    [SerializeField] private CellBook bookCell15;
-    [SerializeField] private CellBook bookCell16;
+    [SerializeField] private List<CellBook> _CellBooks;
 
 
     private void Awake()
@@ -156,7 +140,20 @@ public class Load : MonoBehaviour
             _Fast.position = info.FastEnemy;
             _Blind.position = info.BlindEnemy;
 
-            //Puzle ll
+            //Puzle llibres
+            foreach(CellBook cell in _CellBooks)
+            {
+                foreach(CellBookSave save in info.CellBooks)
+                {
+                    if (cell.cellId == save.cellId)
+                    {
+                        cell.SetBook(_Books.FromID(_Items.FromID(save.bookGO).id).GetComponent<Book>(), _Books.FromID(_Items.FromID(save.bookGO).id));
+                        GameObject aux = Instantiate(_Books.FromID(_Items.FromID(save.bookGO).id));
+                        aux.transform.position = cell.transform.GetChild(0).transform.position;
+                        break;
+                    }
+                }
+            }
 
             if (File.Exists(temporalExistingFile))
                 File.Delete(temporalExistingFile);
