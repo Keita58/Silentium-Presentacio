@@ -97,7 +97,7 @@ public class Save : MonoBehaviour
         foreach(CellBook book in _Cells)
         {
             if (book.bookGO != null)
-                (bookCell.bookGO != null ? new CellBookSave(bookCell.bookGO.GetComponent<PickItem>().item.id) : null),
+                CellBooks.Add(new CellBookSave(book.bookGO.GetComponent<PickItem>().item.id, book.cellId));
         }
 
         //Treure la info del Volume

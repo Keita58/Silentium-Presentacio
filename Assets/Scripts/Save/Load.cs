@@ -2,10 +2,9 @@ using System.IO;
 using UnityEngine;
 using System.Collections.Generic;
 using static InventorySO;
-using static PickObject;
+using static CellBook;
 using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.Rendering;
-using static UnityEditor.Progress;
 using Unity.VisualScripting;
 
 public class Load : MonoBehaviour
@@ -46,22 +45,7 @@ public class Load : MonoBehaviour
     [SerializeField] private List<PickObject> NormalSpawns;
 
     [Header("Books puzzle")]
-    [SerializeField] private CellBook bookCell;
-    [SerializeField] private CellBook bookCell2;
-    [SerializeField] private CellBook bookCell3;
-    [SerializeField] private CellBook bookCell4;
-    [SerializeField] private CellBook bookCell5;
-    [SerializeField] private CellBook bookCell6;
-    [SerializeField] private CellBook bookCell7;
-    [SerializeField] private CellBook bookCell8;
-    [SerializeField] private CellBook bookCell9;
-    [SerializeField] private CellBook bookCell10;
-    [SerializeField] private CellBook bookCell11;
-    [SerializeField] private CellBook bookCell12;
-    [SerializeField] private CellBook bookCell13;
-    [SerializeField] private CellBook bookCell14;
-    [SerializeField] private CellBook bookCell15;
-    [SerializeField] private CellBook bookCell16;
+    [SerializeField] private List<CellBook> _CellBooks;
 
 
     private void Awake()
@@ -157,22 +141,19 @@ public class Load : MonoBehaviour
             _Blind.position = info.BlindEnemy;
 
             //Puzle llibres
-            bookCell.SetBook(_Items.FromID(info.CellBook.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook.bookGO).id));
-            bookCell2.SetBook(_Items.FromID(info.CellBook2.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook2.bookGO).id));
-            bookCell3.SetBook(_Items.FromID(info.CellBook3.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook3.bookGO).id));
-            bookCell4.SetBook(_Items.FromID(info.CellBook4.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook4.bookGO).id));
-            bookCell5.SetBook(_Items.FromID(info.CellBook5.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook5.bookGO).id));
-            bookCell6.SetBook(_Items.FromID(info.CellBook6.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook6.bookGO).id));
-            bookCell7.SetBook(_Items.FromID(info.CellBook7.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook7.bookGO).id));
-            bookCell8.SetBook(_Items.FromID(info.CellBook8.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook8.bookGO).id));
-            bookCell9.SetBook(_Items.FromID(info.CellBook9.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook9.bookGO).id));
-            bookCell10.SetBook(_Items.FromID(info.CellBook10.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook10.bookGO).id));
-            bookCell11.SetBook(_Items.FromID(info.CellBook11.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook11.bookGO).id));
-            bookCell12.SetBook(_Items.FromID(info.CellBook12.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook12.bookGO).id));
-            bookCell13.SetBook(_Items.FromID(info.CellBook13.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook13.bookGO).id));
-            bookCell14.SetBook(_Items.FromID(info.CellBook14.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook14.bookGO).id));
-            bookCell15.SetBook(_Items.FromID(info.CellBook15.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook15.bookGO).id));
-            bookCell16.SetBook(_Items.FromID(info.CellBook16.bookGO).GetComponent<Book>(), _Books.FromID(_Items.FromID(info.CellBook16.bookGO).id));
+            foreach(CellBook cell in _CellBooks)
+            {
+                foreach(CellBookSave save in info.CellBooks)
+                {
+                    if (cell.cellId == save.cellId)
+                    {
+                        cell.SetBook(_Books.FromID(_Items.FromID(save.bookGO).id).GetComponent<Book>(), _Books.FromID(_Items.FromID(save.bookGO).id));
+                        GameObject aux = Instantiate(_Books.FromID(_Items.FromID(save.bookGO).id));
+                        aux.transform.position = cell.transform.GetChild(0).transform.position;
+                        break;
+                    }
+                }
+            }
 
             if (File.Exists(temporalExistingFile))
                 File.Delete(temporalExistingFile);

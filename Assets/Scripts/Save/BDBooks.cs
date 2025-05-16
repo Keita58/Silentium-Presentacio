@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using UnityEngine;
+using static UnityEditor.Progress;
 
 [CreateAssetMenu(fileName = "BDBooks", menuName = "Scriptable Objects/BDBooks")]
 public class BDBooks : ScriptableObject
@@ -14,7 +15,7 @@ public class BDBooks : ScriptableObject
         {
             foreach (GameObject currentScriptable in ScriptableExemples)
             {
-                if (currentScriptable.GetComponent<BookItem>().id == id)
+                if (currentScriptable.GetComponent<PickItem>().item.id == id)
                     return currentScriptable;
             }
             return null;
@@ -34,7 +35,7 @@ public class BDBooks : ScriptableObject
         {
             foreach (GameObject currentScriptable in ScriptableExemples)
             {
-                if (currentScriptable.GetComponent<BookItem>().id == id)
+                if (currentScriptable.GetComponent<PickItem>().item.id == id)
                     return currentScriptable;
             }
             return null;
@@ -49,7 +50,7 @@ public class BDBooks : ScriptableObject
 
         for (int i = 0; i < listScriptables.Count; ++i)
         {
-            listIDs[i] = listScriptables[i].GetComponent<BookItem>().id;
+            listIDs[i] = listScriptables[i].GetComponent<PickItem>().item.id;
         }
 
         return listIDs;
