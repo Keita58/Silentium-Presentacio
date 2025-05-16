@@ -291,13 +291,11 @@ public class Player : MonoBehaviour
                 if (clockPuzzle)
                 {
                     PuzzleManager.instance.InteractClockPuzzle();
-                    StopCoroutine(coroutineInteract);
                     clockPuzzle = false;
 
                 }else if (weaponPuzzle)
                 {
                     PuzzleManager.instance.InteractWeaponPuzzle();
-                    StopCoroutine(coroutineInteract);
                     weaponPuzzle = false;
                 }
                 else if (note)
@@ -380,14 +378,15 @@ public class Player : MonoBehaviour
                     {
                         if (door.isLocked)
                         {
-                            //InventorySO.ItemSlot aux = null;
+                            InventorySO.ItemSlot aux = null;
                             foreach (InventorySO.ItemSlot item in InventoryManager.instance.inventory.items)
                             {
                                 if (item.item == door.itemNeededToOpen)
                                 {
                                     door.isLocked = false;
-                                    //aux = item;
-                                    InventoryManager.instance.inventory.items.Remove(item);
+                                    aux = item;
+                                    InventoryManager.instance.inventory.items.Remove(aux);
+                                    break;
                                 }
                             }
                             if (door.isOpen)
