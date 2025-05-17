@@ -39,6 +39,8 @@ public class Waves : MonoBehaviour
             colors[i] = transparent;
         player.onMakeSound += MakeSound;
         player.onMakeImpactSound += MakeImpactSound;
+        player.OnHpChange += ChangeColorWave;
+
     }
 
     void Draw()
@@ -133,6 +135,22 @@ public class Waves : MonoBehaviour
         this.targetFrequency = currentTargetFrequency;
         if (targetFrequency < 1) targetFrequency = 1;
         this.targetMovementSpeed = currentTargetMovementSpeed;
+    }
+
+    private void ChangeColorWave(int hp, int maxHp)
+    {
+        if (hp <= maxHp / 2)
+        {
+            color = Color.yellow;
+        }
+        else if (hp <= maxHp / 3)
+        {
+           color = Color.red;
+        }
+        else
+        {
+            color = Color.green;
+        }
     }
 
     private void OnDestroy()

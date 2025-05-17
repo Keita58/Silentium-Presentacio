@@ -1,8 +1,10 @@
+using NUnit.Framework;
 using System;
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 public class Player : MonoBehaviour
 {
     [SerializeField] Camera _Camera;
@@ -39,6 +41,8 @@ public class Player : MonoBehaviour
     Vector3 cameraPositionBeforeCrouch = new Vector3(0, 0.627f, -0.198f);
     public int gunAmmo { get; set; }
     public int hp { get; set; }
+
+    public int maxHp { get; private set; }
 
     [SerializeField] GameObject cameraShenanigansGameObject;
 
@@ -118,6 +122,10 @@ public class Player : MonoBehaviour
     public event Action onPickItem;
     public event Action<int> onMakeSound;
     public event Action<int> onMakeImpactSound;
+    public event Action<GameObject> OnInteractuable;
+    public event Action OnNotInteractuable;
+    public event Action<int,int> OnHpChange;
+    public event Action<string> OnWarning;
 
     private void Awake()
     {
@@ -197,10 +205,11 @@ public class Player : MonoBehaviour
         coroutineInteract = StartCoroutine(InteractuarRaycast());
         inventoryOpened = false;
 
-        hp = 3;
+        hp = 6;
+        maxHp = 6;
         gunAmmo = 20;
         maxSilencerUses = 10;
-        //StartCoroutine(EsperarIActuar(5f, ()=>TakeDamage(1)));
+        StartCoroutine(EsperarIActuar(5f, ()=>TakeDamage(6)));
     }
 
     IEnumerator EsperarIActuar(float tempsDespera, Action accio)
@@ -251,31 +260,35 @@ public class Player : MonoBehaviour
             if (item)
             {
                 Debug.Log("ENTRO DEFINITIVAMENTE");
-                Item itemPicked = interactiveGameObject.GetComponent<PickItem>().item;
-                if (InventoryManager.instance.inventory.items.Count<6)
-                    InventoryManager.instance.AddItem(itemPicked);
-                else
-                    Debug.Log("Inventory full");
-                Debug.Log("QUE COJO?" + itemPicked);
-
-                Debug.Log("Entro Coger item");
-                if (bookItem)
+                if (InventoryManager.instance.inventory.items.Count < 6)
                 {
-                    Book book = interactiveGameObject.GetComponent<Book>();
-                    if (book.placed)
+                    Item itemPicked = interactiveGameObject.GetComponent<PickItem>().item;
+                    InventoryManager.instance.AddItem(itemPicked);
+                    Debug.Log("QUE COJO?" + itemPicked);
+
+                    Debug.Log("Entro Coger item");
+                    if (bookItem)
                     {
-                        book.placed = false;
-                        book.collider.enabled = true;
-                        book.collider.transform.GetComponent<CellBook>().SetBook(null);
-                        book.collider = null;
-                        bookItem = false;
-                        item = false;
+                        Book book = interactiveGameObject.GetComponent<Book>();
+                        if (book.placed)
+                        {
+                            book.placed = false;
+                            book.collider.enabled = true;
+                            book.collider.transform.GetComponent<CellBook>().SetBook(null);
+                            book.collider = null;
+                            bookItem = false;
+                            item = false;
+                        }
                     }
+                    interactiveGameObject.gameObject.SetActive(false);
+                    onPickItem?.Invoke();
+                    if (itemPicked is BookItem && itemPicked.ItemType == ItemTypes.BOOK2) PuzzleManager.instance.ChangePositionPlayerAfterHieroglyphic();
+                    interactiveGameObject = null;
                 }
-                interactiveGameObject.gameObject.SetActive(false);
-                onPickItem?.Invoke();
-                if (itemPicked is BookItem && itemPicked.ItemType == ItemTypes.BOOK2) PuzzleManager.instance.ChangePositionPlayerAfterHieroglyphic();
-                interactiveGameObject = null;
+                else
+                {
+                    OnWarning?.Invoke("Inventario lleno!");
+                }  
             }
             else
             {
@@ -422,8 +435,11 @@ public class Player : MonoBehaviour
         }
         else
         {
-            StopCoroutine(coroutineInteract);
-            coroutineInteract = null;
+            if (coroutineInteract != null)
+            {
+                StopCoroutine(coroutineInteract);
+                coroutineInteract = null;
+            }
         }
     }
 
@@ -520,8 +536,15 @@ public class Player : MonoBehaviour
     public void TakeDamage(int damage)
     {
         hp -= damage;
+        if (hp <= 0) SceneManager.LoadScene("GameOver");
         events.ActivateVignatteOnHurt();
+        OnHpChange?.Invoke(hp, maxHp);
+    }
 
+    public void Heal(int hpToheal)
+    {
+        hp += hpToheal;
+        OnHpChange?.Invoke(hp, maxHp);
     }
 
 
@@ -643,29 +666,19 @@ public class Player : MonoBehaviour
                transform.forward * movementInput.y).normalized * 1.5f;
                 vSpeed -= gravity * Time.deltaTime;
                 velocity.y = vSpeed;
-                if (!crouched && movementInput == Vector2.zero)
-                {
-                    ChangeState(PlayerStates.IDLE);
-                }
-                else if (!crouched)
-                {
-                    ChangeState(PlayerStates.MOVE);
-                }else if (crouched && movementInput == Vector2.zero)
+                if (!crouched || crouched && movementInput == Vector2.zero)
                 {
                     ChangeState(PlayerStates.CROUCH_IDLE);
-                }
-                else
-                {
-                    if (coroutineCrouch == null)
-                    {
-                        coroutineCrouch = StartCoroutine(MakeNoiseCrouch());
-                    }
                 }
                 break;
             case PlayerStates.CROUCH_IDLE:
                 if (crouched && movementInput != Vector2.zero)
                 {
                     ChangeState(PlayerStates.CROUCH);
+                }
+                else if (!crouched)
+                {
+                    ChangeState(PlayerStates.IDLE);
                 }
                 break;
             default:
@@ -687,26 +700,23 @@ public class Player : MonoBehaviour
                     StopCoroutine(coroutineRun);
                 break;
             case PlayerStates.CROUCH:
-                if (coroutineCrouch != null)
-                    StopCoroutine(coroutineCrouch);
-                if (!crouched)
-                {
-                    this.GetComponent<CharacterController>().center = Vector3.zero;
-                    this.GetComponent<CharacterController>().height = 2;
-                    _Camera.transform.localPosition = cameraPositionBeforeCrouch;
-                    cameraShenanigansGameObject.transform.localPosition = new Vector3(0f, _Camera.transform.localPosition.y, 0f);
-                    _VelocityMove *= 2;
-                }
+                //if (coroutineCrouch != null)
+                //    StopCoroutine(coroutineCrouch);
+                //if (!crouched)
+                //{
+                //    this.GetComponent<CharacterController>().center = Vector3.zero;
+                //    this.GetComponent<CharacterController>().height = 2;
+                //    _Camera.transform.localPosition = cameraPositionBeforeCrouch;
+                //    cameraShenanigansGameObject.transform.localPosition = new Vector3(0f, _Camera.transform.localPosition.y, 0f);
+                //    _VelocityMove *= 2;
+                //}
                 break;
             case PlayerStates.CROUCH_IDLE:
-                if (!crouched)
-                {
-                    this.GetComponent<CharacterController>().center = Vector3.zero;
-                    this.GetComponent<CharacterController>().height = 2;
-                    _Camera.transform.localPosition = cameraPositionBeforeCrouch;
-                    cameraShenanigansGameObject.transform.localPosition = new Vector3(0f, _Camera.transform.localPosition.y, 0f);
-                    _VelocityMove *= 2;
-                }
+                this.GetComponent<CharacterController>().center = Vector3.zero;
+                this.GetComponent<CharacterController>().height = 2;
+                _Camera.transform.localPosition = cameraPositionBeforeCrouch;
+                cameraShenanigansGameObject.transform.localPosition = new Vector3(0f, _Camera.transform.localPosition.y, 0f);
+                _VelocityMove *= 2;
                 break;
             default:
                 break;
@@ -779,7 +789,6 @@ public class Player : MonoBehaviour
                     else if (hit.transform.gameObject.layer == 11)
                     {
                         clockPuzzle = true;
-
                     }
                     else if (hit.transform.gameObject.layer == 13)
                     {
@@ -806,13 +815,13 @@ public class Player : MonoBehaviour
                         Debug.Log("Entro en la layer de picture");
                         picture = true;
                     }
+                    OnInteractuable?.Invoke(interactiveGameObject);
                 }
                 else if (hit.transform.gameObject.layer == 10)
                 {
                     if (!morse)
                         door = true;
                 }
-
             }
             else if (!Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit2, 10f, interactLayerMask))
             {
@@ -842,10 +851,8 @@ public class Player : MonoBehaviour
                         interactiveGameObject=null;
                     }
                 }
-                //onNotInteractuable?.Invoke();
+                OnNotInteractuable?.Invoke();
             }
-            // onInteractuable?.Invoke();
-
             yield return new WaitForSeconds(0.1f);
         }
     } 
