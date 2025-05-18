@@ -1,10 +1,7 @@
-using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
-using Kino;
-using Kino.PostProcessing;
 
 public class VignetteManager : MonoBehaviour
 {
