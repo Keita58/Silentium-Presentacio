@@ -41,6 +41,9 @@ public class Player : MonoBehaviour
     Vector3 cameraPositionBeforeCrouch = new Vector3(0, 0.627f, -0.198f);
     public int gunAmmo { get; set; }
     public int hp { get; set; }
+    
+    [SerializeField]
+    GameObject flashlight;
 
     public int maxHp { get; private set; }
 
@@ -126,6 +129,7 @@ public class Player : MonoBehaviour
     public event Action OnNotInteractuable;
     public event Action<int,int> OnHpChange;
     public event Action<string> OnWarning;
+    public event Action<int> onPickItem;
 
     private void Awake()
     {
@@ -140,6 +144,7 @@ public class Player : MonoBehaviour
         _inputActions.Player.Inventory.performed += OpenInventory;
         _inputActions.Player.Throw.performed += ThrowItem;
         _inputActions.Player.Pause.performed += OpenMenu;
+        _inputActions.Player.Flashlight.performed += Flashlight;
         _Rigidbody = GetComponent<Rigidbody>();
         _inputActions.Player.Enable();
         characterController = GetComponent<CharacterController>();
@@ -196,6 +201,7 @@ public class Player : MonoBehaviour
 
     private void OpenMenu(InputAction.CallbackContext context)
     {
+        Time.timeScale = 0;
         menuManager.OpenMenu();
     }
 
@@ -268,23 +274,24 @@ public class Player : MonoBehaviour
 
                     Debug.Log("Entro Coger item");
                     if (bookItem)
-                    {
+                    {   
                         Book book = interactiveGameObject.GetComponent<Book>();
                         if (book.placed)
                         {
                             book.placed = false;
                             book.collider.enabled = true;
-                            book.collider.transform.GetComponent<CellBook>().SetBook(null);
+                            book.collider.transform.GetComponent<CellBook>().SetBook(null, null);
                             book.collider = null;
                             bookItem = false;
                             item = false;
                         }
                     }
                     interactiveGameObject.gameObject.SetActive(false);
-                    onPickItem?.Invoke();
+                    if(itemPicked is ThrowableItem || itemPicked is SilencerItem || itemPicked is SaveItem || itemPicked is HealingItem || itemPicked is AmmunitionItem)
+                    onPickItem?.Invoke(interactiveGameObject.GetComponentInParent<PickObject>().Id);
                     if (itemPicked is BookItem && itemPicked.ItemType == ItemTypes.BOOK2) PuzzleManager.instance.ChangePositionPlayerAfterHieroglyphic();
                     interactiveGameObject = null;
-                }
+                    }
                 else
                 {
                     OnWarning?.Invoke("Inventario lleno!");
@@ -298,13 +305,11 @@ public class Player : MonoBehaviour
                 if (clockPuzzle)
                 {
                     PuzzleManager.instance.InteractClockPuzzle();
-                    StopCoroutine(coroutineInteract);
                     clockPuzzle = false;
 
                 }else if (weaponPuzzle)
                 {
                     PuzzleManager.instance.InteractWeaponPuzzle();
-                    StopCoroutine(coroutineInteract);
                     weaponPuzzle = false;
                 }
                 else if (note)
@@ -338,13 +343,13 @@ public class Player : MonoBehaviour
                     {
                         if (equipedObject.GetComponent<PickItem>().item is BookItem)
                         {
-                            interactiveGameObject.GetComponent<CellBook>().SetBook(equipedObject.GetComponent<Book>());
+                            interactiveGameObject.GetComponent<CellBook>().SetBook(equipedObject.GetComponent<Book>(), equipedObject);
                             equipedObject.GetComponent<Book>().collider = interactiveGameObject.GetComponent<CellBook>().GetComponent<BoxCollider>();
                             equipedObject.GetComponent<Book>().placed = true;
                             PuzzleManager.instance.CheckBookPuzzle();
                             interactiveGameObject.GetComponent<CellBook>().GetComponent<BoxCollider>().enabled = false;
                             equipedObject.transform.rotation = Quaternion.identity;
-                            equipedObject.transform.parent = null;
+                            equipedObject.transform.parent = interactiveGameObject.transform;
                             equipedObject.transform.position = interactiveGameObject.transform.GetChild(0).transform.position;
                             equipedObject = null;
                             itemSlotOccuped = false;
@@ -387,14 +392,15 @@ public class Player : MonoBehaviour
                     {
                         if (door.isLocked)
                         {
-                            //InventorySO.ItemSlot aux = null;
+                            InventorySO.ItemSlot aux = null;
                             foreach (InventorySO.ItemSlot item in InventoryManager.instance.inventory.items)
                             {
                                 if (item.item == door.itemNeededToOpen)
                                 {
                                     door.isLocked = false;
-                                    //aux = item;
-                                    InventoryManager.instance.inventory.items.Remove(item);
+                                    aux = item;
+                                    InventoryManager.instance.inventory.items.Remove(aux);
+                                    break;
                                 }
                             }
                             if (door.isOpen)
@@ -458,7 +464,7 @@ public class Player : MonoBehaviour
     {
         if (itemSlotOccuped)
         {
-            equipedObject.transform.GetChild(0).TryGetComponent(out ThrowObject throwable);
+            equipedObject.transform.TryGetComponent<ThrowObject>(out ThrowObject throwable);
             if (throwable != null)
             {
                 events.onHit += MakeSoundThrowable;
@@ -909,6 +915,11 @@ public class Player : MonoBehaviour
         currentFov = fovLevel;
     }
 
+    public void Flashlight(InputAction.CallbackContext context)
+    {
+        if(!flashlight.activeSelf) flashlight.SetActive(true);
+        else flashlight.SetActive(false);
+    }
     private void OnDestroy()
     {
         if (_inputActions.Player.enabled)

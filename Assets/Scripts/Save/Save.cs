@@ -6,11 +6,16 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
 using static InventorySO;
+using static PickObject;
+using static CellBook;
 
 public class Save : MonoBehaviour
 {
     private const string _SavefileName = "silentium_savegame.json";
+    private const string _TemporalSavefileName = "silentium_temp_savegame.json";
     private const string _SavefileNameConfig = "silentium_config.json";
+
+    private string filepath;
 
     [Header("Cameras")]
     [SerializeField] private CameraSave _Camera1;
@@ -38,29 +43,61 @@ public class Save : MonoBehaviour
     [SerializeField] private GameObject[] ImportantSpawns;
     [SerializeField] private GameObject[] NormalSpawns;
 
+    [Header("Monsters")]
+    [SerializeField] private Transform _Blind;
+    [SerializeField] private Transform _Fast;
+    [SerializeField] private Transform _Fat;
+
+    [Header("Books puzzle")]
+    [SerializeField] private List<CellBook> _Cells;
+
     private void Awake()
     {
         _Camera1.onSaveGame += SaveGame;
         _Camera2.onSaveGame += SaveGame;
+        filepath = "";
     }
 
     public void SaveGame()
     {
-        string filePath = Application.persistentDataPath + "/" + _SavefileName;
+        if(filepath == "")
+            filepath = Application.persistentDataPath + "/" + _SavefileName;
 
         //Canviem el tipus de la llista per poder guardar tota la info
         List<ItemSlotSave> Inventory = new List<ItemSlotSave>();
 
-        foreach (var item in _Inventory.items)
+        foreach (ItemSlot item in _Inventory.items)
         {
             Inventory.Add(new ItemSlotSave(item.item.id, item.amount, item.stackable));
         }
 
         List<ItemSlotSave> ChestInventory = new List<ItemSlotSave>();
 
-        foreach (var item in _ChestInventory.items)
+        foreach (ItemSlot item in _ChestInventory.items)
         {
             ChestInventory.Add(new ItemSlotSave(item.item.id, item.amount, item.stackable));
+        }
+
+        List<PickObjectSave> ImportantSpawnsList = new List<PickObjectSave>();
+
+        foreach(GameObject item in ImportantSpawns)
+        {
+            ImportantSpawnsList.Add(new PickObjectSave(item.GetComponent<PickObject>().Object.id, item.GetComponent<PickObject>().Id, item.GetComponent<PickObject>().Picked));
+        }
+
+        List<PickObjectSave> NormalSpawnsList = new List<PickObjectSave>();
+
+        foreach (GameObject item in NormalSpawns)
+        {
+            NormalSpawnsList.Add(new PickObjectSave(item.GetComponent<PickObject>().Object.id, item.GetComponent<PickObject>().Id, item.GetComponent<PickObject>().Picked));
+        }
+
+        List<CellBookSave> CellBooks = new List<CellBookSave>();
+
+        foreach(CellBook book in _Cells)
+        {
+            if (book.bookGO != null)
+                CellBooks.Add(new CellBookSave(book.bookGO.GetComponent<PickItem>().item.id, book.cellId));
         }
 
         //Treure la info del Volume
@@ -78,6 +115,7 @@ public class Save : MonoBehaviour
             Silencer = _Player.isSilencerEquipped,
             SilencerUses = _Player.silencerUses,
             Ammo = _Player.gunAmmo,
+            Position = _Player.transform.position,
             ClockPuzzle = _PuzzleManager.clockPuzzleCompleted,
             HieroglyphicPuzzle = _PuzzleManager.isHieroglyphicCompleted,
             BookPuzzle = _PuzzleManager.bookPuzzleCompleted,
@@ -90,12 +128,23 @@ public class Save : MonoBehaviour
             FilmGrain = Film.active,
             IntensityFilmGrain = Film.intensity.value,
             Fog = Fog.active,
-            ImportantSpawns = ImportantSpawns,
-            NormalSpawns = NormalSpawns,
+            FastEnemy = _Fast.position,
+            FatEnemy = _Fat.position,
+            BlindEnemy = _Blind.position,
+            ImportantSpawns = ImportantSpawnsList,
+            NormalSpawns = NormalSpawnsList,
+            CellBooks = CellBooks,
         };
 
         string infoToSave = JsonUtility.ToJson(info, true);
-        File.WriteAllText(filePath, infoToSave);
+        File.WriteAllText(filepath, infoToSave);
+    }
+
+    public void TemporalSaveGame()
+    {
+        filepath = Application.persistentDataPath + "/" + _TemporalSavefileName;
+
+        SaveGame();
     }
 
     public void SaveConfigMenu()

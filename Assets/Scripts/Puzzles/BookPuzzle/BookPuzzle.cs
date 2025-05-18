@@ -7,10 +7,6 @@ public class BookPuzzle : MonoBehaviour
     [Header("Posicion de cada libro")]
     [SerializeField]
     List<CellBook> bookList;
-    private void Start()
-    {
-
-    }
 
     public void checkBookPosition()
     {

@@ -40,7 +40,7 @@ public class ThrowObject : MonoBehaviour
                 }
             }
             events.MakeThrowImpactSound();
-            this.transform.parent.gameObject.SetActive(false);
+            this.transform.gameObject.SetActive(false);
         }
     }
 

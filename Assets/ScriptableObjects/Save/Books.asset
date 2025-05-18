@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b90817828161794589fed6a5378430e, type: 3}
+  m_Name: Books
+  m_EditorClassIdentifier: 
+  ScriptableExemples:
+  - {fileID: 3381613858797059397, guid: d652446b9a02c7e408f88bc7dd9e943a, type: 3}
+  - {fileID: 3081806356842722468, guid: 12cedb7171e3a4b4abb90fb7b16b8110, type: 3}
+  - {fileID: 3214534961629253321, guid: 9415252a7fc53684dbcebb6ebabb4fbf, type: 3}
+  - {fileID: 8290532723287483875, guid: 588faba657130bd499a1a8df50368ca4, type: 3}
+  - {fileID: 3092749314125021956, guid: cb92ed24cb78f9c4983cec841399dd09, type: 3}

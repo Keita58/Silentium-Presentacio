@@ -2,12 +2,15 @@ using System.IO;
 using UnityEngine;
 using System.Collections.Generic;
 using static InventorySO;
+using static CellBook;
 using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.Rendering;
+using Unity.VisualScripting;
 
 public class Load : MonoBehaviour
 {
     private const string _SavefileName = "silentium_savegame.json";
+    private const string _TemporalSavefileName = "silentium_temp_savegame.json";
     private const string _SavefileNameConfig = "silentium_config.json";
 
     [Header("Inventories")]
@@ -18,6 +21,7 @@ public class Load : MonoBehaviour
     [Header("DataBase for the notes")]
     [SerializeField] private BDNotes _Notes;
     [SerializeField] private BDItems _Items;
+    [SerializeField] private BDBooks _Books;
 
     [Header("Shaders")]
     [SerializeField] private GameObject _Shaders;
@@ -31,6 +35,18 @@ public class Load : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private Settings _Settings;
 
+    [Header("Monsters")]
+    [SerializeField] private Transform _Blind;
+    [SerializeField] private Transform _Fast;
+    [SerializeField] private Transform _Fat;
+
+    [Header("Spawn items")]
+    [SerializeField] private List<PickObject> ImportantSpawns;
+    [SerializeField] private List<PickObject> NormalSpawns;
+
+    [Header("Books puzzle")]
+    [SerializeField] private List<CellBook> _CellBooks;
+
 
     private void Awake()
     {
@@ -42,11 +58,19 @@ public class Load : MonoBehaviour
 
     public void LoadGame()
     {
+        string temporalExistingFile = Application.persistentDataPath + "/" + _TemporalSavefileName;
         string existingFile = Application.persistentDataPath + "/" + _SavefileName;
 
-        if(File.Exists(existingFile))
+        string jsonContent = "";
+
+        if (File.Exists(temporalExistingFile)) 
+            jsonContent = File.ReadAllText(temporalExistingFile);
+        else if (File.Exists(existingFile))
+            jsonContent = File.ReadAllText(existingFile);
+
+
+        if (jsonContent != "")
         {
-            string jsonContent = File.ReadAllText(existingFile);
             SaveInfo info = JsonUtility.FromJson<SaveInfo>(jsonContent);
 
             List<ItemSlot> Inventory = new List<ItemSlot>();
@@ -61,6 +85,18 @@ public class Load : MonoBehaviour
             foreach (var item in info.ChestInventory)
             {
                 ChestInventory.Add(new ItemSlot(_Items.FromID(item.itemId), item.amount, item.stackable));
+            }
+
+            for (int i = 0; i < ImportantSpawns.Count; i++) 
+            {
+                ImportantSpawns[i].Picked = info.ImportantSpawns[i].Picked;
+                ImportantSpawns[i].Object = _Items.FromID(info.ImportantSpawns[i].ObjectId);
+            }
+
+            for (int i = 0; i < NormalSpawns.Count; i++)
+            {
+                NormalSpawns[i].Picked = info.NormalSpawns[i].Picked;
+                NormalSpawns[i].Object = _Items.FromID(info.NormalSpawns[i].ObjectId);
             }
 
             _Inventory.items = Inventory;
@@ -87,6 +123,7 @@ public class Load : MonoBehaviour
             _Player.isSilencerEquipped = info.Silencer;
             _Player.silencerUses = info.SilencerUses;
             _Player.gunAmmo = info.Ammo;
+            _Player.transform.position = info.Position;
 
             //Puzles
             _PuzzleManager.clockPuzzleCompleted = info.ClockPuzzle;
@@ -97,6 +134,29 @@ public class Load : MonoBehaviour
             _PuzzleManager.weaponPuzzleCompleted = info.WeaponPuzzle;
 
             _PuzzleManager.LoadGame();
+
+            //Enemics
+            _Fat.position = info.FatEnemy;
+            _Fast.position = info.FastEnemy;
+            _Blind.position = info.BlindEnemy;
+
+            //Puzle llibres
+            foreach(CellBook cell in _CellBooks)
+            {
+                foreach(CellBookSave save in info.CellBooks)
+                {
+                    if (cell.cellId == save.cellId)
+                    {
+                        cell.SetBook(_Books.FromID(_Items.FromID(save.bookGO).id).GetComponent<Book>(), _Books.FromID(_Items.FromID(save.bookGO).id));
+                        GameObject aux = Instantiate(_Books.FromID(_Items.FromID(save.bookGO).id));
+                        aux.transform.position = cell.transform.GetChild(0).transform.position;
+                        break;
+                    }
+                }
+            }
+
+            if (File.Exists(temporalExistingFile))
+                File.Delete(temporalExistingFile);
         }
 
         GameManager.instance.onLoadedScene -= LoadGame;

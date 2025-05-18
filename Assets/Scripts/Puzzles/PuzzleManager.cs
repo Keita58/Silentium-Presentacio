@@ -37,6 +37,16 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     private GameObject bookWall;
     public bool bookPuzzleCompleted { get; set; }
+    [SerializeField]
+    private GameObject book1;
+    [SerializeField]
+    private GameObject book2;
+    [SerializeField]
+    private GameObject book3;
+    [SerializeField]
+    private GameObject book4;
+    [SerializeField]
+    private GameObject book5;
 
     [Header("Poem Puzzle")]
     [SerializeField]
@@ -151,6 +161,15 @@ public class PuzzleManager : MonoBehaviour
         clockPuzzleCompleted = true;
     }
 
+    private void ClockPuzzleLoad()
+    {
+        if (clockPuzzleCompleted)
+        {
+            cam_Clock.transform.parent.GetComponent<Clock>().inputActions.Clock.Disable();
+            this.KeyClock.SetActive(false);
+        }
+    }
+
     public void InteractHieroglyphicPuzzle()
     {
         cam_Player.gameObject.SetActive(false);
@@ -183,6 +202,18 @@ public class PuzzleManager : MonoBehaviour
         player.ResumeInteract(true);
         cam_Player.gameObject.SetActive(true);
         Cursor.visible = false;
+    }
+
+    private void HieroglyphicPuzzleLoad()
+    {
+        if(isHieroglyphicCompleted)
+        {
+            cam_Hierogliphic.gameObject.SetActive(false);
+            cam_Hierogliphic.transform.parent.GetComponent<Keypad>().inputActions.Hieroglyphic.Disable();
+            cam_Player.gameObject.SetActive(true);
+            Cursor.visible = false;
+            animationTime = 0f;
+        }
     }
 
     public void ExitMorsePuzzleAnimation()
@@ -219,6 +250,17 @@ public class PuzzleManager : MonoBehaviour
         Cursor.visible = true;
     }
 
+    private void MorsePuzzleLoad()
+    {
+        if(isMorseCompleted)
+        {
+            morseKeypad.inputActions.Morse.Disable();
+            Cursor.visible = false;
+            cam_morse.gameObject.SetActive(false);
+            cam_doorsMorseAnimation.SetActive(false);
+        }
+    }
+
     public void CheckBookPuzzle()
     {
         Debug.Log("CheckBookPuzzle");
@@ -235,6 +277,20 @@ public class PuzzleManager : MonoBehaviour
         glitchStarted = true;
         animationTime = 0f;
         bookPuzzleCompleted = true;
+    }
+
+    private void BookPuzzleLoad()
+    {
+        if(bookPuzzleCompleted)
+        {
+            animationTime = 0f;
+            book1.SetActive(false);
+            book2.SetActive(false);
+            book3.SetActive(false);
+            book4.SetActive(false);
+            book5.SetActive(false);
+            bookWall.SetActive(false);
+        }
     }
 
     public void TakePoemPart()
@@ -265,6 +321,15 @@ public class PuzzleManager : MonoBehaviour
         }
     }
 
+    private void PoemPuzzleLoad()
+    {
+        if(poemPuzzleCompleted)
+        {
+            DoorPoem3.isLocked = false;
+            animationTime = 0f;
+        }
+    }
+
     public void InteractWeaponPuzzle()
     {
         cam_Player.gameObject.SetActive(false);
@@ -285,6 +350,16 @@ public class PuzzleManager : MonoBehaviour
         cam_WeaponPuzzle.gameObject.SetActive(false);
         Cursor.visible = false;
         weaponPuzzleCompleted = true;
+    }
+
+    private void WeaponPuzzleLoad()
+    {
+        if (weaponPuzzleCompleted)
+        {
+            cam_WeaponPuzzle.transform.parent.GetComponent<WeaponPuzzle>().inputAction.WeaponPuzzle.Disable();
+            Cursor.visible = false;
+            cam_WeaponPuzzle.gameObject.SetActive(false);
+        }
     }
 
     void Update()
@@ -341,6 +416,11 @@ public class PuzzleManager : MonoBehaviour
 
     public void LoadGame()
     {
-
+        ClockPuzzleLoad();
+        HieroglyphicPuzzleLoad();
+        BookPuzzleLoad();
+        PoemPuzzleLoad();
+        MorsePuzzleLoad();
+        WeaponPuzzleLoad();
     }
 }

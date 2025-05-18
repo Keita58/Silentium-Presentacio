@@ -133,7 +133,6 @@ MonoBehaviour:
   - {fileID: 1872277326555435814}
   - {fileID: 7461877537500253709}
   - {fileID: -1975048886233948518}
-  - {fileID: 8609252997998381825}
 --- !u!114 &1872277326555435814
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -186,13 +185,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a6b00fcf518bb94a90b408492e07b44, type: 3}
   m_Name: FilmGrain
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   type:
     m_OverrideState: 1
     m_Value: 7
   intensity:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0
   response:
     m_OverrideState: 1
     m_Value: 0
