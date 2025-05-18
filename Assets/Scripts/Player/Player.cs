@@ -122,7 +122,6 @@ public class Player : MonoBehaviour
     [SerializeField] MenuUI menuManager;
     [SerializeField] Waves waves;
 
-    public event Action onPickItem;
     public event Action<int> onMakeSound;
     public event Action<int> onMakeImpactSound;
     public event Action<GameObject> OnInteractuable;
