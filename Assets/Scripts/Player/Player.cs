@@ -214,7 +214,7 @@ public class Player : MonoBehaviour
         maxHp = 6;
         gunAmmo = 20;
         maxSilencerUses = 10;
-        StartCoroutine(EsperarIActuar(5f, ()=>TakeDamage(6)));
+        //StartCoroutine(EsperarIActuar(5f, ()=>TakeDamage(6)));
     }
 
     IEnumerator EsperarIActuar(float tempsDespera, Action accio)
