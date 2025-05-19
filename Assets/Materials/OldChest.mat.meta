@@ -11,5 +11,5 @@ AssetOrigin:
   productId: 20179
   packageName: Animated Old Chest
   packageVersion: 1.1
-  assetPath: Assets/OldChest/ModelAndTexture/OldChest.mat
+  assetPath: Assets/Materials/OldChest.mat
   uploadId: 79327

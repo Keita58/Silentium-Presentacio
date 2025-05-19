@@ -271,10 +271,10 @@ public class InventoryManager : MonoBehaviour
 
     public void UseHealingItem(int healing, Item item)
     {
-        //player.hp+=curacion;
         Debug.Log("Player usa item de curacion");
         inventory.UseItem(item);
         inventoryUI.Show();
+        player.Heal(healing);
     }
 
     public void UseAmmo(int numAmmo, Item item)
