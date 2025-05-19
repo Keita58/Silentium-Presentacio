@@ -31,13 +31,14 @@ public class MenuUI : MonoBehaviour
 
     private void Start()
     {
-        player.OnToggleUI += ToggleWavesUI;
+        player.OnToggleUI += ToggleUI;
         player.OnAmmoChange += ChangeNumAmmo;
     }
 
-    private void ToggleWavesUI(bool active)
+    private void ToggleUI(bool active)
     {
        waves.SetActive(active);
+       ammoQuantity.gameObject.SetActive(active);
     }
 
     private void ChangeNumAmmo(int ammo)

@@ -130,6 +130,7 @@ public class Player : MonoBehaviour
     public event Action<int,int> OnHpChange;
     public event Action<string> OnWarning;
     public event Action<int> OnPickItem;
+    //para esconder las waves del sonido
     public event Action<bool> OnToggleUI;
     public event Action<int> OnAmmoChange;
 
@@ -186,19 +187,11 @@ public class Player : MonoBehaviour
     {
         if (!inventoryOpened)
         {
-            Cursor.visible = true;
             InventoryManager.instance.OpenInventory(this.gameObject);
-            inventoryOpened = true;
-            ToggleInputPlayer(false, true);
         }
         else
         {
-            if(chestGO != null)
-                chestGO.GetComponent<Animator>().Play("CloseChest");
-            Cursor.visible = false;
             InventoryManager.instance.CloseInventory();
-            inventoryOpened = false;
-            ToggleInputPlayer(true, true);
         }
     }
 
@@ -318,28 +311,29 @@ public class Player : MonoBehaviour
                 }
                 else if (note)
                 {
-                    NotesSO note = interactiveGameObject.GetComponent<Notes>().note;
-                    if (note.noteId < 6)
+                    NotesSO noteSO = interactiveGameObject.GetComponent<Notes>().note;
+                    if (noteSO.noteId < 6)
                     {
-                        InventoryManager.instance.DiscoverNote(note);
+                        InventoryManager.instance.DiscoverNote(noteSO);
                         interactiveGameObject.gameObject.SetActive(false);
                     }
                     else
                     {
-                        if (note.noteId == 10)
+                        if (noteSO.noteId == 10)
                         {
-                            InventoryManager.instance.ShowNoteScroll(note);
-                        }else if (note.noteType == NotesSO.NoteType.Image)
+                            InventoryManager.instance.ShowNoteScroll(noteSO);
+                        }else if (noteSO.noteType == NotesSO.NoteType.Image)
                         {
-                            InventoryManager.instance.ShowImageNote(note.noteContent);
+                            InventoryManager.instance.ShowImageNote(noteSO.noteContent);
 
-                        }else if (note.noteType == NotesSO.NoteType.Book)
+                        }else if (noteSO.noteType == NotesSO.NoteType.Book)
                         {
-                            InventoryManager.instance.ShowBookNote(note.noteContent);
+                            InventoryManager.instance.ShowBookNote(noteSO.noteContent);
                         }
                         else
-                            InventoryManager.instance.ShowNote(note);
+                            InventoryManager.instance.ShowNote(noteSO);
                     }
+                    note = false;
                 }
                 else if (book)
                 {
@@ -379,10 +373,11 @@ public class Player : MonoBehaviour
                 }
                 else if (chest)
                 {
-                    chestGO.GetComponent<Animator>().Play("OpenChest");
                     InventoryManager.instance.OpenChest();
                     chest = false;
                 }
+                if (interactiveGameObject != null)
+                    interactiveGameObject = null;
                 OnNotInteractuable?.Invoke();
                 OnToggleUI?.Invoke(false);
             }
@@ -931,6 +926,15 @@ public class Player : MonoBehaviour
     {
         if(!flashlight.activeSelf) flashlight.SetActive(true);
         else flashlight.SetActive(false);
+    }
+
+    public void ToggleChestAnimation(bool opened)
+    {
+        if (opened && chestGO != null)
+            chestGO.GetComponent<Animator>().Play("OpenChest");
+        else
+            chestGO.GetComponent<Animator>().Play("CloseChest");
+
     }
     private void OnDestroy()
     {
