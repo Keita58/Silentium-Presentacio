@@ -129,7 +129,7 @@ public class BlindEnemy : Enemy
         Vector3 point = Vector3.zero;
         while (true)
         {
-            Debug.Log("Entro al Patrol");
+            //Debug.Log("Entro al Patrol");
             if (!_Patrolling)
             {
                 if (!_Search)

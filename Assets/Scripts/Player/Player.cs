@@ -484,7 +484,7 @@ public class Player : MonoBehaviour
         {
             gunanimator.Play("Shoot");
             gunAmmo--;
-            Debug.DrawRay(shootPosition.transform.position, -shootPosition.transform.right, Color.magenta, 5f);
+            Debug.DrawRay(shootPosition.transform.position, -shootPosition.transform.right, Color.yellow, 5f);
             Debug.Log("TIRO DEBUGRAY");
             if (isSilencerEquipped)
             {
@@ -499,9 +499,11 @@ public class Player : MonoBehaviour
                     silencer.SetActive(false);
                 }
             }
-            if (Physics.Raycast(shootPosition.transform.position, -shootPosition.transform.right, out RaycastHit e, 5f, enemyLayerMask))
+            if (Physics.Raycast(shootPosition.transform.position, -shootPosition.transform.right, out RaycastHit e, 25f, enemyLayerMask)) // Canviar layer mask per posar les parets
             {
-                e.transform.GetComponent<Enemy>().TakeHealth();
+                if(e.transform.TryGetComponent<Enemy>(out Enemy enemy))
+                    enemy.TakeHealth();
+
                 if (isSilencerEquipped)
                 {
                     Debug.Log("Hago sonido silenciador");

@@ -51,11 +51,16 @@ public class Save : MonoBehaviour
     [Header("Books puzzle")]
     [SerializeField] private List<CellBook> _Cells;
 
+    private bool _Delete;
+    private bool _Temp;
+
     private void Awake()
     {
         _Camera1.onSaveGame += SaveGame;
         _Camera2.onSaveGame += SaveGame;
         filepath = "";
+        _Delete = false;
+        _Temp = false;
     }
 
     public void SaveGame()
@@ -68,14 +73,24 @@ public class Save : MonoBehaviour
 
         foreach (ItemSlot item in _Inventory.items)
         {
-            Inventory.Add(new ItemSlotSave(item.item.id, item.amount, item.stackable));
+            if(!_Temp && (item.item is ThrowableItem || item.item is SilencerItem || item.item is HealingItem || item.item is AmmunitionItem) && !_Delete)
+            {
+                _Delete = true;
+            }
+            else
+                Inventory.Add(new ItemSlotSave(item.item.id, item.amount, item.stackable));
         }
 
         List<ItemSlotSave> ChestInventory = new List<ItemSlotSave>();
 
         foreach (ItemSlot item in _ChestInventory.items)
         {
-            ChestInventory.Add(new ItemSlotSave(item.item.id, item.amount, item.stackable));
+            if (!_Temp && (item.item is ThrowableItem || item.item is SilencerItem || item.item is HealingItem || item.item is AmmunitionItem) && !_Delete)
+            {
+                _Delete = true;
+            }
+            else
+                ChestInventory.Add(new ItemSlotSave(item.item.id, item.amount, item.stackable));
         }
 
         List<PickObjectSave> ImportantSpawnsList = new List<PickObjectSave>();
@@ -143,7 +158,7 @@ public class Save : MonoBehaviour
     public void TemporalSaveGame()
     {
         filepath = Application.persistentDataPath + "/" + _TemporalSavefileName;
-
+        _Temp = true;
         SaveGame();
     }
 
