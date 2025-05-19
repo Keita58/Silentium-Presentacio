@@ -150,6 +150,7 @@ public class PuzzleManager : MonoBehaviour
         cam_Player.gameObject.SetActive(true);
         cam_Clock.gameObject.SetActive(false);
         player._inputActions.Player.Enable();
+        player.ToggleInputPlayer(true, true);
         player.ResumeInteract(true);
         cam_Clock.transform.parent.GetComponent<Clock>().inputActions.Clock.Disable();
     }

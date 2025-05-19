@@ -122,13 +122,16 @@ public class Player : MonoBehaviour
     [SerializeField] MenuUI menuManager;
     [SerializeField] Waves waves;
 
-    public event Action<int> onMakeSound;
-    public event Action<int> onMakeImpactSound;
+    public event Action<int> OnMakeSound;
+    public event Action<int> OnMakeImpactSound;
     public event Action<GameObject> OnInteractuable;
+    //Evento que sirve para limpiar el texto de interactuable.
     public event Action OnNotInteractuable;
     public event Action<int,int> OnHpChange;
     public event Action<string> OnWarning;
-    public event Action<int> onPickItem;
+    public event Action<int> OnPickItem;
+    public event Action<bool> OnToggleUI;
+    public event Action<int> OnAmmoChange;
 
     private void Awake()
     {
@@ -172,6 +175,7 @@ public class Player : MonoBehaviour
             _inputActions.Player.Crouch.Enable();
             _inputActions.Player.PickUpItem.Enable();
             _RunAction.Enable();
+            OnToggleUI?.Invoke(true);
         }
         if (enableInventory) _inputActions.Player.Inventory.Enable();
         else _inputActions.Player.Inventory.Disable();
@@ -214,6 +218,7 @@ public class Player : MonoBehaviour
         maxHp = 6;
         gunAmmo = 20;
         maxSilencerUses = 10;
+        OnAmmoChange?.Invoke(gunAmmo);
         //StartCoroutine(EsperarIActuar(5f, ()=>TakeDamage(6)));
     }
 
@@ -287,7 +292,7 @@ public class Player : MonoBehaviour
                     }
                     interactiveGameObject.gameObject.SetActive(false);
                     if(itemPicked is ThrowableItem || itemPicked is SilencerItem || itemPicked is SaveItem || itemPicked is HealingItem || itemPicked is AmmunitionItem)
-                    onPickItem?.Invoke(interactiveGameObject.GetComponentInParent<PickObject>().Id);
+                    OnPickItem?.Invoke(interactiveGameObject.GetComponentInParent<PickObject>().Id);
                     if (itemPicked is BookItem && itemPicked.ItemType == ItemTypes.BOOK2) PuzzleManager.instance.ChangePositionPlayerAfterHieroglyphic();
                     interactiveGameObject = null;
                     }
@@ -378,6 +383,8 @@ public class Player : MonoBehaviour
                     InventoryManager.instance.OpenChest();
                     chest = false;
                 }
+                OnNotInteractuable?.Invoke();
+                OnToggleUI?.Invoke(false);
             }
         }
         else
@@ -485,7 +492,7 @@ public class Player : MonoBehaviour
     private void MakeSoundThrowable()
     {
         
-        onMakeImpactSound?.Invoke(8);
+        OnMakeImpactSound?.Invoke(8);
     }
 
     public void UnequipItem()
@@ -502,11 +509,11 @@ public class Player : MonoBehaviour
 
     private void Shoot(InputAction.CallbackContext context)
     {
-
         if (gunAmmo >= 1)
         {
             gunanimator.Play("Shoot");
             gunAmmo--;
+            OnAmmoChange?.Invoke(gunAmmo);
             Debug.DrawRay(shootPosition.transform.position, -shootPosition.transform.right, Color.magenta, 5f);
             Debug.Log("TIRO DEBUGRAY");
             if (isSilencerEquipped)
@@ -514,7 +521,7 @@ public class Player : MonoBehaviour
                 if (silencerUses > 0)
                 {
                     Debug.Log("Hago sonido silenciador");
-                    onMakeImpactSound?.Invoke(5);
+                    OnMakeImpactSound?.Invoke(5);
                     MakeNoise(5, 5);
                     silencerUses--;
                     Debug.Log("Silenciador usos: " + silencerUses);
@@ -528,7 +535,7 @@ public class Player : MonoBehaviour
             else
             {
                 MakeNoise(10, 10);
-                onMakeImpactSound?.Invoke(8);
+                OnMakeImpactSound?.Invoke(8);
             }
             if (Physics.Raycast(shootPosition.transform.position, -shootPosition.transform.right, out RaycastHit e, 5f, enemyLayerMask))
             {
@@ -594,7 +601,7 @@ public class Player : MonoBehaviour
         switch (actualState)
         {
             case PlayerStates.IDLE:
-                onMakeSound?.Invoke(2);
+                OnMakeSound?.Invoke(2);
                 break;
             case PlayerStates.MOVE:
                 coroutineMove = StartCoroutine(MakeNoiseMove());
@@ -615,7 +622,7 @@ public class Player : MonoBehaviour
                 {
                     StopCoroutine(coroutineCrouch);
                     coroutineCrouch = null;
-                    onMakeSound?.Invoke(2);
+                    OnMakeSound?.Invoke(2);
                 }
                 break;
             default:
@@ -869,7 +876,7 @@ public class Player : MonoBehaviour
         while (true)
         {
             MakeNoise(30, 3);
-            onMakeSound?.Invoke(4);
+            OnMakeSound?.Invoke(4);
             yield return new WaitForSeconds(0.5f);
         }
     }
@@ -880,7 +887,7 @@ public class Player : MonoBehaviour
         {
             Debug.Log("CORUTINACORRER");
             MakeNoise(37, 7);
-            onMakeSound?.Invoke(7);
+            OnMakeSound?.Invoke(7);
             yield return new WaitForSeconds(0.5f);
         }
     }
@@ -891,7 +898,7 @@ public class Player : MonoBehaviour
         {
             Debug.Log("CORUTINACROUCH");
             MakeNoise(5, 1);
-            onMakeSound?.Invoke(3);
+            OnMakeSound?.Invoke(3);
             yield return new WaitForSeconds(0.5f);
         }
     }
@@ -912,6 +919,12 @@ public class Player : MonoBehaviour
     public void SetCurrentFOV(int fovLevel)
     {
         currentFov = fovLevel;
+    }
+
+    public void ReloadAmmo(int numAmmo)
+    {
+        this.gunAmmo += numAmmo;
+        OnAmmoChange?.Invoke(numAmmo);
     }
 
     public void Flashlight(InputAction.CallbackContext context)

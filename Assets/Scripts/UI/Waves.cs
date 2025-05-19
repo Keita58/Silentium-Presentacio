@@ -37,10 +37,9 @@ public class Waves : MonoBehaviour
         Color transparent = new Color(0, 0, 0, 0);
         for (int i = 0; i < colors.Length; i++)
             colors[i] = transparent;
-        player.onMakeSound += MakeSound;
-        player.onMakeImpactSound += MakeImpactSound;
+        player.OnMakeSound += MakeSound;
+        player.OnMakeImpactSound += MakeImpactSound;
         player.OnHpChange += ChangeColorWave;
-
     }
 
     void Draw()
@@ -155,8 +154,8 @@ public class Waves : MonoBehaviour
 
     private void OnDestroy()
     {
-        player.onMakeImpactSound -= MakeImpactSound;
-        player.onMakeSound -= MakeSound;
+        player.OnMakeImpactSound -= MakeImpactSound;
+        player.OnMakeSound -= MakeSound;
     }
 
 }

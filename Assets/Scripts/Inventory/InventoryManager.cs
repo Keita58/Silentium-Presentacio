@@ -279,9 +279,10 @@ public class InventoryManager : MonoBehaviour
 
     public void UseAmmo(int numAmmo, Item item)
     {
-        //player.RecarregaBales(numBales);
+        player.ReloadAmmo(numAmmo);
         Debug.Log("Player recarrega les bales");
         inventory.UseItem(item);
+        inventoryUI.Show();
     }
 
     public void UseKeyItem(Item item)
