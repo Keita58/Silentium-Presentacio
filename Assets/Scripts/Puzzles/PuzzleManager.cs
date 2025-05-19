@@ -143,6 +143,7 @@ public class PuzzleManager : MonoBehaviour
         cam_Player.transform.parent.rotation = new Quaternion(0, -0.608760536f, 0, 0.793354094f);
         player._inputActions.Player.Disable();
         player.ResumeInteract(false);
+        events.ToggleCustomPass(false);
         cam_Clock.transform.parent.GetComponent<Clock>().inputActions.Clock.Enable();
     }
     public void ExitClockPuzzle()
@@ -152,6 +153,7 @@ public class PuzzleManager : MonoBehaviour
         player._inputActions.Player.Enable();
         player.ToggleInputPlayer(true, true);
         player.ResumeInteract(true);
+        events.ToggleCustomPass(true);
         cam_Clock.transform.parent.GetComponent<Clock>().inputActions.Clock.Disable();
     }
     public void ClockSolved()
@@ -177,6 +179,7 @@ public class PuzzleManager : MonoBehaviour
         cam_Hierogliphic.gameObject.SetActive(true);
         player._inputActions.Player.Disable();
         player.ResumeInteract(false);
+        events.ToggleCustomPass(false);
         //cam_Hierogliphic.transform.parent.GetComponent<Keypad>().inputActions.Hieroglyphic.Enable();
         cam_Hierogliphic.transform.parent.GetComponent<LineRendererExample>()._inputAction.Hieroglyphic.Enable();
         Cursor.visible = true;
@@ -199,6 +202,7 @@ public class PuzzleManager : MonoBehaviour
             cam_Hierogliphic.gameObject.SetActive(false);
 
         player._inputActions.Player.Enable();
+        events.ToggleCustomPass(false);
         cam_Hierogliphic.transform.parent.GetComponent<Keypad>().inputActions.Hieroglyphic.Disable();
         player.ResumeInteract(true);
         cam_Player.gameObject.SetActive(true);
@@ -234,6 +238,7 @@ public class PuzzleManager : MonoBehaviour
             cam_morse.gameObject.SetActive(false);
 
         player.ToggleInputPlayer(true, true);
+        events.ToggleCustomPass(true);
         morseKeypad.inputActions.Morse.Disable();
         player.ResumeInteract(true);
         cam_Player.gameObject.SetActive(true);
@@ -245,6 +250,7 @@ public class PuzzleManager : MonoBehaviour
     {
         cam_Player.gameObject.SetActive(false);
         cam_morse.gameObject.SetActive(true);
+        events.ToggleCustomPass(true);
         player._inputActions.Player.Disable();
         morseKeypad.inputActions.Morse.Enable();
         player.ResumeInteract(false);
@@ -337,6 +343,7 @@ public class PuzzleManager : MonoBehaviour
         cam_WeaponPuzzle.gameObject.SetActive(true);
         cam_WeaponPuzzle.transform.parent.GetComponent<WeaponPuzzle>().inputAction.WeaponPuzzle.Enable();
         player._inputActions.Player.Disable();
+        events.ToggleCustomPass(false);
         allWeapon.enabled = false;
         Cursor.visible = true;
         player.ResumeInteract(false);
@@ -346,6 +353,7 @@ public class PuzzleManager : MonoBehaviour
     {
         cam_WeaponPuzzle.transform.parent.GetComponent<WeaponPuzzle>().inputAction.WeaponPuzzle.Disable();
         player.ResumeInteract(true);
+        events.ToggleCustomPass(true);
         player._inputActions.Player.Enable();
         cam_Player.gameObject.SetActive(true);
         cam_WeaponPuzzle.gameObject.SetActive(false);
