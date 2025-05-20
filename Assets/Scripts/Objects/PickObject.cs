@@ -18,7 +18,7 @@ public class PickObject : MonoBehaviour
     private void Awake()
     {
         Picked = false;
-        _Player.onPickItem += SetPicked;
+        _Player.OnPickItem += SetPicked;
     }
 
     public void SetPicked(int id)

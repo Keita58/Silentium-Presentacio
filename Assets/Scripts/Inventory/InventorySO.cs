@@ -31,6 +31,7 @@ public class InventorySO : ScriptableObject
             this.stackable = stackable;
         }
 
+
         public ItemSlot(Item item, int amount, bool stackable) : this(item, item.isStackable)
         {
             this.amount = amount;
@@ -60,8 +61,10 @@ public class InventorySO : ScriptableObject
         ItemSlot item = GetItem(usedItem);
         if (item == null)
             return;
-
-        item.amount--;
+        if (usedItem is AmmunitionItem)
+            item.amount -= 6;
+        else
+            item.amount--;
         if (item.amount<= 0)
             items.Remove(item);
 
@@ -72,7 +75,10 @@ public class InventorySO : ScriptableObject
         ItemSlot item = GetItem(usedItem);
         if (item == null)
         {
-            items.Add(new ItemSlot(usedItem, usedItem.isStackable));
+            if (usedItem is AmmunitionItem)
+                items.Add(new ItemSlot(usedItem, 6, usedItem.isStackable));
+            else
+                items.Add(new ItemSlot(usedItem, usedItem.isStackable));
         }
         else if (!usedItem.isStackable)
         {
@@ -80,7 +86,9 @@ public class InventorySO : ScriptableObject
         }
         else
         {
-            item.amount++;
+            if (usedItem is AmmunitionItem) item.amount += 6;
+            else
+                item.amount++;
         }
 
     }

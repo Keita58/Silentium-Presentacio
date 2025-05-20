@@ -52,4 +52,10 @@ public class PostProcessEvents : ScriptableObject
         OnToggleCustomPass?.Invoke(enable);
     }
 
+    //Event throw
+    public event Action onHit;
+    public void MakeThrowImpactSound()
+    {
+        onHit?.Invoke();
+    }
 }

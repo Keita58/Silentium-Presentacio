@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour
 
     public void LoadScene()
     {
-        SceneManager.LoadScene("MapaHector");
+        SceneManager.LoadScene("Tasca22");
         _Load = true;
     }
 
@@ -39,7 +39,7 @@ public class GameManager : MonoBehaviour
     {
         switch (scene.name)
         {
-            case "MapaHector":
+            case "Tasca22":
                 //Posar aquí pantalla de càrrega
                 if (_Load)
                 {

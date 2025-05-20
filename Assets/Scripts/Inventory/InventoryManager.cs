@@ -2,6 +2,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class InventoryManager : MonoBehaviour
@@ -34,10 +35,14 @@ public class InventoryManager : MonoBehaviour
     public bool isCombining { get; private set; }
     public bool chestOpened { get; private set; }
     private Item targetItemToCombine;
+    public InputSystem_Actions _inputActions { get; private set; }
+
     private void Awake()
     {
         if (instance == null)
             instance = this;
+        _inputActions = new InputSystem_Actions();
+        _inputActions.Chest.OpenClose.performed += ToggleChest;
     }
 
     private void Start()
@@ -155,14 +160,19 @@ public class InventoryManager : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("Tienes m�s objetos de los que puedes tener en el inventario");
+                    Debug.Log("Tienes mas objetos de los que puedes tener en el inventario");
                 }
                 break;
             case ActionStates.CHEST_OPENED:
                 chestOpened = true;
+                this.inventoryUI.Show();
                 ToggleActionsButtons(false);
                 saveButton.SetActive(true);
                 saveButton.GetComponent<Button>().interactable = false;
+                _inputActions.Chest.Enable();
+                player.ToggleInputPlayer(false, false);
+                player.ToggleChestAnimation(true);
+                //player.ResumeInteract(false);
                 break;
             case ActionStates.ACTION_CHEST_SELECT:
                 saveButton.GetComponent<Button>().interactable = true;
@@ -258,6 +268,9 @@ public class InventoryManager : MonoBehaviour
 
     public void OpenInventory(GameObject target)
     {
+        Cursor.visible = true;
+        player.inventoryOpened = true;
+        player.ToggleInputPlayer(false, true);
         inventoryUI.target = target;
         inventoryUI.Show();
         ChangeState(ActionStates.NOACTION);
@@ -265,23 +278,27 @@ public class InventoryManager : MonoBehaviour
 
     public void CloseInventory()
     {
+        Cursor.visible = false;
+        player.inventoryOpened = false;
+        player.ToggleInputPlayer(true, true);
         inventoryUI.target = null;
         inventoryUI.Hide();
     }
 
     public void UseHealingItem(int healing, Item item)
     {
-        //player.hp+=curacion;
         Debug.Log("Player usa item de curacion");
         inventory.UseItem(item);
         inventoryUI.Show();
+        player.Heal(healing);
     }
 
     public void UseAmmo(int numAmmo, Item item)
     {
-        //player.RecarregaBales(numBales);
+        player.ReloadAmmo(numAmmo);
         Debug.Log("Player recarrega les bales");
         inventory.UseItem(item);
+        inventoryUI.Show();
     }
 
     public void UseKeyItem(Item item)
@@ -404,15 +421,27 @@ public class InventoryManager : MonoBehaviour
                 }
             }
         }
-    }    
+    }
 
+    public void ToggleChest(InputAction.CallbackContext context)
+    {
+        chestOpened = !chestOpened;
+        if (chestOpened) OpenChest();
+        else CloseChest();
+    }
     public void OpenChest()
     {
-        this.OpenInventory(null);
-        this.inventoryUI.ShowChest();
-        player.ToggleInputPlayer(false, true);
-        player.inventoryOpened = true;
         ChangeState(ActionStates.CHEST_OPENED);
+    }
+
+    public void CloseChest()
+    {
+        player.ToggleInputPlayer(true, true);
+        player.ResumeInteract(true);
+        _inputActions.Chest.Disable();
+        inventoryUI.Hide();
+        player.ToggleChestAnimation(false);
+        ChangeState(ActionStates.NOACTION);
     }
 
     public void StoreInChest()
