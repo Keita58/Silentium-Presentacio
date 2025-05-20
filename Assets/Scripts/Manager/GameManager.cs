@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    // Start is called once before the first execution of Update after the MonoBehaviour is created    
     public static GameManager instance { get; private set; }
 
     public event Action onLoadedScene;
@@ -23,6 +23,11 @@ public class GameManager : MonoBehaviour
         _Load = false;
     }
 
+    private void Start()
+    {
+        onLoadedScene?.Invoke();
+    }
+
     public void SceneNewGame()
     {
         SceneManager.LoadScene("MapaHector");
@@ -31,7 +36,7 @@ public class GameManager : MonoBehaviour
 
     public void LoadScene()
     {
-        SceneManager.LoadScene("Tasca22");
+        SceneManager.LoadScene("MapaHector");
         _Load = true;
     }
 
@@ -39,8 +44,8 @@ public class GameManager : MonoBehaviour
     {
         switch (scene.name)
         {
-            case "Tasca22":
-                //Posar aquí pantalla de càrrega
+            case "MapaHector":
+                //Posar aquï¿½ pantalla de cï¿½rrega
                 if (_Load)
                 {
                     Debug.Log("Invoke");

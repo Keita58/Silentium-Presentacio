@@ -50,10 +50,17 @@ public class Load : MonoBehaviour
 
     private void Awake()
     {
-        GameManager.instance.onLoadedScene += LoadGame;
-        GameManager.instance.onLoadedScene += LoadConfig;
+        if (GameManager.instance != null) 
+        {
+            GameManager.instance.onLoadedScene += LoadGame;
+            GameManager.instance.onLoadedScene += LoadConfig;
 
-        GameManager.instance.onNewScene += LoadConfig;
+            GameManager.instance.onNewScene += LoadConfig;
+        }
+        else
+        {
+            LoadConfig();
+        }
     }
 
     public void LoadGame()
@@ -178,10 +185,13 @@ public class Load : MonoBehaviour
             _Settings.currentVSyncState = info.VSync;
         }
 
-        _Settings.isInitialScene = true;
+        //_Settings.isInitialScene = true;
         _Settings.StartOptions();
 
-        GameManager.instance.onLoadedScene -= LoadConfig;
-        GameManager.instance.onNewScene -= LoadConfig;
+        if(GameManager.instance != null)
+        {
+            GameManager.instance.onLoadedScene -= LoadConfig;
+            GameManager.instance.onNewScene -= LoadConfig;
+        }
     }
 }

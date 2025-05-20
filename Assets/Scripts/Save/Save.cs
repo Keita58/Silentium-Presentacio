@@ -56,11 +56,19 @@ public class Save : MonoBehaviour
 
     private void Awake()
     {
-        _Camera1.onSaveGame += SaveGame;
-        _Camera2.onSaveGame += SaveGame;
+        if(_Camera1 != null && _Camera2 != null)
+        {
+            _Camera1.onSaveGame += SaveGame;
+            _Camera2.onSaveGame += SaveGame;
+        }
         filepath = "";
         _Delete = false;
         _Temp = false;
+    }
+
+    private void Start()
+    {
+        _Settings.onSaveConfig += SaveConfigMenu;
     }
 
     public void SaveGame()

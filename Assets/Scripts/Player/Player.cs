@@ -285,9 +285,9 @@ public class Player : MonoBehaviour
                     }
                     interactiveGameObject.gameObject.SetActive(false);
                     if(itemPicked is ThrowableItem || itemPicked is SilencerItem || itemPicked is SaveItem || itemPicked is HealingItem || itemPicked is AmmunitionItem)
-                    OnPickItem?.Invoke(interactiveGameObject.GetComponentInParent<PickObject>().Id);
+                        OnPickItem?.Invoke(interactiveGameObject.GetComponentInParent<PickObject>().Id);
                     if (itemPicked is BookItem && itemPicked.ItemType == ItemTypes.BOOK2) PuzzleManager.instance.ChangePositionPlayerAfterHieroglyphic();
-                    interactiveGameObject = null;
+                        interactiveGameObject = null;
                     }
                 else
                 {
@@ -376,10 +376,20 @@ public class Player : MonoBehaviour
                     InventoryManager.instance.OpenChest();
                     chest = false;
                 }
+
+                if (interactiveGameObject.transform.gameObject.layer == 24)
+                {
+                    onCameraClick?.Invoke();
+                }
+                else
+                {
+                    OnNotInteractuable?.Invoke();
+                    OnToggleUI?.Invoke(false);
+                }
+
                 if (interactiveGameObject != null)
                     interactiveGameObject = null;
-                OnNotInteractuable?.Invoke();
-                OnToggleUI?.Invoke(false);
+                
             }
         }
         else
@@ -783,10 +793,6 @@ public class Player : MonoBehaviour
                     }
 
                     //if(hit.transform.TryGetComponent<Interactuable>(out Interactuable aux))
-                    if(hit.transform.gameObject.layer == 24)
-                    {
-                        onCameraClick?.Invoke();
-                    }
 
                     //S'ha de canviar aixo per una sola layer
                     if (hit.transform.gameObject.layer == 9)

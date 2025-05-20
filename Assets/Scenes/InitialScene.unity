@@ -5214,6 +5214,95 @@ RectTransform:
   m_AnchoredPosition: {x: -21.000038, y: 0}
   m_SizeDelta: {x: -20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1621156539
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1621156541}
+  - component: {fileID: 1621156540}
+  - component: {fileID: 1621156542}
+  m_Layer: 0
+  m_Name: SaveManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1621156540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1621156539}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3f06c94864be1f4cb8658e8f83c25a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _Camera1: {fileID: 0}
+  _Camera2: {fileID: 0}
+  _Inventory: {fileID: 0}
+  _ChestInventory: {fileID: 0}
+  _NotesInventory: {fileID: 0}
+  _Notes: {fileID: 0}
+  _Player: {fileID: 0}
+  _PuzzleManager: {fileID: 0}
+  _Shaders: {fileID: 0}
+  _Settings: {fileID: 2086840199}
+  ImportantSpawns: []
+  NormalSpawns: []
+  _Blind: {fileID: 0}
+  _Fast: {fileID: 0}
+  _Fat: {fileID: 0}
+  _Cells: []
+--- !u!4 &1621156541
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1621156539}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -28.110502, y: 2.490105, z: 14.062409}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1621156542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1621156539}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0ff5d313086a434297074cafbb14bf8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _Inventory: {fileID: 0}
+  _ChestInventory: {fileID: 0}
+  _NotesInventory: {fileID: 0}
+  _Notes: {fileID: 0}
+  _Items: {fileID: 0}
+  _Books: {fileID: 0}
+  _Shaders: {fileID: 0}
+  _Player: {fileID: 0}
+  _PuzzleManager: {fileID: 0}
+  _Settings: {fileID: 2086840199}
+  _Blind: {fileID: 0}
+  _Fast: {fileID: 0}
+  _Fat: {fileID: 0}
+  ImportantSpawns: []
+  NormalSpawns: []
+  _CellBooks: []
 --- !u!1 &1673490461
 GameObject:
   m_ObjectHideFlags: 0
@@ -6641,9 +6730,10 @@ CanvasRenderer:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 337359781}
   - {fileID: 116970012}
   - {fileID: 103048631}
   - {fileID: 1990529831}
   - {fileID: 129588185}
   - {fileID: 1249435082}
-  - {fileID: 337359781}
+  - {fileID: 1621156541}

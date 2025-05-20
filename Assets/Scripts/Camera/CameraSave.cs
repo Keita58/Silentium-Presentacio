@@ -9,7 +9,7 @@ public class CameraSave : MonoBehaviour
 
     [SerializeField] private GameObject _Player;
     [SerializeField] private InventorySO _Inventory;
-    [SerializeField] private TextMeshProUGUI _SaveText;
+    [SerializeField] private GameObject _SaveText;
 
     private bool _SavedGame;
 
@@ -23,7 +23,7 @@ public class CameraSave : MonoBehaviour
     {
         foreach (var item in _Inventory.items) 
         {
-            if(item.GetType() == typeof(SaveItem))
+            if(item.item.GetType() == typeof(SaveItem))
             {
                 if (item.amount >= 2)
                     _Inventory.UseItem(item.item);
@@ -32,12 +32,13 @@ public class CameraSave : MonoBehaviour
 
                 _SavedGame = true;
                 onSaveGame?.Invoke();
+                break;
             }
         }
 
         if (_SavedGame)
         {
-            _SaveText.enabled = true;
+            _SaveText.SetActive(true);
             StartCoroutine(DeleteText());
             _SavedGame = false;
         }
@@ -45,7 +46,7 @@ public class CameraSave : MonoBehaviour
 
     IEnumerator DeleteText()
     {
-        yield return new WaitForSeconds(2);
-        _SaveText.enabled = false;
+        yield return new WaitForSeconds(5);
+        _SaveText.SetActive(true);
     }
 }

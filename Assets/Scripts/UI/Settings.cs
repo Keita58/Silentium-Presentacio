@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
+using System;
 
 public class Settings : MonoBehaviour
 {
@@ -20,17 +21,11 @@ public class Settings : MonoBehaviour
     //Variables temporales para guardar el valor actual
     [SerializeField] public float currentVolumeValue;
     [SerializeField] public float currentSfxValue;
-    [SerializeField] public int currentFpsValue;
-    [SerializeField] public int currentVSyncState;
-    [SerializeField] public float currentFOVValue;
+    [SerializeField] public int currentFpsValue = 0;
+    [SerializeField] public int currentVSyncState = 0;
+    [SerializeField] public float currentFOVValue = 60;
 
-    private void Awake()
-    {
-        //Las iniciamos a los valores mínimos de cada componente.
-        currentFOVValue = 60;
-        currentVSyncState = 0;
-        currentFpsValue = 0;
-    }
+    public event Action onSaveConfig;
 
     //Cuando el usuario abre el menu de opciones se ponen los valores de los componentes según el valor de las variables temporales
     //si no se ha modificado nada, pues se quedan los valores mínimos, si no se ponen los valores guardados anteriormente.
@@ -44,6 +39,8 @@ public class Settings : MonoBehaviour
         fovSlider.value = currentFOVValue;
         vSyncToggle.isOn = currentVSyncState == 1 ? true:false;
         fpsDropdown.value = currentFpsValue;
+
+        ApplySettings();
     }
 
     public void SetVolume()
@@ -109,6 +106,7 @@ public class Settings : MonoBehaviour
         UpdateCurrentValues();
         //SetVolume();
         //SetSfxValue();
+        onSaveConfig?.Invoke();
     }
 
 }
