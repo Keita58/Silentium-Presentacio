@@ -16669,7 +16669,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -9, y: 11, z: -86}
-  m_LocalScale: {x: 5.656435, y: 1.9319, z: 0.1245}
+  m_LocalScale: {x: 2.2471886, y: 1.9319, z: 0.1245}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 278105438}
@@ -18757,8 +18757,8 @@ Transform:
   m_GameObject: {fileID: 1087134306}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 14.6317, y: 0.8199997, z: 4.03}
-  m_LocalScale: {x: 0.04258851, y: 3.6907988, z: 17.858044}
+  m_LocalPosition: {x: 14.6317, y: 4.3, z: 4.03}
+  m_LocalScale: {x: 0.04258851, y: 8.489206, z: 8.148982}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 728221872}
@@ -18807,7 +18807,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 73c176f402d2c2f4d929aa5da7585d17, type: 2}
+  - {fileID: 2100000, guid: 9ea30e36e2c7bd54f9fcfd860f2c29d3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -22020,7 +22020,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   drawCamera: {fileID: 1849708688}
   renderTexture: {fileID: 8400000, guid: 2ebf14237a097b844929a480998db506, type: 2}
-  modelAsset: {fileID: 5022602860645237092, guid: 6834904154c88c64aafc219267c05170, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: b5cf04f4a8e61f844b0265be593d819a, type: 3}
   First: 0
   Second: 0
   Third: 0
@@ -32832,7 +32832,7 @@ Transform:
   m_GameObject: {fileID: 1849708684}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.999979, z: -0, w: 0.006481567}
-  m_LocalPosition: {x: 0.007, y: 0, z: 23.5}
+  m_LocalPosition: {x: 0.006, y: 0.109, z: 23.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -33016,11 +33016,11 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: -1.64
-  far clip plane: 3.6
-  field of view: 60
+  near clip plane: 2.7
+  far clip plane: 3.45
+  field of view: 42.9
   orthographic: 1
-  orthographic size: 3.2
+  orthographic size: 1.09
   m_Depth: 100
   m_CullingMask:
     serializedVersion: 2

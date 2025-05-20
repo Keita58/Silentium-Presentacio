@@ -1,5 +1,6 @@
 using UnityEngine;
 using Unity.Barracuda;
+using System.IO;
 
 public class AI : MonoBehaviour
 {
@@ -37,11 +38,13 @@ public class AI : MonoBehaviour
         RenderTexture currentRT = RenderTexture.active;
         RenderTexture.active = renderTexture;
 
-        Texture2D image = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGB24, false);
+        Texture2D image = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGBA32, false);
         image.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
         image.Apply();
 
         RenderTexture.active = currentRT;
+        byte[] bytes = image.EncodeToPNG();
+        File.WriteAllBytes(Application.persistentDataPath + "/Captured.png", bytes);
         Classify(image);
         return image;
     }
