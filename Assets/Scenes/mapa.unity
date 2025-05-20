@@ -22020,7 +22020,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   drawCamera: {fileID: 1849708688}
   renderTexture: {fileID: 8400000, guid: 2ebf14237a097b844929a480998db506, type: 2}
-  modelAsset: {fileID: 5022602860645237092, guid: 5fad214e58ba6d34fb59d6190c25b957, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: 6834904154c88c64aafc219267c05170, type: 3}
+  First: 0
+  Second: 0
+  Third: 0
+  Fourth: 0
+  Fifth: 0
+  Sixth: 0
+  Seventh: 0
+  Eighth: 0
 --- !u!4 &1299566654
 Transform:
   m_ObjectHideFlags: 0
@@ -33009,10 +33017,10 @@ Camera:
     width: 1
     height: 1
   near clip plane: -1.64
-  far clip plane: 16.4
+  far clip plane: 3.6
   field of view: 60
   orthographic: 1
-  orthographic size: 1.5679445
+  orthographic size: 3.2
   m_Depth: 100
   m_CullingMask:
     serializedVersion: 2
