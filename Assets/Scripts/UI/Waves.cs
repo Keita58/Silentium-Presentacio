@@ -138,11 +138,11 @@ public class Waves : MonoBehaviour
 
     private void ChangeColorWave(int hp, int maxHp)
     {
-        if (hp <= maxHp / 2)
+        if (hp <= 4 && hp > 2)
         {
             color = Color.yellow;
         }
-        else if (hp <= maxHp / 3)
+        else if (hp <= 2)
         {
            color = Color.red;
         }

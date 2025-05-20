@@ -1,10 +1,9 @@
-using NUnit.Framework;
 using System;
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+
 public class Player : MonoBehaviour
 {
     [SerializeField] Camera _Camera;
@@ -25,7 +24,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float _VelocityMove = 3f;
 
     [Tooltip("Mouse velocity in degrees per second.")]
-    [UnityEngine.Range(10f, 360f)]
+    [Range(10f, 360f)]
     [SerializeField] private float _LookVelocity = 100;
 
     [SerializeField] private bool _InvertY = false;
@@ -53,7 +52,6 @@ public class Player : MonoBehaviour
     [SerializeField] GameObject gunGameObject;
     [SerializeField] LayerMask enemyLayerMask;
     [SerializeField] LayerMask interactLayerMask;
-    //[SerializeField] Camera weaponCamera;
     [SerializeField] GameObject interactiveGameObject;
     [SerializeField] Material material;
     GameObject equippedItem;
@@ -86,6 +84,7 @@ public class Player : MonoBehaviour
     bool morse = false;
     private GameObject clockGameObject;
     private bool weaponPuzzle;
+
     //Coroutines
     private Coroutine coroutineRun;
     private Coroutine coroutineMove;
@@ -153,54 +152,6 @@ public class Player : MonoBehaviour
         characterController = GetComponent<CharacterController>();
     }
 
-    public void ToggleInputPlayer(bool enable, bool enableInventory)
-    {
-        if (!enable)
-        {
-            Cursor.visible = true;
-            _inputActions.Player.Shoot.Disable();
-            _inputActions.Player.Aim.Disable();
-            _inputActions.Player.Move.Disable();
-            _inputActions.Player.Look.Disable();
-            _inputActions.Player.Crouch.Disable();
-            _inputActions.Player.PickUpItem.Disable();
-            _RunAction.Disable();
-        }
-        else
-        {
-            Cursor.visible = false;
-            _inputActions.Player.Shoot.Enable();
-            _inputActions.Player.Aim.Enable();
-            _inputActions.Player.Move.Enable();
-            _inputActions.Player.Look.Enable();
-            _inputActions.Player.Crouch.Enable();
-            _inputActions.Player.PickUpItem.Enable();
-            _RunAction.Enable();
-            OnToggleUI?.Invoke(true);
-        }
-        if (enableInventory) _inputActions.Player.Inventory.Enable();
-        else _inputActions.Player.Inventory.Disable();
-
-    }
-
-    private void OpenInventory(InputAction.CallbackContext context)
-    {
-        if (!inventoryOpened)
-        {
-            InventoryManager.instance.OpenInventory(this.gameObject);
-        }
-        else
-        {
-            InventoryManager.instance.CloseInventory();
-        }
-    }
-
-    private void OpenMenu(InputAction.CallbackContext context)
-    {
-        Time.timeScale = 0;
-        menuManager.OpenMenu();
-    }
-
     void Start()
     {
         Cursor.visible = false;
@@ -209,19 +160,9 @@ public class Player : MonoBehaviour
 
         hp = 6;
         maxHp = 6;
-        gunAmmo = 20;
+        gunAmmo = 12;
         maxSilencerUses = 10;
         OnAmmoChange?.Invoke(gunAmmo);
-        //StartCoroutine(EsperarIActuar(5f, ()=>TakeDamage(6)));
-    }
-
-    IEnumerator EsperarIActuar(float tempsDespera, Action accio)
-    {
-        if (tempsDespera > 0)
-            yield return new WaitForSeconds(tempsDespera);
-        else
-            yield return null;
-        accio();
     }
 
     private void Update()
@@ -254,6 +195,62 @@ public class Player : MonoBehaviour
             }
         }
     }
+
+    public void ToggleInputPlayer(bool enable, bool enableInventory)
+    {
+        if (!enable)
+        {
+            Cursor.visible = true;
+            _inputActions.Player.Shoot.Disable();
+            _inputActions.Player.Aim.Disable();
+            _inputActions.Player.Move.Disable();
+            _inputActions.Player.Look.Disable();
+            _inputActions.Player.Crouch.Disable();
+            _inputActions.Player.PickUpItem.Disable();
+            _RunAction.Disable();
+        }
+        else
+        {
+            Cursor.visible = false;
+            _inputActions.Player.Shoot.Enable();
+            _inputActions.Player.Aim.Enable();
+            _inputActions.Player.Move.Enable();
+            _inputActions.Player.Look.Enable();
+            _inputActions.Player.Crouch.Enable();
+            _inputActions.Player.PickUpItem.Enable();
+            _RunAction.Enable();
+            OnToggleUI?.Invoke(true);
+        }
+
+        if (enableInventory) 
+            _inputActions.Player.Inventory.Enable();
+        else 
+            _inputActions.Player.Inventory.Disable();
+    }
+
+    private void OpenInventory(InputAction.CallbackContext context)
+    {
+        if (!inventoryOpened)
+            InventoryManager.instance.OpenInventory(this.gameObject);
+        else
+            InventoryManager.instance.CloseInventory();
+    }
+
+    private void OpenMenu(InputAction.CallbackContext context)
+    {
+        Time.timeScale = 0;
+        menuManager.OpenMenu();
+    }
+
+    IEnumerator EsperarIActuar(float tempsDespera, Action accio)
+    {
+        if (tempsDespera > 0)
+            yield return new WaitForSeconds(tempsDespera);
+        else
+            yield return null;
+        accio();
+    }
+
 
     private void Interact(InputAction.CallbackContext context)
     {
@@ -765,15 +762,16 @@ public class Player : MonoBehaviour
                         interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
                         interactiveGameObject = null;
                     }
+
                     interactiveGameObject = hit.collider.gameObject;
+
                     if (hit.transform.gameObject.layer != 15 && hit.transform.gameObject.layer != 18)
                     {
                         baseMaterial = interactiveGameObject.GetComponent<MeshRenderer>().materials[0];
                         interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[]
                         {
-                    interactiveGameObject.GetComponent<MeshRenderer>().materials[0],
-
-                    material
+                            interactiveGameObject.GetComponent<MeshRenderer>().materials[0],
+                            material
                         };
                     }
                     else if(interactiveGameObject.layer != 18)
@@ -786,7 +784,6 @@ public class Player : MonoBehaviour
                             bookChild.GetComponent<MeshRenderer>().materials = new Material[]
                             {
                                 bookChild.GetComponent<MeshRenderer>().materials[0],
-
                                 material
                             };
                         }
@@ -884,7 +881,7 @@ public class Player : MonoBehaviour
     {
         while (true)
         {
-            MakeNoise(30, 3);
+            MakeNoise(8, 3);
             OnMakeSound?.Invoke(4);
             yield return new WaitForSeconds(0.5f);
         }
@@ -895,7 +892,7 @@ public class Player : MonoBehaviour
         while (true)
         {
             Debug.Log("CORUTINACORRER");
-            MakeNoise(37, 7);
+            MakeNoise(18, 7);
             OnMakeSound?.Invoke(7);
             yield return new WaitForSeconds(0.5f);
         }
@@ -906,7 +903,7 @@ public class Player : MonoBehaviour
         while (true)
         {
             Debug.Log("CORUTINACROUCH");
-            MakeNoise(5, 1);
+            MakeNoise(3, 1);
             OnMakeSound?.Invoke(3);
             yield return new WaitForSeconds(0.5f);
         }
@@ -933,7 +930,7 @@ public class Player : MonoBehaviour
     public void ReloadAmmo(int numAmmo)
     {
         this.gunAmmo += numAmmo;
-        OnAmmoChange?.Invoke(numAmmo);
+        OnAmmoChange?.Invoke(gunAmmo);
     }
 
     public void Flashlight(InputAction.CallbackContext context)

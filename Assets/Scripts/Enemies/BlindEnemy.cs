@@ -384,33 +384,38 @@ public class BlindEnemy : Enemy
 
     private void OnEnter()
     {
-        _Search = false;
-        if (_ChangeStateToPatrol != null)
+        if(_CurrentState != EnemyStates.KNOCKED)
         {
-            StopCoroutine(_ChangeStateToPatrol);
-            _ChangeStateToPatrol = null;
+            _Search = false;
+            if (_ChangeStateToPatrol != null)
+            {
+                StopCoroutine(_ChangeStateToPatrol);
+                _ChangeStateToPatrol = null;
+            }
+
+            if (!_NavMeshAgent.enabled)
+                _NavMeshAgent.enabled = true;
+            ChangeState(EnemyStates.ATTACK);
+            if (_AttackCoroutine == null)
+                _AttackCoroutine = StartCoroutine(Attack());
         }
-
-        if (!_NavMeshAgent.enabled)
-            _NavMeshAgent.enabled = true;
-
-        ChangeState(EnemyStates.ATTACK);
-        if (_AttackCoroutine == null)
-            _AttackCoroutine = StartCoroutine(Attack());
     }
 
     private void OnExit()
     {
-        if (_AttackCoroutine != null)
+        if(_CurrentState != EnemyStates.KNOCKED)
         {
-            StopCoroutine(_AttackCoroutine);
-            _AttackCoroutine = null;
-        }
+            if (_AttackCoroutine != null)
+            {
+                StopCoroutine(_AttackCoroutine);
+                _AttackCoroutine = null;
+            }
 
-        _Search = true;
-        _RangeSearchSound = 0.5f;
-        _PointOfPatrol = transform.position;
-        ChangeState(EnemyStates.PATROL);
-        Debug.Log("Activo l'estat de Patrol");
+            _Search = true;
+            _RangeSearchSound = 0.5f;
+            _PointOfPatrol = transform.position;
+            ChangeState(EnemyStates.PATROL);
+            Debug.Log("Activo l'estat de Patrol");
+        }
     }
 }
