@@ -1030,6 +1030,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Finish"",
+                    ""type"": ""Button"",
+                    ""id"": ""6e2c384a-1890-4741-9c98-e55e32a0eb20"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
                     ""initialStateCheck"": false
                 }
             ],
@@ -1053,6 +1062,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Paint"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""df9f481b-9ce4-4de1-b03f-b7c6de0ca567"",
+                    ""path"": ""<Keyboard>/enter"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Finish"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1241,6 +1261,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Hieroglyphic = asset.FindActionMap("Hieroglyphic", throwIfNotFound: true);
         m_Hieroglyphic_Exit = m_Hieroglyphic.FindAction("Exit", throwIfNotFound: true);
         m_Hieroglyphic_Paint = m_Hieroglyphic.FindAction("Paint", throwIfNotFound: true);
+        m_Hieroglyphic_Finish = m_Hieroglyphic.FindAction("Finish", throwIfNotFound: true);
         // WeaponPuzzle
         m_WeaponPuzzle = asset.FindActionMap("WeaponPuzzle", throwIfNotFound: true);
         m_WeaponPuzzle_Unmount = m_WeaponPuzzle.FindAction("Unmount", throwIfNotFound: true);
@@ -1638,12 +1659,14 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private List<IHieroglyphicActions> m_HieroglyphicActionsCallbackInterfaces = new List<IHieroglyphicActions>();
     private readonly InputAction m_Hieroglyphic_Exit;
     private readonly InputAction m_Hieroglyphic_Paint;
+    private readonly InputAction m_Hieroglyphic_Finish;
     public struct HieroglyphicActions
     {
         private @InputSystem_Actions m_Wrapper;
         public HieroglyphicActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
         public InputAction @Exit => m_Wrapper.m_Hieroglyphic_Exit;
         public InputAction @Paint => m_Wrapper.m_Hieroglyphic_Paint;
+        public InputAction @Finish => m_Wrapper.m_Hieroglyphic_Finish;
         public InputActionMap Get() { return m_Wrapper.m_Hieroglyphic; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1659,6 +1682,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Paint.started += instance.OnPaint;
             @Paint.performed += instance.OnPaint;
             @Paint.canceled += instance.OnPaint;
+            @Finish.started += instance.OnFinish;
+            @Finish.performed += instance.OnFinish;
+            @Finish.canceled += instance.OnFinish;
         }
 
         private void UnregisterCallbacks(IHieroglyphicActions instance)
@@ -1669,6 +1695,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Paint.started -= instance.OnPaint;
             @Paint.performed -= instance.OnPaint;
             @Paint.canceled -= instance.OnPaint;
+            @Finish.started -= instance.OnFinish;
+            @Finish.performed -= instance.OnFinish;
+            @Finish.canceled -= instance.OnFinish;
         }
 
         public void RemoveCallbacks(IHieroglyphicActions instance)
@@ -1907,6 +1936,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     {
         void OnExit(InputAction.CallbackContext context);
         void OnPaint(InputAction.CallbackContext context);
+        void OnFinish(InputAction.CallbackContext context);
     }
     public interface IWeaponPuzzleActions
     {

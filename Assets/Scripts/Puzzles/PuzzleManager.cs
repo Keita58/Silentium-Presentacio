@@ -23,6 +23,10 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     private Camera cam_Hierogliphic;
     [SerializeField]
+    private Camera cam_AIHierogliphic;
+    [SerializeField]
+    private Camera cam_WeaponPuzzle;
+    [SerializeField]
     private AnimationClip doorsHieroglyphic;
     [SerializeField]
     private Animator hieroglyphicAnimator;
@@ -177,6 +181,7 @@ public class PuzzleManager : MonoBehaviour
     {
         cam_Player.gameObject.SetActive(false);
         cam_Hierogliphic.gameObject.SetActive(true);
+        cam_AIHierogliphic.gameObject.SetActive(true);
         player._inputActions.Player.Disable();
         player.ResumeInteract(false);
         events.ToggleCustomPass(false);
@@ -188,6 +193,7 @@ public class PuzzleManager : MonoBehaviour
     public void HieroglyphicPuzzleExitAnimation()
     {
         cam_Hierogliphic.gameObject.SetActive(false);
+        cam_AIHierogliphic.gameObject.SetActive(false);
         cam_HieroglyphicAnimation.gameObject.SetActive(true);
         hieroglyphicAnimator.Play("HieroDoor");
         animationTime = 0f;
