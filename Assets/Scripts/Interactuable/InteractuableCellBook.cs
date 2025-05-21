@@ -1,12 +1,12 @@
 using UnityEngine;
 
 [RequireComponent (typeof(CellBook))]
-public class InteractuableCellBook : MonoBehaviour
+public class InteractuableCellBook : MonoBehaviour, IInteractuable
 {
     public bool isRemarkable { get; private set; }
     private void Awake()
     {
-        isRemarkable = true;
+        isRemarkable = false;
     }
 
     public void Interact()

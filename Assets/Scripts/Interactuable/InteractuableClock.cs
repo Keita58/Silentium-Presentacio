@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class InteractuebleClock : MonoBehaviour, IInteractuable
+public class InteractuableClock : MonoBehaviour, IInteractuable
 {
     public bool isRemarkable { get; private set; }
     private void Awake()

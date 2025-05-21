@@ -61,10 +61,10 @@ public class Events : ScriptableObject
 
     //EVENTS UI
     //Event Warning Inventari ple
-    public event Action<string> OnInventoryWarning;
+    public event Action<string> OnWarning;
     public void ShowWarning(string text)
     {
-        OnInventoryWarning?.Invoke(text);
+        OnWarning?.Invoke(text);
     }
 
     //Per amagar les waves.
