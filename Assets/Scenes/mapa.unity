@@ -22020,7 +22020,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   drawCamera: {fileID: 1849708688}
   renderTexture: {fileID: 8400000, guid: 2ebf14237a097b844929a480998db506, type: 2}
-  modelAsset: {fileID: 5022602860645237092, guid: b5cf04f4a8e61f844b0265be593d819a, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: 54bd8d50a4e24744c8e2394df4574022, type: 3}
   First: 0
   Second: 0
   Third: 0
