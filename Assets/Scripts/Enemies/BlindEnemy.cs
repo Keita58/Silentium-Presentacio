@@ -14,7 +14,9 @@ public class BlindEnemy : Enemy
     [SerializeField] private LayerMask _LayerObjectsAndPlayer;
     [SerializeField] private LayerMask _LayerDoor;
     [SerializeField] private GameObject _DetectionSphere;
-    [SerializeField] private List<GameObject> _Waypoints;
+    [SerializeField] private List<GameObject> _WaypointsFirstPart;
+    [SerializeField] private List<GameObject> _WaypointsSecondPart;
+    [SerializeField] private Door _DoorLocked;
 
     private NavMeshAgent _NavMeshAgent;
     private Vector3 _SoundPos;
@@ -22,6 +24,7 @@ public class BlindEnemy : Enemy
     [SerializeField] private bool _Patrolling;
     [SerializeField] private bool _Search;
     private bool _OpeningDoor;
+    private bool _Jumping;
 
     private int _Hp;
     public override int hp => _Hp;
@@ -46,6 +49,7 @@ public class BlindEnemy : Enemy
         _Patrolling = false;
         _Search = false;
         _OpeningDoor = false;
+        _Jumping = false;
         _Hp = MAXHEALTH;
 
         _DetectionSphere.GetComponent<DetectionSphere>().OnEnter += OnEnter;
@@ -125,14 +129,31 @@ public class BlindEnemy : Enemy
         Vector3 point = Vector3.zero;
         while (true)
         {
-            Debug.Log("Entro al Patrol");
+            //Debug.Log("Entro al Patrol");
             if (!_Patrolling)
             {
                 if (!_Search)
                 {
                     while (true)
                     {
-                        point = _Waypoints[Random.Range(0, _Waypoints.Count)].transform.position;
+                        if (_DoorLocked.isLocked)
+                        {
+                            point = _WaypointsFirstPart[Random.Range(0, _WaypointsFirstPart.Count)].transform.position;
+                        }
+                        else
+                        {
+                            int random = Random.Range(0, 2);
+
+                            switch (random)
+                            {
+                                case 0:
+                                    point = _WaypointsFirstPart[Random.Range(0, _WaypointsFirstPart.Count)].transform.position;
+                                    break;
+                                case 1:
+                                    point = _WaypointsSecondPart[Random.Range(0, _WaypointsSecondPart.Count)].transform.position;
+                                    break;
+                            }
+                        }
                         if (point != _NavMeshAgent.destination)
                             break;
                     }
@@ -143,8 +164,7 @@ public class BlindEnemy : Enemy
                     point = coord;
                 }
                 _Patrolling = true;
-                if (_NavMeshAgent.remainingDistance < 5)
-                    _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
+                _NavMeshAgent.SetDestination(point);
             }
 
             if (_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
@@ -255,20 +275,23 @@ public class BlindEnemy : Enemy
                     }
                 }
 
-                if (Vector3.Distance(_SoundPos, transform.position) > 1.5f && Vector3.Distance(_SoundPos, transform.position) <= 4 && !wall)
+                if (Vector3.Distance(_SoundPos, transform.position) > 1.5f && Vector3.Distance(_SoundPos, transform.position) <= 8 && !wall && !_Jumping)
                 {
                     Debug.Log("Faig salt!");
+                    _Jumping = true;
                     ExitState(_CurrentState);
                     Vector3 start = transform.position;
                     Vector3 end = _SoundPos;
 
                     _NavMeshAgent.enabled = false;
-                    //GetComponent<Rigidbody>().isKinematic = false;
-                    GetComponent<Rigidbody>().AddForce((end - start) * 10);
+                    GetComponent<Rigidbody>().isKinematic = false;
+                    GetComponent<Rigidbody>().AddForce((end - start) * 70);
+                    transform.rotation = Quaternion.LookRotation(Vector3.RotateTowards(transform.forward, (end - start), 20, 0));
 
                     _RestoreCoroutine = StartCoroutine(RecoverAgent());
+                    StartCoroutine(RecoverJump());
                 }
-                else if (Vector3.Distance(_SoundPos, transform.position) > 4)
+                else if (Vector3.Distance(_SoundPos, transform.position) > 8)
                 {
                     _NavMeshAgent.SetDestination(_SoundPos);
                 }
@@ -335,11 +358,17 @@ public class BlindEnemy : Enemy
 
     IEnumerator RecoverAgent()
     {
-        yield return new WaitForSeconds(0.5f);
-        //GetComponent<Rigidbody>().isKinematic = true;
+        yield return new WaitForSeconds(1f);
+        GetComponent<Rigidbody>().isKinematic = true;
         _NavMeshAgent.enabled = true;
         if (_CurrentState != EnemyStates.ATTACK)
             ChangeState(EnemyStates.PATROL);
+    }
+
+    IEnumerator RecoverJump()
+    {
+        yield return new WaitForSeconds(3);
+        _Jumping = false;
     }
 
     IEnumerator Attack()

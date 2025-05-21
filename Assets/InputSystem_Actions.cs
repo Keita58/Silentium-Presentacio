@@ -110,6 +110,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""Pause"",
+                    ""type"": ""Button"",
+                    ""id"": ""985ea030-abee-4a88-bf7c-fe85b7e7e4c4"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""Flashlight"",
                     ""type"": ""Button"",
                     ""id"": ""a08e4503-d9db-4973-9c34-c092d65053fa"",
@@ -359,6 +368,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Throw"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""77d43a19-e356-46fb-9353-f873df07f95d"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Pause"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1113,6 +1133,34 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Chest"",
+            ""id"": ""dc5ac447-5aa2-4c31-8242-9f2a00444a8c"",
+            ""actions"": [
+                {
+                    ""name"": ""OpenClose"",
+                    ""type"": ""Button"",
+                    ""id"": ""594ed35b-11e5-4399-9792-d40dcc6d2722"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""c8d9e4fa-ed15-4837-8e0f-9722ba182fc6"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OpenClose"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -1189,6 +1237,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_Aim = m_Player.FindAction("Aim", throwIfNotFound: true);
         m_Player_Inventory = m_Player.FindAction("Inventory", throwIfNotFound: true);
         m_Player_Throw = m_Player.FindAction("Throw", throwIfNotFound: true);
+        m_Player_Pause = m_Player.FindAction("Pause", throwIfNotFound: true);
         m_Player_Flashlight = m_Player.FindAction("Flashlight", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
@@ -1219,6 +1268,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         // Morse
         m_Morse = asset.FindActionMap("Morse", throwIfNotFound: true);
         m_Morse_Exit = m_Morse.FindAction("Exit", throwIfNotFound: true);
+        // Chest
+        m_Chest = asset.FindActionMap("Chest", throwIfNotFound: true);
+        m_Chest_OpenClose = m_Chest.FindAction("OpenClose", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
@@ -1229,6 +1281,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         Debug.Assert(!m_Hieroglyphic.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Hieroglyphic.Disable() has not been called.");
         Debug.Assert(!m_WeaponPuzzle.enabled, "This will cause a leak and performance issues, InputSystem_Actions.WeaponPuzzle.Disable() has not been called.");
         Debug.Assert(!m_Morse.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Morse.Disable() has not been called.");
+        Debug.Assert(!m_Chest.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Chest.Disable() has not been called.");
     }
 
     public void Dispose()
@@ -1299,6 +1352,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Aim;
     private readonly InputAction m_Player_Inventory;
     private readonly InputAction m_Player_Throw;
+    private readonly InputAction m_Player_Pause;
     private readonly InputAction m_Player_Flashlight;
     public struct PlayerActions
     {
@@ -1313,6 +1367,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         public InputAction @Aim => m_Wrapper.m_Player_Aim;
         public InputAction @Inventory => m_Wrapper.m_Player_Inventory;
         public InputAction @Throw => m_Wrapper.m_Player_Throw;
+        public InputAction @Pause => m_Wrapper.m_Player_Pause;
         public InputAction @Flashlight => m_Wrapper.m_Player_Flashlight;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
@@ -1350,6 +1405,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Throw.started += instance.OnThrow;
             @Throw.performed += instance.OnThrow;
             @Throw.canceled += instance.OnThrow;
+            @Pause.started += instance.OnPause;
+            @Pause.performed += instance.OnPause;
+            @Pause.canceled += instance.OnPause;
             @Flashlight.started += instance.OnFlashlight;
             @Flashlight.performed += instance.OnFlashlight;
             @Flashlight.canceled += instance.OnFlashlight;
@@ -1384,6 +1442,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Throw.started -= instance.OnThrow;
             @Throw.performed -= instance.OnThrow;
             @Throw.canceled -= instance.OnThrow;
+            @Pause.started -= instance.OnPause;
+            @Pause.performed -= instance.OnPause;
+            @Pause.canceled -= instance.OnPause;
             @Flashlight.started -= instance.OnFlashlight;
             @Flashlight.performed -= instance.OnFlashlight;
             @Flashlight.canceled -= instance.OnFlashlight;
@@ -1746,6 +1807,52 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         }
     }
     public MorseActions @Morse => new MorseActions(this);
+
+    // Chest
+    private readonly InputActionMap m_Chest;
+    private List<IChestActions> m_ChestActionsCallbackInterfaces = new List<IChestActions>();
+    private readonly InputAction m_Chest_OpenClose;
+    public struct ChestActions
+    {
+        private @InputSystem_Actions m_Wrapper;
+        public ChestActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @OpenClose => m_Wrapper.m_Chest_OpenClose;
+        public InputActionMap Get() { return m_Wrapper.m_Chest; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(ChestActions set) { return set.Get(); }
+        public void AddCallbacks(IChestActions instance)
+        {
+            if (instance == null || m_Wrapper.m_ChestActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_ChestActionsCallbackInterfaces.Add(instance);
+            @OpenClose.started += instance.OnOpenClose;
+            @OpenClose.performed += instance.OnOpenClose;
+            @OpenClose.canceled += instance.OnOpenClose;
+        }
+
+        private void UnregisterCallbacks(IChestActions instance)
+        {
+            @OpenClose.started -= instance.OnOpenClose;
+            @OpenClose.performed -= instance.OnOpenClose;
+            @OpenClose.canceled -= instance.OnOpenClose;
+        }
+
+        public void RemoveCallbacks(IChestActions instance)
+        {
+            if (m_Wrapper.m_ChestActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IChestActions instance)
+        {
+            foreach (var item in m_Wrapper.m_ChestActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_ChestActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public ChestActions @Chest => new ChestActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     public InputControlScheme KeyboardMouseScheme
     {
@@ -1802,6 +1909,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         void OnAim(InputAction.CallbackContext context);
         void OnInventory(InputAction.CallbackContext context);
         void OnThrow(InputAction.CallbackContext context);
+        void OnPause(InputAction.CallbackContext context);
         void OnFlashlight(InputAction.CallbackContext context);
     }
     public interface IUIActions
@@ -1837,5 +1945,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     public interface IMorseActions
     {
         void OnExit(InputAction.CallbackContext context);
+    }
+    public interface IChestActions
+    {
+        void OnOpenClose(InputAction.CallbackContext context);
     }
 }

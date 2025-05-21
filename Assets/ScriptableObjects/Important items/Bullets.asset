@@ -15,10 +15,12 @@ MonoBehaviour:
   nom: Balas
   description: Balas simples.
   sprite: {fileID: 21300000, guid: 7f45c1ee97473ac4abe2b484d0b6f0c6, type: 3}
-  prefab: {fileID: 627999134386644201, guid: 5bd860a680f90294aa0429a0b8d1db93, type: 3}
+  prefab: {fileID: 0}
+  prefabInst: {fileID: 7303124644145991233, guid: 85ae26644f1b96a4cb7e4178ce00a89c, type: 3}
   stackable: 1
   itemType: 4
   usable: 1
-  equipable: 1
+  equipable: 0
   combinable: 0
-  bales: 1
+  ammoId: 8
+  bales: 6

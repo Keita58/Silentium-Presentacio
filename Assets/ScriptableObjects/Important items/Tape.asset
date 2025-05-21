@@ -16,7 +16,8 @@ MonoBehaviour:
   description: "Cinta americana. Si la combinase con otro objeto podr\xEDa hacer
     que la pistola hiciese menos ruido..."
   sprite: {fileID: 21300000, guid: 58767aa96f79cd9419bc0ac16591164c, type: 3}
-  prefab: {fileID: 7621407073725110988, guid: 3ff6d9a8a98cdbd4c8697cc4530f0552, type: 3}
+  prefab: {fileID: 0}
+  prefabInst: {fileID: 7621407073725110988, guid: 3ff6d9a8a98cdbd4c8697cc4530f0552, type: 3}
   itemsToCombine:
   - {fileID: 11400000, guid: 68558df8a6fc21e4e826b17012aa5235, type: 2}
   stackable: 1
@@ -24,4 +25,5 @@ MonoBehaviour:
   usable: 0
   equipable: 0
   combinable: 1
+  silencerId: 11
   silencer: {fileID: 11400000, guid: 6f84b6f5e8d320540bb3093a9c3f96fb, type: 2}

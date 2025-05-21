@@ -39,13 +39,13 @@ TagManager:
   - MorseTrigger
   - Atenuacio
   - Paint
+  - Interactuable
   - 
   - 
   - 
   - 
   - 
-  - 
-  - 
+  - Silencer
   - 
   m_SortingLayers:
   - name: Default

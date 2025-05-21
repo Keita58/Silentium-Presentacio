@@ -16,6 +16,9 @@ public class AmmunitionItem : Item
     [SerializeField] private GameObject prefab;
     public override GameObject prefabToEquip => prefab;
 
+    [SerializeField] private GameObject prefabInst;
+    public override GameObject prefabToInstantiate => prefabInst;
+
     public override List<Item> combinableItems => throw new System.NotImplementedException();
 
     [SerializeField] private bool stackable;
@@ -32,6 +35,9 @@ public class AmmunitionItem : Item
 
     [SerializeField] private bool combinable;
     public override bool isCombinable => combinable;
+
+    [SerializeField] private int ammoId;
+    public override int id => ammoId;
 
 
     [Header("Specific values")]
