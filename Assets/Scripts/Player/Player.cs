@@ -487,6 +487,7 @@ public class Player : MonoBehaviour
                 {
                     throwable.transform.parent.parent = null;
                 }
+                InventoryManager.instance.UseEquippedItem();
             }
         }
     }
