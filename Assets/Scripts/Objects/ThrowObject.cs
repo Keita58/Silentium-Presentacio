@@ -6,7 +6,7 @@ public class ThrowObject : MonoBehaviour
 {
     [SerializeField] private int soundIntensity;
     [SerializeField] public GameObject camaraPrimera;
-    [SerializeField] private PostProcessEvents events;
+    [SerializeField] private Events events;
     void Start()
     {  
         this.AddComponent<CapsuleCollider>();

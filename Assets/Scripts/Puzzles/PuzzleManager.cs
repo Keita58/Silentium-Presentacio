@@ -115,7 +115,7 @@ public class PuzzleManager : MonoBehaviour
     private float scanLinesStrength;
     [SerializeField]
     private float FlickeringStrength;
-    [SerializeField] PostProcessEvents events;
+    [SerializeField] Events events;
 
     private void Awake()
     {
@@ -144,6 +144,7 @@ public class PuzzleManager : MonoBehaviour
         player._inputActions.Player.Disable();
         player.ResumeInteract(false);
         events.ToggleCustomPass(false);
+        events.ToggleUI(false);
         cam_Clock.transform.parent.GetComponent<Clock>().inputActions.Clock.Enable();
     }
     public void ExitClockPuzzle()
@@ -154,6 +155,7 @@ public class PuzzleManager : MonoBehaviour
         player.ToggleInputPlayer(true, true);
         player.ResumeInteract(true);
         events.ToggleCustomPass(true);
+        events.ToggleUI(true);
         cam_Clock.transform.parent.GetComponent<Clock>().inputActions.Clock.Disable();
     }
     public void ClockSolved()
@@ -183,6 +185,7 @@ public class PuzzleManager : MonoBehaviour
         //cam_Hierogliphic.transform.parent.GetComponent<Keypad>().inputActions.Hieroglyphic.Enable();
         cam_Hierogliphic.transform.parent.GetComponent<LineRendererExample>()._inputAction.Hieroglyphic.Enable();
         Cursor.visible = true;
+        events.ToggleUI(false);
     }
 
     public void HieroglyphicPuzzleExitAnimation()
@@ -207,6 +210,7 @@ public class PuzzleManager : MonoBehaviour
         player.ResumeInteract(true);
         cam_Player.gameObject.SetActive(true);
         Cursor.visible = false;
+        events.ToggleUI(true);
     }
 
     private void HieroglyphicPuzzleLoad()
@@ -244,6 +248,7 @@ public class PuzzleManager : MonoBehaviour
         cam_Player.gameObject.SetActive(true);
         Cursor.visible = false;
         isMorseCompleted = true;
+        events.ToggleUI(true);
     }
 
     public void InteractMorsePuzzle()
@@ -255,6 +260,7 @@ public class PuzzleManager : MonoBehaviour
         morseKeypad.inputActions.Morse.Enable();
         player.ResumeInteract(false);
         Cursor.visible = true;
+        events.ToggleUI(true);
     }
 
     private void MorsePuzzleLoad()
@@ -347,6 +353,7 @@ public class PuzzleManager : MonoBehaviour
         allWeapon.enabled = false;
         Cursor.visible = true;
         player.ResumeInteract(false);
+        events.ToggleUI(false);
     }
 
     public void ExitWeaponPuzzle()
@@ -359,6 +366,7 @@ public class PuzzleManager : MonoBehaviour
         cam_WeaponPuzzle.gameObject.SetActive(false);
         Cursor.visible = false;
         weaponPuzzleCompleted = true;
+        events.ToggleUI(true);
     }
 
     private void WeaponPuzzleLoad()

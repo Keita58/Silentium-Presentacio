@@ -4,12 +4,13 @@ using UnityEngine;
 public class InteractuableItem : MonoBehaviour, IInteractuable
 {
     public bool isRemarkable { get; private set; }
+    [SerializeField] Events events;
     private void Awake()
     {
         isRemarkable = true;
     }
 
-    public void Interactuar()
+    public void Interact()
     {
         if (InventoryManager.instance.inventory.items.Count < 6)
         {
@@ -33,11 +34,10 @@ public class InteractuableItem : MonoBehaviour, IInteractuable
             if (itemPicked is ThrowableItem || itemPicked is SilencerItem || itemPicked is SaveItem || itemPicked is HealingItem || itemPicked is AmmunitionItem)
                 //OnPickItem?.Invoke(GetComponentInParent<PickObject>().Id);
                 if (itemPicked is BookItem && itemPicked.ItemType == ItemTypes.BOOK2) PuzzleManager.instance.ChangePositionPlayerAfterHieroglyphic();
-            //interactiveGameObject = null;
         }
-        //else
-        //{
-        //    OnWarning?.Invoke("Inventario lleno!");
-        //}
+        else
+        {
+            events.ShowWarning("Inventario lleno!");
+        }
     }
 }

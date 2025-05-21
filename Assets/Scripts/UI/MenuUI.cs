@@ -6,6 +6,7 @@ public class MenuUI : MonoBehaviour
     [SerializeField] GameObject panelParent;
     [SerializeField] GameObject optionsPanel;
     [SerializeField] Player player;
+    [SerializeField] Events events;
     [SerializeField] GameObject waves;
     [SerializeField] TextMeshProUGUI ammoQuantity;
 
@@ -31,7 +32,7 @@ public class MenuUI : MonoBehaviour
 
     private void Start()
     {
-        player.OnToggleUI += ToggleUI;
+        events.OnToggleUI += ToggleUI;
         player.OnAmmoChange += ChangeNumAmmo;
     }
 

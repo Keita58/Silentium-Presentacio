@@ -6,7 +6,7 @@ public class ChromaticAberrationManager : MonoBehaviour
 {
     Volume volume;
     ChromaticAberration chAb;
-    [SerializeField] PostProcessEvents postProcessEvent;
+    [SerializeField] Events postProcessEvent;
 
     private void Start()
     {

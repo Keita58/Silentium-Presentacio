@@ -28,7 +28,7 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] GameObject notesPanelScroll;
     [SerializeField] private GameObject imagePanel;
     [SerializeField] private GameObject bookPanel;
-    [SerializeField] private PostProcessEvents postProcessEvents;
+    [SerializeField] private Events events;
 
     private Item equippedItem;
 
@@ -340,9 +340,9 @@ public class InventoryManager : MonoBehaviour
     public void DiscoverNote(NotesSO note)
     {
         noteInventory.AddNote(note);
-        postProcessEvents.IncreaseIntensityChAb(0.167f);
-        postProcessEvents.IncreaseSampleChAb(3);
-        postProcessEvents.IncreaseIntensityFilmGrain(0.167f);
+        events.IncreaseIntensityChAb(0.167f);
+        events.IncreaseSampleChAb(3);
+        events.IncreaseIntensityFilmGrain(0.167f);
     }
 
     public void ShowNoteScroll(NotesSO note)
@@ -471,5 +471,7 @@ public class InventoryManager : MonoBehaviour
     {
         inventoryUI.SetEquippedItem(null, false);
         unequipButton.SetActive(false);
+        player.equipedObject = null;
+        player.itemSlotOccuped = false;
     }
 }

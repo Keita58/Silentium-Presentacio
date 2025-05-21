@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.ProBuilder.Shapes;
 
 [RequireComponent(typeof(Door))]
 public class InteractuableDoor : MonoBehaviour, IInteractuable
@@ -13,11 +12,11 @@ public class InteractuableDoor : MonoBehaviour, IInteractuable
         door = GetComponent<Door>();
     }
 
-    public void Interactuar()
+    public void Interact()
     {
     }
 
-    public void Interactuar(Transform player)
+    public void Interact(Transform player)
     {
         if (door.isLocked)
         {

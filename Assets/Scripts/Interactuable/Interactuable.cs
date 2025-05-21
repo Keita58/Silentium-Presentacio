@@ -1,5 +1,5 @@
 public interface IInteractuable
 {
-    void Interactuar();
+    void Interact();
     bool isRemarkable { get; }
 }

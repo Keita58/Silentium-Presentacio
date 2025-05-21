@@ -7,12 +7,13 @@ public class Messages : MonoBehaviour
 {
     [SerializeField] private Player player;
     [SerializeField] private TextMeshProUGUI messageText;
+    [SerializeField] private Events events;
 
     private void Awake()
     {
         player.OnInteractuable += ShowMessageInteractuable;
         player.OnNotInteractuable += HideMessage;
-        player.OnWarning += ShowWarningMessage;
+        events.OnInventoryWarning += ShowWarningMessage;
     }
 
     private void ShowMessageInteractuable(GameObject interactableGameObject)

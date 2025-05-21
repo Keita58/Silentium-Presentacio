@@ -60,8 +60,8 @@ public class Player : MonoBehaviour
     [SerializeField] private Material baseMaterial;
     private GameObject itemEquipped;
     public bool inventoryOpened;
-    private bool itemSlotOccuped;
-    [SerializeField] private GameObject equipedObject;
+    public bool itemSlotOccuped;
+    [SerializeField] public GameObject equipedObject;
     [SerializeField] Transform itemSlot;
     [SerializeField]
     bool door = false;
@@ -116,7 +116,7 @@ public class Player : MonoBehaviour
     [SerializeField] private Animator gunanimator;
 
     [Header("PostProcess")]
-    [SerializeField] private PostProcessEvents events;
+    [SerializeField] private Events events;
 
     [Header("General")]
     [SerializeField] MenuUI menuManager;
@@ -128,10 +128,9 @@ public class Player : MonoBehaviour
     //Evento que sirve para limpiar el texto de interactuable.
     public event Action OnNotInteractuable;
     public event Action<int,int> OnHpChange;
-    public event Action<string> OnWarning;
     public event Action<int> OnPickItem;
     //para esconder las waves del sonido
-    public event Action<bool> OnToggleUI;
+    //public event Action<bool> OnToggleUI;
     public event Action<int> OnAmmoChange;
 
     private void Awake()
@@ -176,7 +175,7 @@ public class Player : MonoBehaviour
             _inputActions.Player.Crouch.Enable();
             _inputActions.Player.PickUpItem.Enable();
             _RunAction.Enable();
-            OnToggleUI?.Invoke(true);
+            //OnToggleUI?.Invoke(true);
         }
         if (enableInventory) _inputActions.Player.Inventory.Enable();
         else _inputActions.Player.Inventory.Disable();
@@ -267,15 +266,25 @@ public class Player : MonoBehaviour
                 {
                     if (hit.collider.TryGetComponent<InteractuableDoor>(out InteractuableDoor door))
                     {
-                        door.Interactuar(this.transform);
+                        door.Interact(this.transform);
+                    }
+                }
+            }else if (interactiveGameObject.GetComponent<IInteractuable>() is InteractuableCellBook)
+            {
+                if (equipedObject != null)
+                {
+                    if (equipedObject.GetComponent<PickItem>().item is BookItem)
+                    {
+                        interactiveGameObject.GetComponent<InteractuableCellBook>().Interact(equipedObject.gameObject);
                     }
                 }
             }
             else
             {
-                interactiveGameObject.GetComponent<IInteractuable>().Interactuar();
+                interactiveGameObject.GetComponent<IInteractuable>().Interact();
             }
-            interactiveGameObject = null;
+            if (interactiveGameObject!=null)
+                interactiveGameObject = null;
 
             ////if (item)
             ////{
@@ -399,14 +408,14 @@ public class Player : MonoBehaviour
             //        onCameraClick?.Invoke();
             //    }
             //    else
-            //    {
-            //        OnNotInteractuable?.Invoke();
-            //        OnToggleUI?.Invoke(false);
-            //    }
+            {
+                OnNotInteractuable?.Invoke();
+                //OnToggleUI?.Invoke(false);
+            }
 
             //    if (interactiveGameObject != null)
             //        interactiveGameObject = null;
-                
+
             //}
         }
         else
@@ -457,14 +466,7 @@ public class Player : MonoBehaviour
                 throwable.GetComponent<Rigidbody>().isKinematic = false;
                 throwable.camaraPrimera = _Camera.gameObject;
                 throwable.Lanzar();
-                if (throwable.transform.parent == itemSlot)
-                {
-                    throwable.transform.parent = null;
-                }
-                else
-                {
-                    throwable.transform.parent.parent = null;
-                }
+                //throwable.gameObject.SetActive(false);
             }
         }
     }
@@ -529,7 +531,6 @@ public class Player : MonoBehaviour
                 }
                 Debug.Log("Enemy hit");
             }
-            //OnDisparar?.Invoke();
         }
     }
 
@@ -836,20 +837,6 @@ public class Player : MonoBehaviour
             }
             else if (!Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit2, 5f, interactLayerMask))
             {
-                //door=false;
-                //book=false;
-                //keypad=false;
-                //item = false;
-                //morse=false;
-                //clockPuzzle = false;
-                //bookItem = false;
-                //picture = false;
-                //note = false;
-                //weaponPuzzle = false;
-                //chest = false;
-
-                //chestGO = null;
-
                 if (interactiveGameObject != null)
                 {
                     if (interactiveGameObject.GetComponent<IInteractuable>().isRemarkable)
@@ -934,10 +921,10 @@ public class Player : MonoBehaviour
 
     public void ToggleChestAnimation(bool opened)
     {
-        //if (opened && interactiveGameObject != null && interactiveGameObject.GetComponent<IInteractuable>() is InteractuableChest)
-        //    interactiveGameObject.GetComponent<Animator>().Play("OpenChest");
-        //else
-        //    interactiveGameObject.GetComponent<Animator>().Play("CloseChest");
+        if (opened && interactiveGameObject != null && interactiveGameObject.GetComponent<IInteractuable>() is InteractuableChest)
+            interactiveGameObject.GetComponent<Animator>().Play("OpenChest");
+        else
+            interactiveGameObject.GetComponent<Animator>().Play("CloseChest");
 
     }
     private void OnDestroy()
