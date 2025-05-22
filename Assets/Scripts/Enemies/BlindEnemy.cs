@@ -70,7 +70,7 @@ public class BlindEnemy : Enemy
 
     private void ChangeState(EnemyStates newState)
     {
-        if (_CurrentState == newState) return;
+        //if (_CurrentState == newState) return;
 
         Debug.Log($"---------------------- Sortint de {_CurrentState} a {newState} ------------------------");
         ExitState(_CurrentState);
@@ -175,7 +175,7 @@ public class BlindEnemy : Enemy
                     _ChangeStateToPatrol = StartCoroutine(WakeUp(10));
                 }
                 _Patrolling = false;
-                yield return new WaitForSeconds(2);
+                yield return new WaitForSeconds(1);
             }
             else
                 yield return new WaitForSeconds(0.5f);
@@ -296,6 +296,8 @@ public class BlindEnemy : Enemy
                     _NavMeshAgent.SetDestination(_SoundPos);
                 }
             }
+
+            ChangeState(EnemyStates.PATROL);
         }
     }
 
@@ -376,7 +378,7 @@ public class BlindEnemy : Enemy
         while (true)
         {
             Debug.Log("Entro a l'atac");
-            _Player.GetComponent<Player>().TakeDamage(3);
+            _Player.GetComponent<Player>().TakeDamage(2);
             Debug.Log("Estic fent mal (Enemic cec)");
             yield return new WaitForSeconds(1);
         }
