@@ -74,5 +74,11 @@ public class Events : ScriptableObject
         OnToggleUI?.Invoke(active);
     }
 
+    //EVENT Objects
+    public event Action<int> OnPickItem;
+    public void PickItem(int itemId)
+    {
+        OnPickItem?.Invoke(itemId);
+    }
 
 }

@@ -4,12 +4,13 @@ using UnityEngine;
 public class InteractuableDoor : MonoBehaviour, IInteractuable
 {
     public bool isRemarkable { get; private set; }
+    public bool isInteractuable { get;  set; }
     Door door;
 
     private void Awake()
     {
         isRemarkable = false;
-        door = GetComponent<Door>();
+        isInteractuable = true;
     }
 
     public void Interact()

@@ -5,11 +5,15 @@ using UnityEngine;
 public class InteractuableCamera : MonoBehaviour, IInteractuable
 {
     public bool isRemarkable { get; private set; }
+
+    public bool isInteractuable { get; set; }
+
     public event Action onCameraClick;
 
     private void Awake()
     {
         isRemarkable = true;
+        isInteractuable = true;
     }
 
     public void Interact()

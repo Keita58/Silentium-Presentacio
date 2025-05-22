@@ -4,10 +4,14 @@ using UnityEngine;
 public class InteractuableItem : MonoBehaviour, IInteractuable
 {
     public bool isRemarkable { get; private set; }
+
+    public bool isInteractuable { get;  set; }
+
     [SerializeField] Events events;
     private void Awake()
     {
         isRemarkable = true;
+        isInteractuable = true;
     }
 
     public void Interact()
@@ -32,8 +36,8 @@ public class InteractuableItem : MonoBehaviour, IInteractuable
             }
             gameObject.SetActive(false);
             if (itemPicked is ThrowableItem || itemPicked is SilencerItem || itemPicked is SaveItem || itemPicked is HealingItem || itemPicked is AmmunitionItem)
-                //OnPickItem?.Invoke(GetComponentInParent<PickObject>().Id);
-                if (itemPicked is BookItem && itemPicked.ItemType == ItemTypes.BOOK2) PuzzleManager.instance.ChangePositionPlayerAfterHieroglyphic();
+                events.PickItem(GetComponentInParent<PickObject>().Id);
+            if (itemPicked is BookItem && itemPicked.ItemType == ItemTypes.BOOK2) PuzzleManager.instance.ChangePositionPlayerAfterHieroglyphic();
         }
         else
         {

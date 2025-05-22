@@ -156,14 +156,13 @@ namespace NavKeypad
 
         private void AccessGranted()
         {
+            GetComponent<InteractuableMorse>().isInteractuable = false;
             door.SetLocked(false);
             door.Open(new Vector3(0,0,0));
             accessWasGranted = true;
             keypadDisplayText.text = accessGrantedText;
             PuzzleManager.instance.ExitMorsePuzzleAnimation();
             audioSource.PlayOneShot(accessGrantedSfx);
-            this.transform.gameObject.layer = 0;
-            panelCollider.transform.gameObject.layer = 0;
         }
         private void ExitPuzzle(InputAction.CallbackContext context)
         {

@@ -316,7 +316,7 @@ public class PuzzleManager : MonoBehaviour
                 {
                     for (int x = 0; x < picturesClicked.Count; x++)
                     {
-                        pictureList.ElementAt(x).gameObject.layer = 0;
+                        pictureList.ElementAt(x).GetComponent<InteractuablePicture>().isInteractuable = false;
                     }
                     DoorPoem3.isLocked = false;
                     player.ToggleInputPlayer(false, false);

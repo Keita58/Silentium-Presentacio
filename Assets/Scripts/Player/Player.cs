@@ -169,8 +169,11 @@ public class Player : MonoBehaviour
 
     private void OpenMenu(InputAction.CallbackContext context)
     {
-        Time.timeScale = 0;
-        menuManager.OpenMenu();
+        if (!inventoryOpened)
+        {
+            Time.timeScale = 0;
+            menuManager.OpenMenu();
+        }
     }
 
     void Start()
@@ -578,24 +581,27 @@ public class Player : MonoBehaviour
             if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask)){
                 if (hit.transform.TryGetComponent<IInteractuable>(out IInteractuable interactuable))
                 {
-                    if (interactiveGameObject != null && !interactiveGameObject.Equals(hit.transform.gameObject) && interactuable.isRemarkable && interactiveGameObject.GetComponent<MeshRenderer>() !=null)
+                    if (interactuable.isInteractuable)
                     {
-                        interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
-                        interactiveGameObject = null;
-                    }
-                    interactiveGameObject = hit.transform.gameObject;
-                    if (interactuable.isRemarkable)
-                    {
-                        interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
-                        baseMaterial = interactiveGameObject.GetComponent<MeshRenderer>().materials[0];
-                        interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[]
+                        if (interactiveGameObject != null && !interactiveGameObject.Equals(hit.transform.gameObject) && interactuable.isRemarkable && interactiveGameObject.GetComponent<MeshRenderer>() != null)
                         {
+                            interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
+                            interactiveGameObject = null;
+                        }
+                        interactiveGameObject = hit.transform.gameObject;
+                        if (interactuable.isRemarkable)
+                        {
+                            interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
+                            baseMaterial = interactiveGameObject.GetComponent<MeshRenderer>().materials[0];
+                            interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[]
+                            {
                             interactiveGameObject.GetComponent<MeshRenderer>().materials[0],
 
                             material
-                        };
+                            };
+                        }
+                        OnInteractuable?.Invoke(interactiveGameObject);
                     }
-                    OnInteractuable?.Invoke(interactiveGameObject);
                 }
             }
             else if (!Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit2, 5f, interactLayerMask))

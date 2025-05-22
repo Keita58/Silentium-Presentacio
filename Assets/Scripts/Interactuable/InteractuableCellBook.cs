@@ -4,14 +4,17 @@ using UnityEngine;
 public class InteractuableCellBook : MonoBehaviour, IInteractuable
 {
     public bool isRemarkable { get; private set; }
+
+    public bool isInteractuable { get; set; }
+
     private void Awake()
     {
         isRemarkable = false;
+        isInteractuable = true;
     }
 
     public void Interact()
     {
-
     }
 
     public void Interact(GameObject equipedObject)
