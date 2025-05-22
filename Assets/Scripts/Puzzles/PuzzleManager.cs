@@ -29,7 +29,11 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     private Animator hieroglyphicAnimator;
     [SerializeField]
-    private Camera cam_HieroglyphicAnimation;
+    private Camera cam_HieroglyphicAnimation;    
+    [SerializeField]
+    private Animator hieroglyphicAnimator2;
+    [SerializeField]
+    private AnimationClip HieroglyphicAnimation2;
     [SerializeField]
     public bool isHieroglyphicCompleted { get; set; }
 
@@ -194,6 +198,7 @@ public class PuzzleManager : MonoBehaviour
         cam_AIHierogliphic.gameObject.SetActive(false);
         cam_HieroglyphicAnimation.gameObject.SetActive(true);
         hieroglyphicAnimator.Play("HieroDoor");
+        hieroglyphicAnimator2.Play(HieroglyphicAnimation2.name);
         animationTime = 0f;
         isHieroglyphicCompleted = true;
     }

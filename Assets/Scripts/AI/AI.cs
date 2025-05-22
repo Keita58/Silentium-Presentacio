@@ -116,7 +116,7 @@ public class AI : MonoBehaviour
             if (scores[5] > 0.8f)
             {
                 Eighth = true;
-                PuzzleManager.instance.HieroglyphicPuzzleExit(true);
+                PuzzleManager.instance.HieroglyphicPuzzleExitAnimation();
             }
         }
         input.Dispose();
