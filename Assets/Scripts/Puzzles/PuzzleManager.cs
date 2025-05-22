@@ -78,8 +78,6 @@ public class PuzzleManager : MonoBehaviour
 
     [Header("Weapon Puzzle")]
     [SerializeField]
-    private Camera cam_WeaponPuzzle;
-    [SerializeField]
     private BoxCollider allWeapon;
     public bool weaponPuzzleCompleted { get; set; }
 

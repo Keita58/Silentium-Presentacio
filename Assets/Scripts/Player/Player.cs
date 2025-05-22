@@ -5,6 +5,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using UnityEngine.VFX;
 public class Player : MonoBehaviour
 {
     [SerializeField] Camera _Camera;
@@ -105,6 +106,7 @@ public class Player : MonoBehaviour
     public event Action<int,int> OnHpChange;
     public event Action<int> OnPickItem;
     public event Action<int> OnAmmoChange;
+    public event Action OnShoot;
 
     private void Awake()
     {
@@ -339,6 +341,7 @@ public class Player : MonoBehaviour
         if (gunAmmo >= 1)
         {
             gunanimator.Play("Shoot");
+            OnShoot?.Invoke();
             gunAmmo--;
             OnAmmoChange?.Invoke(gunAmmo);
             Debug.DrawRay(shootPosition.transform.position, -shootPosition.transform.right, Color.yellow, 5f);
