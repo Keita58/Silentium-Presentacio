@@ -7,31 +7,28 @@ public class Messages : MonoBehaviour
 {
     [SerializeField] private Player player;
     [SerializeField] private TextMeshProUGUI messageText;
+    [SerializeField] private Events events;
 
     private void Awake()
     {
         player.OnInteractuable += ShowMessageInteractuable;
         player.OnNotInteractuable += HideMessage;
-        player.OnWarning += ShowWarningMessage;
+        events.OnWarning += ShowWarningMessage;
     }
 
     private void ShowMessageInteractuable(GameObject interactableGameObject)
     {
-        switch (interactableGameObject.layer)
+        IInteractuable interactuable = interactableGameObject.GetComponent<IInteractuable>();
+        if (interactuable != null)
         {
-            case 13:
-                messageText.text = "Pulsa E para abrir el cofre";
-                break;
-            case 12:
-                messageText.text = "Pulsa E para coger la nota";
-                break;
-            case 9:
+            if (interactuable is InteractuableChest) messageText.text = "Pulsa E para abrir el cofre";
+            else if (interactuable is InteractuableNote) messageText.text = "Pulsa E para coger la nota";
+            else if (interactuable is InteractuableItem)
+            {
                 string itemName = interactableGameObject.GetComponent<PickItem>().item.name;
-                messageText.text = "Pulsa E para coger "+itemName;
-                break;
-            default:
+                messageText.text = "Pulsa E para coger " + itemName;
+            }else
                 messageText.text = "Pulsa E para interactuar";
-                break;
         }
     }
 
@@ -40,16 +37,25 @@ public class Messages : MonoBehaviour
         messageText.text = "";
     }
 
-    private void ShowWarningMessage(string text)
+    private void HideMessageWarning()
     {
-        messageText.text = text;
-        StartCoroutine(DoAction(3f, () => HideMessage()));
+        messageText.text = "";
+        player.OnInteractuable += ShowMessageInteractuable;
+        player.OnNotInteractuable += HideMessage;
     }
 
-    IEnumerator DoAction(float tempsDespera, Action action)
+    private void ShowWarningMessage(string text)
     {
-        if (tempsDespera > 0)
-            yield return new WaitForSeconds(tempsDespera);
+        player.OnInteractuable -= ShowMessageInteractuable;
+        player.OnNotInteractuable -= HideMessage;
+        messageText.text = text;    
+        StartCoroutine(DoAction(3f, () => HideMessageWarning()));
+    }
+
+    IEnumerator DoAction(float waitTime, Action action)
+    {
+        if (waitTime > 0)
+            yield return new WaitForSeconds(waitTime);
         else
             yield return null;
         action();

@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(InteractuableClock))]
 public class Clock : MonoBehaviour
 {
 
@@ -42,7 +43,6 @@ public class Clock : MonoBehaviour
         inputActions.Clock.FinishClock.canceled += HandleMinutesFinished;
         moveClock = inputActions.Clock.MoveClockHand;
         inputActions.Clock.Exit.started += Exit;
-        //    inputActions.Clock.Enable();
     }
     void Start()
     {
@@ -52,13 +52,6 @@ public class Clock : MonoBehaviour
         float rotationHours = ((360.0f / 12.0f) * hour) + ((360.0f / (60.0f * 12.0f)) * minutes);
         pointerHours.transform.localEulerAngles = new Vector3(0.0f, 0.0f, rotationHours);
     }
-
-    void Update()
-    {
-        // moveMinutes();
-        //StartCoroutine(Finished());
-    }
-
     private void HandleInputMinutes(InputAction.CallbackContext context)
     {
         if (context.performed)
@@ -149,7 +142,7 @@ public class Clock : MonoBehaviour
             yield return new WaitForSeconds(1.5f);
             if ((hour >= 8.9 && hour < 9.7 || hour >= 20.9 && hour < 21.7) && minutes >= 20.9 && minutes < 21.7)
             {
-                this.gameObject.layer = 0;
+                GetComponent<InteractuableClock>().isInteractuable = false;
                 PuzzleManager.instance.ClockSolved();
             }
         }

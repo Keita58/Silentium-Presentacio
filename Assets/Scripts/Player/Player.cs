@@ -60,32 +60,9 @@ public class Player : MonoBehaviour
     [SerializeField] private Material baseMaterial;
     private GameObject itemEquipped;
     public bool inventoryOpened;
-    private bool itemSlotOccuped;
-    [SerializeField] private GameObject equipedObject;
+    public bool itemSlotOccuped;
+    [SerializeField] public GameObject equipedObject;
     [SerializeField] Transform itemSlot;
-    [SerializeField]
-    bool door = false;
-    bool clockPuzzle = false;
-
-    //interactive booleans
-    [SerializeField]
-    bool item = false;
-    [SerializeField]
-    bool note = false;
-    [SerializeField]
-    bool chest = false;
-    [SerializeField]
-    bool book = false;
-    [SerializeField]
-    bool keypad = false;
-    [SerializeField]
-    bool bookItem= false;
-    [SerializeField]
-    bool picture = false;
-    [SerializeField]
-    bool morse = false;
-    private GameObject clockGameObject;
-    private bool weaponPuzzle;
     //Coroutines
     private Coroutine coroutineRun;
     private Coroutine coroutineMove;
@@ -102,10 +79,7 @@ public class Player : MonoBehaviour
     [SerializeField] GameObject silencer;
     public bool isSilencerEquipped { get; set; }
     public int silencerUses { get; set; }
-    public int maxSilencerUses { get; set; }
-
-    //Chest
-    private GameObject chestGO;
+    public int maxSilencerUses { get; private set; }
 
     [Header("Gun")]
     [SerializeField] private Transform gunAimPosition;
@@ -116,22 +90,20 @@ public class Player : MonoBehaviour
     [SerializeField] private Animator gunanimator;
 
     [Header("PostProcess")]
-    [SerializeField] private PostProcessEvents events;
+    [SerializeField] private Events events;
 
     [Header("General")]
     [SerializeField] MenuUI menuManager;
     [SerializeField] Waves waves;
 
+    //Events
     public event Action<int> OnMakeSound;
     public event Action<int> OnMakeImpactSound;
     public event Action<GameObject> OnInteractuable;
     //Evento que sirve para limpiar el texto de interactuable.
     public event Action OnNotInteractuable;
     public event Action<int,int> OnHpChange;
-    public event Action<string> OnWarning;
     public event Action<int> OnPickItem;
-    //para esconder las waves del sonido
-    public event Action<bool> OnToggleUI;
     public event Action<int> OnAmmoChange;
 
     private void Awake()
@@ -176,7 +148,7 @@ public class Player : MonoBehaviour
             _inputActions.Player.Crouch.Enable();
             _inputActions.Player.PickUpItem.Enable();
             _RunAction.Enable();
-            OnToggleUI?.Invoke(true);
+            //OnToggleUI?.Invoke(true);
         }
         if (enableInventory) _inputActions.Player.Inventory.Enable();
         else _inputActions.Player.Inventory.Disable();
@@ -197,8 +169,11 @@ public class Player : MonoBehaviour
 
     private void OpenMenu(InputAction.CallbackContext context)
     {
-        Time.timeScale = 0;
-        menuManager.OpenMenu();
+        if (!inventoryOpened)
+        {
+            Time.timeScale = 0;
+            menuManager.OpenMenu();
+        }
     }
 
     void Start()
@@ -260,184 +235,38 @@ public class Player : MonoBehaviour
         Debug.Log("ENTRO?");
         if (interactiveGameObject != null)
         {
-            if (item)
-            {
-                Debug.Log("ENTRO DEFINITIVAMENTE");
-                if (InventoryManager.instance.inventory.items.Count < 6)
-                {
-                    Item itemPicked = interactiveGameObject.GetComponent<PickItem>().item;
-                    InventoryManager.instance.AddItem(itemPicked);
-                    Debug.Log("QUE COJO?" + itemPicked);
-
-                    Debug.Log("Entro Coger item");
-                    if (bookItem)
-                    {   
-                        Book book = interactiveGameObject.GetComponent<Book>();
-                        if (book.placed)
-                        {
-                            book.placed = false;
-                            book.collider.enabled = true;
-                            book.collider.transform.GetComponent<CellBook>().SetBook(null, null);
-                            book.collider = null;
-                            bookItem = false;
-                            item = false;
-                        }
-                    }
-                    interactiveGameObject.gameObject.SetActive(false);
-                    if(itemPicked is ThrowableItem || itemPicked is SilencerItem || itemPicked is SaveItem || itemPicked is HealingItem || itemPicked is AmmunitionItem)
-                        OnPickItem?.Invoke(interactiveGameObject.GetComponentInParent<PickObject>().Id);
-                    if (itemPicked is BookItem && itemPicked.ItemType == ItemTypes.BOOK2) PuzzleManager.instance.ChangePositionPlayerAfterHieroglyphic();
-                        interactiveGameObject = null;
-                    }
-                else
-                {
-                    OnWarning?.Invoke("Inventario lleno!");
-                }  
-            }
-            else
-            {
-                if (!book && !door && !weaponPuzzle)
-                    interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
-
-                if (clockPuzzle)
-                {
-                    PuzzleManager.instance.InteractClockPuzzle();
-                    clockPuzzle = false;
-
-                }else if (weaponPuzzle)
-                {
-                    PuzzleManager.instance.InteractWeaponPuzzle();
-                    weaponPuzzle = false;
-                }
-                else if (note)
-                {
-                    NotesSO noteSO = interactiveGameObject.GetComponent<Notes>().note;
-                    if (noteSO.noteId < 6)
-                    {
-                        InventoryManager.instance.DiscoverNote(noteSO);
-                        interactiveGameObject.gameObject.SetActive(false);
-                    }
-                    else
-                    {
-                        if (noteSO.noteId == 10)
-                        {
-                            InventoryManager.instance.ShowNoteScroll(noteSO);
-                        }else if (noteSO.noteType == NotesSO.NoteType.Image)
-                        {
-                            InventoryManager.instance.ShowImageNote(noteSO.noteContent);
-
-                        }else if (noteSO.noteType == NotesSO.NoteType.Book)
-                        {
-                            InventoryManager.instance.ShowBookNote(noteSO.noteContent);
-                        }
-                        else
-                            InventoryManager.instance.ShowNote(noteSO);
-                    }
-                    note = false;
-                }
-                else if (book)
-                {
-                    if (equipedObject != null)
-                    {
-                        if (equipedObject.GetComponent<PickItem>().item is BookItem)
-                        {
-                            interactiveGameObject.GetComponent<CellBook>().SetBook(equipedObject.GetComponent<Book>(), equipedObject);
-                            equipedObject.GetComponent<Book>().collider = interactiveGameObject.GetComponent<CellBook>().GetComponent<BoxCollider>();
-                            equipedObject.GetComponent<Book>().placed = true;
-                            PuzzleManager.instance.CheckBookPuzzle();
-                            interactiveGameObject.GetComponent<CellBook>().GetComponent<BoxCollider>().enabled = false;
-                            equipedObject.transform.rotation = Quaternion.identity;
-                            equipedObject.transform.parent = interactiveGameObject.transform;
-                            equipedObject.transform.position = interactiveGameObject.transform.GetChild(0).transform.position;
-                            equipedObject = null;
-                            itemSlotOccuped = false;
-                            InventoryManager.instance.UseEquippedItem();
-                        }
-                    }
-                }
-                else if (keypad)
-                {
-                    PuzzleManager.instance.InteractHieroglyphicPuzzle();
-                }
-                else if (morse)
-                {
-                    PuzzleManager.instance.InteractMorsePuzzle();
-                }
-                else if (picture)
-                {
-                    Debug.Log("Entro en interact picture");
-                    PuzzleManager.instance.picturesClicked.Add(interactiveGameObject.GetComponent<Picture>());
-                    PuzzleManager.instance.TakePoemPart();
-                    picture = false;
-
-                }
-                else if (chest)
-                {
-                    InventoryManager.instance.OpenChest();
-                    chest = false;
-                }
-
-                if (interactiveGameObject.transform.gameObject.layer == 24)
-                {
-                    onCameraClick?.Invoke();
-                }
-                else
-                {
-                    OnNotInteractuable?.Invoke();
-                    OnToggleUI?.Invoke(false);
-                }
-
-                if (interactiveGameObject != null)
-                    interactiveGameObject = null;
-                
-            }
-        }
-        else
-        {
-            if (door)
+            if (interactiveGameObject.GetComponent<IInteractuable>() is InteractuableDoor)
             {
                 Debug.DrawRay(_Camera.transform.position, _Camera.transform.forward, Color.magenta, 5f);
                 if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask))
                 {
-                    if (hit.collider.TryGetComponent<Door>(out Door door))
+                    if (hit.collider.TryGetComponent<InteractuableDoor>(out InteractuableDoor door))
                     {
-                        if (door.isLocked)
-                        {
-                            InventorySO.ItemSlot aux = null;
-                            foreach (InventorySO.ItemSlot item in InventoryManager.instance.inventory.items)
-                            {
-                                if (item.item == door.itemNeededToOpen)
-                                {
-                                    door.isLocked = false;
-                                    aux = item;
-                                    InventoryManager.instance.inventory.items.Remove(aux);
-                                    break;
-                                }
-                            }
-                            if (door.isOpen)
-                            {
-                                door.Close();
-                            }
-                            else
-                            {
-                                door.Open(transform.position);
-                            }
-                        }
-                        else
-                        {
-                            if (door.isOpen)
-                            {
-                                door.Close();
-                            }
-                            else
-                            {
-                                door.Open(transform.position);
-                            }
-                        }
+                        door.Interact(this.transform);
+                    }
+                }
+            }else if (interactiveGameObject.GetComponent<IInteractuable>() is InteractuableCellBook)
+            {
+                if (equipedObject != null)
+                {
+                    if (equipedObject.GetComponent<PickItem>().item is BookItem)
+                    {
+                        interactiveGameObject.GetComponent<InteractuableCellBook>().Interact(equipedObject.gameObject);
                     }
                 }
             }
-            
+            else
+            {
+                interactiveGameObject.GetComponent<IInteractuable>().Interact();
+            }
+            if (interactiveGameObject.GetComponent<IInteractuable>().isRemarkable)
+                interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
+
+            if (interactiveGameObject!=null)
+                interactiveGameObject = null;
+            {
+                OnNotInteractuable?.Invoke();
+            }
         }
         
 
@@ -482,14 +311,7 @@ public class Player : MonoBehaviour
                 throwable.GetComponent<Rigidbody>().isKinematic = false;
                 throwable.camaraPrimera = _Camera.gameObject;
                 throwable.Lanzar();
-                if (throwable.transform.parent == itemSlot)
-                {
-                    throwable.transform.parent = null;
-                }
-                else
-                {
-                    throwable.transform.parent.parent = null;
-                }
+                //throwable.gameObject.SetActive(false);
             }
         }
     }
@@ -554,7 +376,6 @@ public class Player : MonoBehaviour
                 }
                 Debug.Log("Enemy hit");
             }
-            //OnDisparar?.Invoke();
         }
     }
 
@@ -758,111 +579,36 @@ public class Player : MonoBehaviour
             //Lanzar Raycast interactuar con el mundo.
 
             if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask)){
-                if (!hit.collider.gameObject.Equals(interactiveGameObject) && hit.transform.gameObject.layer != 10)
+                if (hit.transform.TryGetComponent<IInteractuable>(out IInteractuable interactuable))
                 {
-                    if (interactiveGameObject!=null && interactiveGameObject.transform.gameObject.layer != 15 && interactiveGameObject.transform.gameObject.layer!=18)
+                    if (interactuable.isInteractuable)
                     {
-                        interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
-                        interactiveGameObject = null;
-                    }
-                    interactiveGameObject = hit.collider.gameObject;
-                    if (hit.transform.gameObject.layer != 15 && hit.transform.gameObject.layer != 18)
-                    {
-                        baseMaterial = interactiveGameObject.GetComponent<MeshRenderer>().materials[0];
-                        interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[]
+                        if (interactiveGameObject != null && !interactiveGameObject.Equals(hit.transform.gameObject) && interactuable.isRemarkable && interactiveGameObject.GetComponent<MeshRenderer>() != null)
                         {
-                    interactiveGameObject.GetComponent<MeshRenderer>().materials[0],
-
-                    material
-                        };
-                    }
-                    else if(interactiveGameObject.layer != 18)
-                    {
-                        Transform child =interactiveGameObject.transform.GetChild(0);
-                        if (child.childCount > 0)
+                            interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
+                            interactiveGameObject = null;
+                        }
+                        interactiveGameObject = hit.transform.gameObject;
+                        if (interactuable.isRemarkable)
                         {
-                            Transform bookChild = child.GetChild(0);
-                            baseMaterial = bookChild.GetComponent<MeshRenderer>().materials[0];
-                            bookChild.GetComponent<MeshRenderer>().materials = new Material[]
+                            interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
+                            baseMaterial = interactiveGameObject.GetComponent<MeshRenderer>().materials[0];
+                            interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[]
                             {
-                                bookChild.GetComponent<MeshRenderer>().materials[0],
+                            interactiveGameObject.GetComponent<MeshRenderer>().materials[0],
 
-                                material
+                            material
                             };
                         }
+                        OnInteractuable?.Invoke(interactiveGameObject);
                     }
-
-                    //if(hit.transform.TryGetComponent<Interactuable>(out Interactuable aux))
-
-                    //S'ha de canviar aixo per una sola layer
-                    if (hit.transform.gameObject.layer == 9)
-                    {
-                        item = true;
-                        if (hit.collider.GetComponent<PickItem>().item is BookItem)
-                        {
-                            bookItem = true;
-                        }
-                    }
-                    else if (hit.transform.gameObject.layer == 12)
-                    {
-                        note = true;
-                    }
-                    else if (hit.transform.gameObject.layer == 11)
-                    {
-                        clockPuzzle = true;
-                    }
-                    else if (hit.transform.gameObject.layer == 13)
-                    {
-                        chest = true;
-                        chestGO = hit.transform.gameObject;
-                    }
-                    else if (hit.transform.gameObject.layer == 15)
-                    {
-                        book = true;
-                    }
-                    else if (hit.transform.gameObject.layer == 23)
-                    {
-                        keypad = true;
-                    }else if (hit.transform.gameObject.layer == 18)
-                    {
-                        weaponPuzzle = true;
-                    }else if (hit.transform.gameObject.layer == 20)
-                    {
-                        morse = true;
-                        door = false;
-                    }
-                    else if (hit.transform.gameObject.layer == 17)
-                    {
-                        Debug.Log("Entro en la layer de picture");
-                        picture = true;
-                    }
-                    OnInteractuable?.Invoke(interactiveGameObject);
-                }
-                else if (hit.transform.gameObject.layer == 10)
-                {
-                    if (!morse)
-                        door = true;
                 }
             }
-            else if (!Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit2, 10f, interactLayerMask))
+            else if (!Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit2, 5f, interactLayerMask))
             {
-                door=false;
-                book=false;
-                keypad=false;
-                item = false;
-                morse=false;
-                clockPuzzle = false;
-                bookItem = false;
-                picture = false;
-                note = false;
-                weaponPuzzle = false;
-                chest = false;
-
-                chestGO = null;
-
                 if (interactiveGameObject != null)
                 {
-                    if (interactiveGameObject.transform.gameObject.layer != 15 && interactiveGameObject.transform.gameObject.layer != 18)
+                    if (interactiveGameObject.GetComponent<IInteractuable>().isRemarkable)
                     {
                         interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
                         interactiveGameObject = null;
@@ -944,10 +690,10 @@ public class Player : MonoBehaviour
 
     public void ToggleChestAnimation(bool opened)
     {
-        if (opened && chestGO != null)
-            chestGO.GetComponent<Animator>().Play("OpenChest");
+        if (opened && interactiveGameObject != null && interactiveGameObject.GetComponent<IInteractuable>() is InteractuableChest)
+            interactiveGameObject.GetComponent<Animator>().Play("OpenChest");
         else
-            chestGO.GetComponent<Animator>().Play("CloseChest");
+            interactiveGameObject.GetComponent<Animator>().Play("CloseChest");
 
     }
     private void OnDestroy()

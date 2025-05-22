@@ -6,7 +6,7 @@ public class FogManager : MonoBehaviour
 {
     Volume volume;
     Fog fog;
-    [SerializeField] PostProcessEvents postProcessEvent;
+    [SerializeField] Events postProcessEvent;
 
     private void Start()
     {
