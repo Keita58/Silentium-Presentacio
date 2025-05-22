@@ -186,7 +186,7 @@ public class PuzzleManager : MonoBehaviour
         cam_AIHierogliphic.gameObject.SetActive(true);
         player._inputActions.Player.Disable();
         player.ResumeInteract(false);
-        events.ToggleCustomPass(false);
+       // events.ToggleCustomPass(false);
         //cam_Hierogliphic.transform.parent.GetComponent<Keypad>().inputActions.Hieroglyphic.Enable();
         cam_Hierogliphic.transform.parent.GetComponent<LineRendererExample>()._inputAction.Hieroglyphic.Enable();
         Cursor.visible = true;

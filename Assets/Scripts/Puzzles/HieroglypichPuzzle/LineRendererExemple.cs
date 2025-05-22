@@ -32,7 +32,10 @@ public class LineRendererExample : MonoBehaviour
         lineRenderer = new List<LineRenderer>();
         // Set the material
         previousPosition = transform.position;
-        lr = this.gameObject.AddComponent<LineRenderer>();
+        GameObject lineObject = new GameObject("Line");
+        lineObject.transform.parent = this.transform;
+        lineObject.layer = 23;
+        lr = lineObject.AddComponent<LineRenderer>();
         lr.SetColors(Color.black, Color.black);
         lr.startWidth = 0.05f;                 // Ancho de la línea
         lr.endWidth = 0.05f;
@@ -120,9 +123,15 @@ public class LineRendererExample : MonoBehaviour
             if (!this.transform.GetChild(i).gameObject.TryGetComponent<Camera>(out Camera cam))
                 Destroy(this.transform.GetChild(i).gameObject);
         }
-        this.GetComponent<LineRenderer>().positionCount = 0;
-        this.GetComponent<LineRenderer>().positionCount = 2;
         lineRenderer.Clear();
-        lineRenderer.Add(this.GetComponent<LineRenderer>());
+        GameObject lineObject = new GameObject("Line");
+        lineObject.transform.parent = this.transform;
+        lineObject.layer = 23;
+        lr = lineObject.AddComponent<LineRenderer>();
+        lr.SetColors(Color.black, Color.black);
+        lr.startWidth = 0.05f;                 // Ancho de la línea
+        lr.endWidth = 0.05f;
+        lineRenderer.Add(lr);
+        lineRenderer[lineRenderer.Count - 1].material = new Material(Shader.Find("Sprites/Default"));
     }
 }
