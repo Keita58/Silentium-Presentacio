@@ -22,6 +22,7 @@ public class LineRendererExample : MonoBehaviour
     private Vector3 previousPosition;
     DrawSystem drawSystem;
     LineRenderer lr;
+    bool correctPosition = false;
     void Start()
     {
         _inputAction = new InputSystem_Actions();
@@ -34,10 +35,11 @@ public class LineRendererExample : MonoBehaviour
         previousPosition = transform.position;
         GameObject lineObject = new GameObject("Line");
         lineObject.transform.parent = this.transform;
+        lineObject.transform.localPosition = Vector3.zero;
         lineObject.layer = 23;
         lr = lineObject.AddComponent<LineRenderer>();
         lr.SetColors(Color.black, Color.black);
-        lr.startWidth = 0.05f;                 // Ancho de la línea
+        lr.startWidth = 0.05f;                 // Ancho de la lnea
         lr.endWidth = 0.05f;
         lineRenderer.Add(lr);
         lineRenderer[lineRenderer.Count - 1].material = new Material(Shader.Find("Sprites/Default"));
@@ -62,11 +64,13 @@ public class LineRendererExample : MonoBehaviour
     {
         if (context.performed)
         {
+            correctPosition = false;
             isHeld = true;
             Ray ray = cam.ScreenPointToRay(Mouse.current.position.ReadValue());
-            if (Physics.Raycast(ray, out RaycastHit hit, 5, layer))
+            if (Physics.Raycast(ray, out RaycastHit hit, 5f, layer))
             {
-                Vector3 currentPosition = new Vector3(hit.point.x, hit.point.y, hit.point.z + 0.1f);
+                correctPosition = true;
+                Vector3 currentPosition = new Vector3(hit.point.x, hit.point.y, hit.point.z);
                 if (Vector3.Distance(currentPosition, previousPosition) > minDistance)
                 {
                     if (previousPosition == transform.position || previousPosition == hit.point)
@@ -86,28 +90,32 @@ public class LineRendererExample : MonoBehaviour
         else if (context.canceled)
         {
             isHeld = false;
-            GameObject lineObject = new GameObject("Line");
-            lineObject.transform.parent = this.transform;
-            lineObject.layer = 23;
-            // Añade un LineRenderer a ese nuevo;
-            lr = lineObject.AddComponent<LineRenderer>();
-            lr.SetColors(Color.black, Color.black);
-            lr.startWidth = 0.05f;                 // Ancho de la línea
-            lr.endWidth = 0.05f;
-            lineRenderer.Add(lr);
-            lineRenderer[lineRenderer.Count - 1].material = new Material(Shader.Find("Sprites/Default"));
-            lineRenderer[lineRenderer.Count - 1].positionCount = 2;
+            if (correctPosition)
+            {
+                GameObject lineObject = new GameObject("Line");
+                lineObject.transform.parent = this.transform;
+                lineObject.transform.localPosition = Vector3.zero;
+                lineObject.layer = 23;
+                // Añade un LineRenderer a ese nuevo;
+                lr = lineObject.AddComponent<LineRenderer>();
+                lr.SetColors(Color.black, Color.black);
+                lr.startWidth = 0.05f;                 // Ancho de la línea
+                lr.endWidth = 0.05f;
+                lineRenderer.Add(lr);
+                lineRenderer[lineRenderer.Count - 1].material = new Material(Shader.Find("Sprites/Default"));
+                lineRenderer[lineRenderer.Count - 1].positionCount = 2;
+            }
         }
     }
     IEnumerator Held()
     {
         //lineRenderer[lineRenderer.Count - 1].positionCount++;
-        while (isHeld)
+        while (isHeld && correctPosition)
         {
             Ray ray = cam.ScreenPointToRay(Mouse.current.position.ReadValue());
-            if (Physics.Raycast(ray, out RaycastHit hit))
+            if (Physics.Raycast(ray, out RaycastHit hit, 5f,layer))
             {
-                lineRenderer[lineRenderer.Count - 1].SetPosition(1, new Vector3(hit.point.x, hit.point.y, hit.point.z + 0.1f));
+                lineRenderer[lineRenderer.Count - 1].SetPosition(1, new Vector3(hit.point.x, hit.point.y, hit.point.z));
             }
 
             yield return new WaitForEndOfFrame();
@@ -129,7 +137,7 @@ public class LineRendererExample : MonoBehaviour
         lineObject.layer = 23;
         lr = lineObject.AddComponent<LineRenderer>();
         lr.SetColors(Color.black, Color.black);
-        lr.startWidth = 0.05f;                 // Ancho de la línea
+        lr.startWidth = 0.05f;                 // Ancho de la linea
         lr.endWidth = 0.05f;
         lineRenderer.Add(lr);
         lineRenderer[lineRenderer.Count - 1].material = new Material(Shader.Find("Sprites/Default"));

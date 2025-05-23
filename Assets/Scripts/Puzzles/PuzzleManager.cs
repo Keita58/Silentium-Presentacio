@@ -1,6 +1,7 @@
 using NavKeypad;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering.HighDefinition;
@@ -35,7 +36,9 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     private AnimationClip HieroglyphicAnimation2;
     [SerializeField]
-    public bool isHieroglyphicCompleted { get; set; }
+    public bool isHieroglyphicCompleted { get; set; } 
+    [SerializeField]
+    TextMeshProUGUI riddlerText;
 
     [Header("Book Puzzle")]
     [SerializeField]
@@ -66,6 +69,7 @@ public class PuzzleManager : MonoBehaviour
     [Header("Morse Puzzle")]
     [SerializeField]
     Player player;
+
     [SerializeField]
     private Camera cam_morse;
     [SerializeField]
@@ -191,7 +195,12 @@ public class PuzzleManager : MonoBehaviour
         cam_Hierogliphic.transform.parent.GetComponent<LineRendererExample>()._inputAction.Hieroglyphic.Enable();
         Cursor.visible = true;
     }
-
+    public void IsFlashlightning() { 
+        if(player.flashlight.activeSelf)
+            riddlerText.gameObject.SetActive(false);
+        else
+            riddlerText.gameObject.SetActive(true);
+    }
     public void HieroglyphicPuzzleExitAnimation()
     {
         cam_Hierogliphic.gameObject.SetActive(false);
