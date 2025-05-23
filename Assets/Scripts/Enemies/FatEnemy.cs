@@ -20,6 +20,7 @@ public class FatEnemy : Enemy
     [SerializeField] private bool _Patrolling;
     [SerializeField] private bool _Search;
     private bool _OpeningDoor;
+    private Animator _Animator;
 
     private int _Hp;
     public override int hp => _Hp;
@@ -36,6 +37,7 @@ public class FatEnemy : Enemy
 
     private void Awake()
     {
+        _Animator = GetComponent<Animator>();
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
         _PointOfPatrol = transform.position;
@@ -83,6 +85,7 @@ public class FatEnemy : Enemy
                 _AttackCoroutine = StartCoroutine(AttackPlayer());
                 break;
             case EnemyStates.KNOCKED:
+                _Animator.Play("Idle");
                 StartCoroutine(WakeUp());
                 break;
         }
@@ -133,17 +136,20 @@ public class FatEnemy : Enemy
                     RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
                     point = coord;
                 }
+                _Animator.SetBool("Idle", false);
                 _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
                 _Patrolling = true;
             }
 
+            yield return new WaitForEndOfFrame();
             if (_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
             {
+                _Animator.SetBool("Idle", true);
                 _Patrolling = false;
                 if (!_Search)
                     yield return new WaitForSeconds(2);
                 else
-                    yield return new WaitForSeconds(5);
+                    yield return new WaitForSeconds(1);
             }
             else
                 yield return new WaitForSeconds(0.5f);
@@ -304,7 +310,7 @@ public class FatEnemy : Enemy
     {
         while (true)
         {
-            //Animation -> attack
+            _Animator.Play("Attack");
             transform.LookAt(_Player.transform.position);
             _Player.GetComponent<Player>().TakeDamage(1);
             yield return new WaitForSeconds(0.5f);

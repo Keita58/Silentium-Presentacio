@@ -23,6 +23,7 @@ public class FastEnemy : Enemy
     private bool _Patrolling;
     private bool _Search;
     private bool _OpeningDoor;
+    private Animator _Animator;
 
     private int _Hp;
     public override int hp => _Hp;
@@ -41,6 +42,7 @@ public class FastEnemy : Enemy
 
     private void Awake()
     {
+        _Animator = GetComponent<Animator>();
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
         _PointOfPatrol = transform.position;
@@ -86,13 +88,18 @@ public class FastEnemy : Enemy
                 _PatrolCoroutine = StartCoroutine(Patrol(_RangeSearchSound, _PointOfPatrol));
                 break;
             case EnemyStates.CHASE:
+                _Animator.Play("Run");
                 _NavMeshAgent.speed = 5.5f;
                 break;
             case EnemyStates.ATTACK:
                 _AttackCoroutine = StartCoroutine(AttackPlayer());
                 break;
             case EnemyStates.KNOCKED:
+                _Animator.Play("Idle");
                 StartCoroutine(WakeUp());
+                break;
+            case EnemyStates.STOPPED:
+                _Animator.speed = 0;
                 break;
         }
     }
@@ -266,6 +273,7 @@ public class FastEnemy : Enemy
                     RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
                     point = coord;
                 }
+                _Animator.Play("Walk");
                 _Patrolling = true;
                 _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
             }
@@ -276,7 +284,7 @@ public class FastEnemy : Enemy
                 {
                     _ChangeToPatrolCoroutine = StartCoroutine(StopChase());
                 }
-
+                _Animator.Play("Idle");
                 _Patrolling = false;
                 yield return new WaitForSeconds(2);
             }
@@ -308,7 +316,7 @@ public class FastEnemy : Enemy
     {
         while (true)
         {
-            //Animation -> attack
+            _Animator.Play("Attack");
             _Player.GetComponent<Player>().TakeDamage(1);
             yield return new WaitForSeconds(1);
         }
