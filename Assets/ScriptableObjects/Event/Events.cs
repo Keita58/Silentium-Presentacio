@@ -80,5 +80,4 @@ public class Events : ScriptableObject
     {
         OnPickItem?.Invoke(itemId);
     }
-
 }

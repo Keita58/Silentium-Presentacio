@@ -107,6 +107,7 @@ public class Player : MonoBehaviour
     public event Action<int> OnPickItem;
     public event Action<int> OnAmmoChange;
     public event Action OnShoot;
+    public event Action OnThrow;
 
     private void Awake()
     {
@@ -313,6 +314,7 @@ public class Player : MonoBehaviour
                 throwable.GetComponent<Rigidbody>().isKinematic = false;
                 throwable.camaraPrimera = _Camera.gameObject;
                 throwable.Lanzar();
+                //OnThrow.Invoke();
                 //throwable.gameObject.SetActive(false);
             }
         }
