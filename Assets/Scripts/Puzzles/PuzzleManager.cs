@@ -205,6 +205,7 @@ public class PuzzleManager : MonoBehaviour
     {
         cam_Hierogliphic.gameObject.SetActive(false);
         cam_AIHierogliphic.gameObject.SetActive(false);
+        cam_Hierogliphic.transform.parent.gameObject.layer = 0;
         cam_HieroglyphicAnimation.gameObject.SetActive(true);
         hieroglyphicAnimator.Play("HieroDoor");
         hieroglyphicAnimator2.Play(HieroglyphicAnimation2.name);
@@ -221,7 +222,7 @@ public class PuzzleManager : MonoBehaviour
 
         player._inputActions.Player.Enable();
         events.ToggleCustomPass(false);
-        cam_Hierogliphic.transform.parent.GetComponent<Keypad>().inputActions.Hieroglyphic.Disable();
+        cam_Hierogliphic.transform.parent.GetComponent<LineRendererExample>()._inputAction.Hieroglyphic.Disable();
         player.ResumeInteract(true);
         cam_Player.gameObject.SetActive(true);
         Cursor.visible = false;
