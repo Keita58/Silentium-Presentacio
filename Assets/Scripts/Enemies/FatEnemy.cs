@@ -13,6 +13,7 @@ public class FatEnemy : Enemy
     [SerializeField] private LayerMask _LayerDoor;
     [SerializeField] private GameObject _DetectionSphere;
     [SerializeField] private List<GameObject> _Waypoints;
+    [SerializeField] private GameObject _Waypoint;
 
     private NavMeshAgent _NavMeshAgent;
     private Vector3 _SoundPos;
@@ -77,7 +78,7 @@ public class FatEnemy : Enemy
         {
             case EnemyStates.PATROL:
                 _Patrolling = false;
-                _PatrolCoroutine = StartCoroutine(Patrol(_RangeSearchSound, _PointOfPatrol));
+                _PatrolCoroutine = StartCoroutine(Patrol());
                 if (_Search)
                     _ChangeToPatrolCoroutine = StartCoroutine(ChangeToPatrol(7));
                 break;
@@ -114,10 +115,10 @@ public class FatEnemy : Enemy
 
     #endregion 
 
-    // Funci� per moure l'enemic pel mapa
-    IEnumerator Patrol(int range, Vector3 pointOfSearch)
+    // Funcio per moure l'enemic pel mapa
+    IEnumerator Patrol()
     {
-        Vector3 point = Vector3.zero;
+        GameObject waypointToGo = null;
         while (true)
         {
             if (!_Patrolling)
@@ -126,23 +127,25 @@ public class FatEnemy : Enemy
                 {
                     while (true)
                     {
-                        point = _Waypoints[Random.Range(0, _Waypoints.Count)].transform.position;
-                        if (point != _NavMeshAgent.destination)
-                            break;
+                        _Waypoint = _Waypoints[Random.Range(0, _Waypoints.Count)];
+                        if (_Waypoint != waypointToGo)
+                        {
+                            waypointToGo = _Waypoint;
+                            break; 
+                        }
                     }
                 }
                 else
                 {
                     RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
-                    point = coord;
+                    _Waypoint.transform.position = coord;
                 }
                 _Animator.SetBool("Idle", false);
-                _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
+                _NavMeshAgent.SetDestination(_Waypoint.transform.position);
                 _Patrolling = true;
             }
-
-            yield return new WaitForEndOfFrame();
-            if (_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
+            
+            if (!_NavMeshAgent.pathPending && _NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
             {
                 _Animator.SetBool("Idle", true);
                 _Patrolling = false;
@@ -310,7 +313,7 @@ public class FatEnemy : Enemy
     {
         while (true)
         {
-            _Animator.Play("Attack");
+            _Animator.SetBool("Attack", false);
             transform.LookAt(_Player.transform.position);
             _Player.GetComponent<Player>().TakeDamage(1);
             yield return new WaitForSeconds(0.5f);
