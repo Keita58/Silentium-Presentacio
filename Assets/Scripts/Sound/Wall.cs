@@ -1,9 +1,9 @@
 using UnityEngine;
 
-public class Wall : MonoBehaviour, IAtenuacio
+public class Wall : MonoBehaviour, IAttenuable
 {
-    public int atenuarSo(int nivellSo)
+    public int AttenuateSound(int soundLvl)
     {
-        return nivellSo -= 1;
+        return soundLvl -= 1;
     }
 }

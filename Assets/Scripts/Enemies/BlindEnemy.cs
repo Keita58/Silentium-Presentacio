@@ -220,9 +220,9 @@ public class BlindEnemy : Enemy
 
         foreach (RaycastHit hit in hits)
         {
-            if (hit.collider.TryGetComponent<IAtenuacio>(out IAtenuacio a))
+            if (hit.collider.TryGetComponent<IAttenuable>(out IAttenuable a))
             {
-                lvlSound = a.atenuarSo(lvlSound);
+                lvlSound = a.AttenuateSound(lvlSound);
             }
         }
 
