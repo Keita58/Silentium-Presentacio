@@ -83,6 +83,7 @@ public class FatEnemy : Enemy
                     _ChangeToPatrolCoroutine = StartCoroutine(ChangeToPatrol(7));
                 break;
             case EnemyStates.ATTACK:
+                _Animator.SetBool("Attack", true);
                 _AttackCoroutine = StartCoroutine(AttackPlayer());
                 break;
             case EnemyStates.KNOCKED:
@@ -106,6 +107,7 @@ public class FatEnemy : Enemy
                 break;
             case EnemyStates.ATTACK:
                 StopCoroutine(_AttackCoroutine);
+                _Animator.SetBool("Attack", false);
                 break;
             case EnemyStates.KNOCKED:
                 _Hp = MAXHEALTH;
@@ -313,7 +315,6 @@ public class FatEnemy : Enemy
     {
         while (true)
         {
-            _Animator.SetBool("Attack", false);
             transform.LookAt(_Player.transform.position);
             _Player.GetComponent<Player>().TakeDamage(1);
             yield return new WaitForSeconds(0.5f);

@@ -92,6 +92,7 @@ public class FastEnemy : Enemy
                 _NavMeshAgent.speed = 5.5f;
                 break;
             case EnemyStates.ATTACK:
+                _Animator.SetBool("Attack", true);
                 _AttackCoroutine = StartCoroutine(AttackPlayer());
                 break;
             case EnemyStates.KNOCKED:
@@ -131,6 +132,7 @@ public class FastEnemy : Enemy
                 break;
             case EnemyStates.ATTACK:
                 StopCoroutine(_AttackCoroutine);
+                _Animator.SetBool("Attack", false);
                 break;
             case EnemyStates.KNOCKED:
                 _Hp = MAXHEALTH;
@@ -317,7 +319,6 @@ public class FastEnemy : Enemy
     {
         while (true)
         {
-            _Animator.SetBool("Attack", false);
             _Player.GetComponent<Player>().TakeDamage(1);
             yield return new WaitForSeconds(1);
         }
