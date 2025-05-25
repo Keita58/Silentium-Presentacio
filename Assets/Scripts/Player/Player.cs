@@ -42,9 +42,9 @@ public class Player : MonoBehaviour
     Vector3 cameraPositionBeforeCrouch = new Vector3(0, 0.627f, -0.198f);
     public int gunAmmo { get; set; }
     public int hp { get; set; }
-    
+
     [SerializeField]
-    GameObject flashlight;
+    public GameObject flashlight;
 
     public int maxHp { get; private set; }
 
@@ -691,6 +691,7 @@ public class Player : MonoBehaviour
     {
         if(!flashlight.activeSelf) flashlight.SetActive(true);
         else flashlight.SetActive(false);
+        PuzzleManager.instance.IsFlashlightning();
     }
 
     public void ToggleChestAnimation(bool opened)

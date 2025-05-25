@@ -1,6 +1,7 @@
 using NavKeypad;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering.HighDefinition;
@@ -25,15 +26,19 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     private Camera cam_AIHierogliphic;
     [SerializeField]
-    private Camera cam_WeaponPuzzle;
-    [SerializeField]
     private AnimationClip doorsHieroglyphic;
     [SerializeField]
     private Animator hieroglyphicAnimator;
     [SerializeField]
-    private Camera cam_HieroglyphicAnimation;
+    private Camera cam_HieroglyphicAnimation;    
     [SerializeField]
-    public bool isHieroglyphicCompleted { get; set; }
+    private Animator hieroglyphicAnimator2;
+    [SerializeField]
+    private AnimationClip HieroglyphicAnimation2;
+    [SerializeField]
+    public bool isHieroglyphicCompleted { get; set; } 
+    [SerializeField]
+    TextMeshProUGUI riddlerText;
 
     [Header("Book Puzzle")]
     [SerializeField]
@@ -64,6 +69,7 @@ public class PuzzleManager : MonoBehaviour
     [Header("Morse Puzzle")]
     [SerializeField]
     Player player;
+
     [SerializeField]
     private Camera cam_morse;
     [SerializeField]
@@ -184,19 +190,26 @@ public class PuzzleManager : MonoBehaviour
         cam_AIHierogliphic.gameObject.SetActive(true);
         player._inputActions.Player.Disable();
         player.ResumeInteract(false);
-        events.ToggleCustomPass(false);
+       // events.ToggleCustomPass(false);
         //cam_Hierogliphic.transform.parent.GetComponent<Keypad>().inputActions.Hieroglyphic.Enable();
         cam_Hierogliphic.transform.parent.GetComponent<LineRendererExample>()._inputAction.Hieroglyphic.Enable();
         Cursor.visible = true;
         events.ToggleUI(false);
     }
-
+    public void IsFlashlightning() { 
+        if(player.flashlight.activeSelf)
+            riddlerText.gameObject.SetActive(false);
+        else
+            riddlerText.gameObject.SetActive(true);
+    }
     public void HieroglyphicPuzzleExitAnimation()
     {
         cam_Hierogliphic.gameObject.SetActive(false);
         cam_AIHierogliphic.gameObject.SetActive(false);
+        cam_Hierogliphic.transform.parent.gameObject.layer = 0;
         cam_HieroglyphicAnimation.gameObject.SetActive(true);
         hieroglyphicAnimator.Play("HieroDoor");
+        hieroglyphicAnimator2.Play(HieroglyphicAnimation2.name);
         animationTime = 0f;
         isHieroglyphicCompleted = true;
     }
@@ -210,7 +223,7 @@ public class PuzzleManager : MonoBehaviour
 
         player._inputActions.Player.Enable();
         events.ToggleCustomPass(false);
-        cam_Hierogliphic.transform.parent.GetComponent<Keypad>().inputActions.Hieroglyphic.Disable();
+        cam_Hierogliphic.transform.parent.GetComponent<LineRendererExample>()._inputAction.Hieroglyphic.Disable();
         player.ResumeInteract(true);
         cam_Player.gameObject.SetActive(true);
         Cursor.visible = false;

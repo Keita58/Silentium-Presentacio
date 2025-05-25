@@ -40,6 +40,21 @@ public class AI : MonoBehaviour
 
         Texture2D image = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGBA32, false);
         image.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
+        float threshold = 0.05f; //Posem aquest threshold per tal que reconeixi les linies i no el fons gris
+
+        for (int x = 0; x < image.width; x++)
+        {
+            for (int y = 0; y < image.height; y++)
+            {
+                Color pixel = image.GetPixel(x, y);
+
+                //Calculem la brillantor del pixel i mirem si es mes petit que el threshold, per tant el considerem negre
+                float luminance = 0.2126f * pixel.r + 0.7152f * pixel.g + 0.0722f * pixel.b;
+
+                //Si es obscur el pixel, el considerem negre si no blanc
+                image.SetPixel(x, y, luminance < threshold ? Color.black : Color.white);
+            }
+        }
         image.Apply();
 
         RenderTexture.active = currentRT;
@@ -116,7 +131,7 @@ public class AI : MonoBehaviour
             if (scores[5] > 0.8f)
             {
                 Eighth = true;
-                PuzzleManager.instance.HieroglyphicPuzzleExit(true);
+                PuzzleManager.instance.HieroglyphicPuzzleExitAnimation();
             }
         }
         input.Dispose();
