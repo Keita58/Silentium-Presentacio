@@ -8,7 +8,7 @@ public class InteractuableCamera : MonoBehaviour, IInteractuable
 
     public bool isInteractuable { get; set; }
 
-    public event Action onCameraClick;
+    public event Action OnCameraClick;
 
     private void Awake()
     {
@@ -18,6 +18,6 @@ public class InteractuableCamera : MonoBehaviour, IInteractuable
 
     public void Interact()
     {
-        onCameraClick?.Invoke();
+        OnCameraClick?.Invoke();
     }
 }

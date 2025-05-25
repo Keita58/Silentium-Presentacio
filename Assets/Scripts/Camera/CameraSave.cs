@@ -16,7 +16,7 @@ public class CameraSave : MonoBehaviour
     private void Awake()
     {
         _SavedGame = false;
-        GetComponent<InteractuableCamera>().onCameraClick += Save;
+        GetComponent<InteractuableCamera>().OnCameraClick += Save;
     }
 
     public void Save()
