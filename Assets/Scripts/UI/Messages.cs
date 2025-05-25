@@ -19,7 +19,7 @@ public class Messages : MonoBehaviour
     private void ShowMessageInteractuable(GameObject interactableGameObject)
     {
         IInteractuable interactuable = interactableGameObject.GetComponent<IInteractuable>();
-        if (interactuable != null)
+        if (interactuable != null && interactuable is not InteractuableDoor)
         {
             if (interactuable is InteractuableChest) messageText.text = "Pulsa E para abrir el cofre";
             else if (interactuable is InteractuableNote) messageText.text = "Pulsa E para coger la nota";

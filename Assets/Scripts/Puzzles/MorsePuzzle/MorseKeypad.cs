@@ -156,7 +156,6 @@ namespace NavKeypad
 
         private void AccessGranted()
         {
-            GetComponent<InteractuableMorse>().isInteractuable = false;
             door.SetLocked(false);
             door.Open(new Vector3(0,0,0));
             accessWasGranted = true;

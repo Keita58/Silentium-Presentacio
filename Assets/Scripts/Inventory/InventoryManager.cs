@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Linq.Expressions;
 using TMPro;
@@ -29,6 +30,7 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private GameObject imagePanel;
     [SerializeField] private GameObject bookPanel;
     [SerializeField] private Events events;
+    public event Action<bool> OnNote;
 
     private Item equippedItem;
 
@@ -352,6 +354,7 @@ public class InventoryManager : MonoBehaviour
         notesPanelScroll.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = note.noteContent;
         player.ToggleInputPlayer(false, false);
         Cursor.visible = true;
+        OnNote?.Invoke(true);
 
     }
     public void ShowNote(NotesSO note)
@@ -361,6 +364,7 @@ public class InventoryManager : MonoBehaviour
         notesPanel.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = note.noteContent;
         player.ToggleInputPlayer(false, false);
         Cursor.visible = true;
+        OnNote?.Invoke(true);
 
     }
 
@@ -370,6 +374,7 @@ public class InventoryManager : MonoBehaviour
         imagePanel.transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = content;
         player.ToggleInputPlayer(false, false);
         Cursor.visible = true;
+        OnNote?.Invoke(true);
     }
 
     public void ShowBookNote(string content)
@@ -378,31 +383,36 @@ public class InventoryManager : MonoBehaviour
         bookPanel.SetActive(true);
         bookPanel.transform.GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>().text = content;
         player.ToggleInputPlayer(false, false);
+        OnNote?.Invoke(true);
     }
 
     public void CloseNote()
     {
         notesPanel.SetActive(false);
         player.ToggleInputPlayer(true, true);
+        OnNote?.Invoke(false);
+        
     }    
     public void CloseNoteScroll()
     {
         Cursor.visible = false;
         notesPanelScroll.SetActive(false);
         player.ToggleInputPlayer(true, true);
+        OnNote?.Invoke(false);
     }
 
     public void CloseImageNote()
     {
         imagePanel.SetActive(false);
         player.ToggleInputPlayer(true, true);
-        player.ToggleInputPlayer(true, true);
+        OnNote?.Invoke(false);
     }
 
     public void CloseBookNote()
     {
         bookPanel.SetActive(false);
         player.ToggleInputPlayer(true, true);
+        OnNote?.Invoke(false);
     }
 
     //pasar este metodo al ui.

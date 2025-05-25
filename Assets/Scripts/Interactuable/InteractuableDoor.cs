@@ -6,11 +6,13 @@ public class InteractuableDoor : MonoBehaviour, IInteractuable
     public bool isRemarkable { get; private set; }
     public bool isInteractuable { get;  set; }
     Door door;
+    [SerializeField] private Events events;
 
     private void Awake()
     {
         isRemarkable = false;
         isInteractuable = true;
+        door = GetComponent<Door>();
     }
 
     public void Interact()
@@ -28,7 +30,7 @@ public class InteractuableDoor : MonoBehaviour, IInteractuable
                 {
                     door.isLocked = false;
                     aux = item;
-                    InventoryManager.instance.inventory.items.Remove(aux);
+                    InventoryManager.instance.inventory.UseItem(aux.item);
                     break;
                 }
             }
@@ -39,6 +41,14 @@ public class InteractuableDoor : MonoBehaviour, IInteractuable
             else
             {
                 door.Open(player.position);
+            }
+
+            if (aux == null)
+            {
+                if (door.itemNeededToOpen == null)
+                    events.ShowWarning("No puedo abrirla.");
+                else
+                    events.ShowWarning("Creo que se necesita " + door.itemNeededToOpen.name + " para abrir esta puerta, pero no recuerdo bien.");
             }
         }
         else

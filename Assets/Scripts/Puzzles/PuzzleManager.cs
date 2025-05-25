@@ -70,6 +70,7 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     Player player;
 
+    [SerializeField] private InteractuableMorse morsePanel;
     [SerializeField]
     private Camera cam_morse;
     [SerializeField]
@@ -86,6 +87,7 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     private BoxCollider allWeapon;
     public bool weaponPuzzleCompleted { get; set; }
+    [SerializeField] private Camera cam_WeaponPuzzle;
 
     [Header("Glitch")]
     [SerializeField]
@@ -169,6 +171,7 @@ public class PuzzleManager : MonoBehaviour
     public void ClockSolved()
     {
         ExitClockPuzzle();
+        cam_Clock.transform.parent.GetComponent<InteractuableClock>().isInteractuable = false;
         player.ResumeInteract(true);
         this.KeyClock.SetActive(true);
         clockPuzzleCompleted = true;
@@ -190,8 +193,7 @@ public class PuzzleManager : MonoBehaviour
         cam_AIHierogliphic.gameObject.SetActive(true);
         player._inputActions.Player.Disable();
         player.ResumeInteract(false);
-       // events.ToggleCustomPass(false);
-        //cam_Hierogliphic.transform.parent.GetComponent<Keypad>().inputActions.Hieroglyphic.Enable();
+        events.ToggleCustomPass(false);
         cam_Hierogliphic.transform.parent.GetComponent<LineRendererExample>()._inputAction.Hieroglyphic.Enable();
         Cursor.visible = true;
         events.ToggleUI(false);
@@ -206,7 +208,7 @@ public class PuzzleManager : MonoBehaviour
     {
         cam_Hierogliphic.gameObject.SetActive(false);
         cam_AIHierogliphic.gameObject.SetActive(false);
-        cam_Hierogliphic.transform.parent.gameObject.layer = 0;
+        cam_Hierogliphic.transform.parent.GetComponent<InteractuablePaint>().isInteractuable = false;
         cam_HieroglyphicAnimation.gameObject.SetActive(true);
         hieroglyphicAnimator.Play("HieroDoor");
         hieroglyphicAnimator2.Play(HieroglyphicAnimation2.name);
@@ -249,6 +251,7 @@ public class PuzzleManager : MonoBehaviour
         morseAnimator.Play("FinalDoor");
         animationTime = 0f;
         isMorseCompleted = true;
+        morsePanel.isInteractuable = false;
     }
 
     public void ExitMorsePuzzle(bool isCompleted)
@@ -277,7 +280,7 @@ public class PuzzleManager : MonoBehaviour
         morseKeypad.inputActions.Morse.Enable();
         player.ResumeInteract(false);
         Cursor.visible = true;
-        events.ToggleUI(true);
+        events.ToggleUI(false);
     }
 
     private void MorsePuzzleLoad()
@@ -336,6 +339,7 @@ public class PuzzleManager : MonoBehaviour
                         pictureList.ElementAt(x).GetComponent<InteractuablePicture>().isInteractuable = false;
                     }
                     DoorPoem3.isLocked = false;
+                    events.ToggleUI(false);
                     player.ToggleInputPlayer(false, false);
                     positionToTeleport = positionAfterPoem;
                     glitchAnimator.Play("Glitch");
@@ -435,6 +439,7 @@ public class PuzzleManager : MonoBehaviour
                 glitchStarted = false;
                 player.ToggleInputPlayer(true, true);
                 events.ToggleCustomPass(true);
+                events.ToggleUI(true);
             }
         }
     }

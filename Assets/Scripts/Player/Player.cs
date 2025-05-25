@@ -32,8 +32,8 @@ public class Player : MonoBehaviour
     [SerializeField] private bool _InvertY = false;
     private Vector2 _LookRotation = Vector2.zero;
 
-    float maxAngle = 45.0f;
-    float minAngle = -45.0f;
+    float maxAngle = 90.0f;
+    float minAngle = -90.0f;
 
     bool crouched = false;
     bool aim = false;
@@ -108,6 +108,8 @@ public class Player : MonoBehaviour
     public event Action<int> OnAmmoChange;
     public event Action OnShoot;
     public event Action OnThrow;
+    
+    private bool noteOpened = false;
 
     private void Awake()
     {
@@ -126,6 +128,7 @@ public class Player : MonoBehaviour
         _Rigidbody = GetComponent<Rigidbody>();
         _inputActions.Player.Enable();
         characterController = GetComponent<CharacterController>();
+        InventoryManager.instance.OnNote+=SetNoteOpened;
     }
 
     public void ToggleInputPlayer(bool enable, bool enableInventory)
@@ -160,7 +163,7 @@ public class Player : MonoBehaviour
 
     private void OpenInventory(InputAction.CallbackContext context)
     {
-        if (!inventoryOpened)
+        if (!inventoryOpened && !noteOpened)
         {
             InventoryManager.instance.OpenInventory(this.gameObject);
         }
@@ -172,7 +175,7 @@ public class Player : MonoBehaviour
 
     private void OpenMenu(InputAction.CallbackContext context)
     {
-        if (!inventoryOpened)
+        if (!inventoryOpened && !noteOpened)
         {
             Time.timeScale = 0;
             menuManager.OpenMenu();
@@ -190,18 +193,7 @@ public class Player : MonoBehaviour
         gunAmmo = 20;
         maxSilencerUses = 10;
         OnAmmoChange?.Invoke(gunAmmo);
-        //StartCoroutine(EsperarIActuar(5f, ()=>TakeDamage(6)));
     }
-
-    IEnumerator EsperarIActuar(float tempsDespera, Action accio)
-    {
-        if (tempsDespera > 0)
-            yield return new WaitForSeconds(tempsDespera);
-        else
-            yield return null;
-        accio();
-    }
-
     private void Update()
     {
         // To move the camera
@@ -271,8 +263,11 @@ public class Player : MonoBehaviour
                 OnNotInteractuable?.Invoke();
             }
         }
-        
+    }
 
+    private void SetNoteOpened(bool opened)
+    {
+        noteOpened = opened;
     }
 
     public void ResumeInteract(bool resume)
@@ -314,8 +309,8 @@ public class Player : MonoBehaviour
                 throwable.GetComponent<Rigidbody>().isKinematic = false;
                 throwable.camaraPrimera = _Camera.gameObject;
                 throwable.Lanzar();
-                //OnThrow.Invoke();
-                //throwable.gameObject.SetActive(false);
+                itemSlotOccuped = false;
+                equipedObject = null;
             }
         }
     }

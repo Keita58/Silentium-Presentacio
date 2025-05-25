@@ -330,22 +330,22 @@ public class FastEnemy : Enemy
         {
             if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 3f, _LayerDoor))
             {
-                Door door = hit.collider.GetComponentInChildren<Door>();
-
-                if (!door.isLocked && !door.isOpen && !_OpeningDoor)
+                if (hit.transform.TryGetComponent(out InteractuableDoor interactuableDoor) && hit.transform.TryGetComponent(out Door door))
                 {
-                    door.onDoorOpen += Resume;
-                    _NavMeshAgent.isStopped = true;
-                    door.Open(transform.position);
-                    _OpeningDoor = true;
-                }
-                else if (door.isLocked)
-                {
-                    _NavMeshAgent.SetDestination(transform.position);
-                    yield return new WaitForSeconds(2);
+                    if (!door.isLocked && !door.isOpen && !_OpeningDoor)
+                    {
+                        door.onDoorOpen += Resume;
+                        _NavMeshAgent.isStopped = true;
+                        door.Open(transform.position);
+                        _OpeningDoor = true;
+                    }
+                    else if (door.isLocked)
+                    {
+                        _NavMeshAgent.SetDestination(transform.position);
+                        yield return new WaitForSeconds(2);
+                    }
                 }
             }
-
             yield return new WaitForSeconds(0.5f);
         }
     }
