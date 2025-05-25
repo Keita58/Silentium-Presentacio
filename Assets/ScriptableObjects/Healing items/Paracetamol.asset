@@ -20,7 +20,7 @@ MonoBehaviour:
   prefabInst: {fileID: 8474635125787463359, guid: 46b7d683be7451646ad35bdeeaf63f5f, type: 3}
   itemsToCombine:
   - {fileID: 11400000}
-  stackable: 1
+  stackable: 0
   itemType: 1
   usable: 1
   equipable: 0

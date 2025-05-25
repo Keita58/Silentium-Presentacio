@@ -17,8 +17,9 @@ MonoBehaviour:
   sprite: {fileID: 21300000, guid: 7e18085c06cb88147aa9e499634e2e71, type: 3}
   healing: 2
   prefab: {fileID: 0}
+  prefabInst: {fileID: 0}
   itemsToCombine: []
-  stackable: 1
+  stackable: 0
   itemType: 0
   usable: 1
   equipable: 0
