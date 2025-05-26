@@ -13,17 +13,6 @@ MonoBehaviour:
   m_Name: Inventory
   m_EditorClassIdentifier: 
   items:
-<<<<<<< HEAD
   - item: {fileID: 11400000, guid: e2149e4831f8919479f916f924c429ba, type: 2}
     amount: 49
-=======
-  - item: {fileID: 11400000, guid: 3e7ee1ca131436e42a5d807c6648622f, type: 2}
-    amount: 2
-    stackable: 1
-  - item: {fileID: 11400000, guid: 68558df8a6fc21e4e826b17012aa5235, type: 2}
-    amount: 2
-    stackable: 1
-  - item: {fileID: 11400000, guid: f3a7a77011dab4c43b33531315afd136, type: 2}
-    amount: 2
->>>>>>> Tasca30-Marc
     stackable: 1
