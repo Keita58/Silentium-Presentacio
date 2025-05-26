@@ -6,8 +6,8 @@ using UnityEngine;
 public class HealingItem : Item
 {
     [Header("Common values")]
-    [SerializeField] private string nom;
-    public override string Name => name;
+    [SerializeField] private string itemName;
+    public override string Name => itemName;
     [SerializeField] private string description;
     public override string Description => description;
 
@@ -45,7 +45,6 @@ public class HealingItem : Item
     [SerializeField] private int healId;
     public override int id => healId;
 
-
     [SerializeField] private Item itemAfterCombineParacetamol;
 
     public override void Use()
@@ -61,10 +60,5 @@ public class HealingItem : Item
         {
             InventoryManager.instance.AddNewItemAfterCombine(itemAfterCombineParacetamol);
         }
-    }
-
-    public override void Equip()
-    {
-        throw new System.NotImplementedException();
     }
 }

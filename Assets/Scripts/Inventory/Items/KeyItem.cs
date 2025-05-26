@@ -6,8 +6,8 @@ using UnityEngine;
 public class KeyItem : Item
 {
     [Header("Common values")]
-    [SerializeField] private string nom;
-    public override string Name => nom;
+    [SerializeField] private string itemName;
+    public override string Name => itemName;
     [SerializeField] private string description;
     public override string Description => description;
 
@@ -40,20 +40,8 @@ public class KeyItem : Item
     [SerializeField] private int keyId;
     public override int id => keyId;
 
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     public override void Use()
     {
         InventoryManager.instance.UseKeyItem(this);
-    }
-
-    public override void Combine(Item item)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public override void Equip()
-    {
-        throw new System.NotImplementedException();
     }
 }
