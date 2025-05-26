@@ -95,6 +95,27 @@ public class Player : MonoBehaviour
     [SerializeField] MenuUI menuManager;
     [SerializeField] Waves waves;
 
+    [Header("Audio")]
+    AudioSource GunAudioSource;
+    AudioSource playerAudioSource;
+    [SerializeField]
+    AudioClip ShootGunAudio;
+    [SerializeField]
+    AudioClip EmptyShootGunAudio;      
+    [SerializeField]
+    AudioClip SilencedShootGunAudio;    
+    [SerializeField]
+    AudioClip RechargeGunAudio;
+    [SerializeField]
+    AudioClip walkAudio;
+    [SerializeField]
+    AudioClip runAudio;   
+    [SerializeField]
+    AudioClip healthAudio;
+    [SerializeField]
+    AudioClip flashlightSound;
+
+
     //Events
     public event Action<int> OnMakeSound;
     public event Action<int> OnMakeImpactSound;
@@ -127,6 +148,8 @@ public class Player : MonoBehaviour
         _inputActions.Player.Enable();
         characterController = GetComponent<CharacterController>();
         InventoryManager.instance.OnNote+=SetNoteOpened;
+        GunAudioSource = gunGameObject.GetComponent<AudioSource>();
+        playerAudioSource = this.GetComponent<AudioSource>();
     }
 
     public void ToggleInputPlayer(bool enable, bool enableInventory)
@@ -334,6 +357,10 @@ public class Player : MonoBehaviour
     {
         if (gunAmmo >= 1)
         {
+            if(!isSilencerEquipped)
+                GunAudioSource.PlayOneShot(ShootGunAudio);
+            else
+                GunAudioSource.PlayOneShot(SilencedShootGunAudio);
             gunanimator.Play("Shoot");
             OnShoot?.Invoke();
             gunAmmo--;
@@ -374,6 +401,10 @@ public class Player : MonoBehaviour
                 Debug.Log("Enemy hit");
             }
         }
+        else
+        {
+            GunAudioSource.PlayOneShot(EmptyShootGunAudio);
+        }
     }
 
     public void TakeDamage(int damage)
@@ -386,6 +417,7 @@ public class Player : MonoBehaviour
 
     public void Heal(int hpToheal)
     {
+        playerAudioSource.PlayOneShot(healthAudio);
         hp += hpToheal;
         OnHpChange?.Invoke(hp, maxHp);
     }
@@ -435,12 +467,19 @@ public class Player : MonoBehaviour
                 OnMakeSound?.Invoke(2);
                 break;
             case PlayerStates.MOVE:
+                playerAudioSource.Stop();
+                playerAudioSource.loop = true;
+                playerAudioSource.PlayOneShot(walkAudio);
                 coroutineMove = StartCoroutine(MakeNoiseMove());
                 break;
             case PlayerStates.RUN:
+                playerAudioSource.Stop();
+                playerAudioSource.PlayOneShot(runAudio);
+                playerAudioSource.loop = true;
                 coroutineRun = StartCoroutine(MakeNoiseRun());
                 break;
             case PlayerStates.CROUCH:
+                playerAudioSource.Stop();
                 this.GetComponent<CharacterController>().center = new Vector3(0f, crouchedCenterCollider, 0f);
                 this.GetComponent<CharacterController>().height = crouchedHeightCollider;
                 _Camera.transform.localPosition = new Vector3(0f, 0f, -0.198f);
@@ -503,6 +542,8 @@ public class Player : MonoBehaviour
                 velocity.y = vSpeed;
                 if (!_RunAction.IsPressed() || aim)
                     ChangeState(PlayerStates.MOVE);
+                else if (movementInput == Vector2.zero)
+                    ChangeState(PlayerStates.IDLE);
                 break;
             case PlayerStates.CROUCH:
                 velocity = (transform.right * movementInput.x +
@@ -535,10 +576,14 @@ public class Player : MonoBehaviour
         switch (exitState)
         {
             case PlayerStates.MOVE:
+                playerAudioSource.loop = false;
+                playerAudioSource.Stop();
                 if (coroutineMove != null)
                     StopCoroutine(coroutineMove);
                 break;
             case PlayerStates.RUN:
+                playerAudioSource.loop = false;
+                playerAudioSource.Stop();
                 if (coroutineRun != null)
                     StopCoroutine(coroutineRun);
                 break;
@@ -675,12 +720,14 @@ public class Player : MonoBehaviour
 
     public void ReloadAmmo(int numAmmo)
     {
+        GunAudioSource.PlayOneShot(RechargeGunAudio);
         this.gunAmmo += numAmmo;
         OnAmmoChange?.Invoke(gunAmmo);
     }
 
     public void Flashlight(InputAction.CallbackContext context)
     {
+        playerAudioSource.PlayOneShot(flashlightSound);
         if(!flashlight.activeSelf) flashlight.SetActive(true);
         else flashlight.SetActive(false);
         PuzzleManager.instance.IsFlashlightning();

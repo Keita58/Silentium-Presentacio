@@ -40,12 +40,18 @@ public class InventoryManager : MonoBehaviour
     private Item targetItemToCombine;
     public InputSystem_Actions _inputActions { get; private set; }
 
+    [Header("Audio")]
+    AudioSource inventoryAudioSource;
+    [SerializeField]
+    AudioClip tapeAudio;
     private void Awake()
     {
+
         if (instance == null)
             instance = this;
         _inputActions = new InputSystem_Actions();
         _inputActions.Chest.OpenClose.performed += ToggleChest;
+        inventoryAudioSource = this.GetComponent<AudioSource>();
     }
 
     private void Start()
@@ -228,6 +234,7 @@ public class InventoryManager : MonoBehaviour
 
     public void AddNewItemAfterCombine(Item newItem)
     {
+        inventoryAudioSource.PlayOneShot(tapeAudio);
         inventory.UseItem(itemSelected);
         inventory.UseItem(targetItemToCombine);
         inventory.AddItem(newItem);
@@ -290,6 +297,7 @@ public class InventoryManager : MonoBehaviour
 
     public void UseHealingItem(int healing, Item item)
     {
+        
         Debug.Log("Player usa item de curacion");
         inventory.UseItem(item);
         inventoryUI.Show();
