@@ -4,7 +4,7 @@ using UnityEngine.Rendering.HighDefinition;
 public class CustomPassesManager : MonoBehaviour
 {
     GameObject weaponCustomPass;
-    [SerializeField] PostProcessEvents postProcessEvents;
+    [SerializeField] Events postProcessEvents;
     void Start()
     {
         weaponCustomPass = this.gameObject;

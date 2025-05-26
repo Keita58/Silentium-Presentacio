@@ -162,8 +162,6 @@ namespace NavKeypad
             keypadDisplayText.text = accessGrantedText;
             PuzzleManager.instance.ExitMorsePuzzleAnimation();
             audioSource.PlayOneShot(accessGrantedSfx);
-            this.transform.gameObject.layer = 0;
-            panelCollider.transform.gameObject.layer = 0;
         }
         private void ExitPuzzle(InputAction.CallbackContext context)
         {

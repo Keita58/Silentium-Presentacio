@@ -7,7 +7,7 @@ public class VignetteManager : MonoBehaviour
 {
     private Volume volume;
     private Vignette vignette;
-    [SerializeField] private PostProcessEvents postProcessEvents;
+    [SerializeField] private Events postProcessEvents;
     //public DigitalGlitch glitch;
     //Glitch glitch;
 

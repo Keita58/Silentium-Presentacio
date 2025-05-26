@@ -92,3 +92,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   soundIntensity: 5
   camaraPrimera: {fileID: 0}
+  events: {fileID: 11400000, guid: f00603c9116a40e4d91df0c25019e760, type: 2}

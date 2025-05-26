@@ -36,7 +36,7 @@ public class LineRendererExample : MonoBehaviour
         GameObject lineObject = new GameObject("Line");
         lineObject.transform.parent = this.transform;
         lineObject.transform.localPosition = Vector3.zero;
-        lineObject.layer = 23;
+        lineObject.layer = 14;
         lr = lineObject.AddComponent<LineRenderer>();
         lr.SetColors(Color.black, Color.black);
         lr.startWidth = 0.05f;                 // Ancho de la lnea
@@ -46,20 +46,8 @@ public class LineRendererExample : MonoBehaviour
 
         // Set the number of vertices
         lineRenderer[lineRenderer.Count - 1].positionCount = 2;
-
-        // Set the positions of the vertices
-        // lineRenderer.SetPosition(0, new Vector3(0, 0, 0));
-        // lineRenderer.SetPosition(1, new Vector3(1, 1, 0));
-        // lineRenderer.SetPosition(2, new Vector3(2, 0, 0));
+        
     }
-    /*  public void a(InputAction.CallbackContext context)
-      {
-          Ray ray = cam.ScreenPointToRay(Mouse.current.position.ReadValue());
-          if (Physics.Raycast(ray, out RaycastHit hit, 5, layer))
-          {
-              drawSystem.SetPoint(hit, cam, hit.point.z+0.1f);
-          }
-      }*/
     private void ClickRay(InputAction.CallbackContext context)
     {
         if (context.performed)
@@ -95,11 +83,10 @@ public class LineRendererExample : MonoBehaviour
                 GameObject lineObject = new GameObject("Line");
                 lineObject.transform.parent = this.transform;
                 lineObject.transform.localPosition = Vector3.zero;
-                lineObject.layer = 23;
-                // Añade un LineRenderer a ese nuevo;
+                lineObject.layer = 14;
                 lr = lineObject.AddComponent<LineRenderer>();
                 lr.SetColors(Color.black, Color.black);
-                lr.startWidth = 0.05f;                 // Ancho de la línea
+                lr.startWidth = 0.05f;
                 lr.endWidth = 0.05f;
                 lineRenderer.Add(lr);
                 lineRenderer[lineRenderer.Count - 1].material = new Material(Shader.Find("Sprites/Default"));
@@ -134,7 +121,7 @@ public class LineRendererExample : MonoBehaviour
         lineRenderer.Clear();
         GameObject lineObject = new GameObject("Line");
         lineObject.transform.parent = this.transform;
-        lineObject.layer = 23;
+        lineObject.layer = 14;
         lr = lineObject.AddComponent<LineRenderer>();
         lr.SetColors(Color.black, Color.black);
         lr.startWidth = 0.05f;                 // Ancho de la linea

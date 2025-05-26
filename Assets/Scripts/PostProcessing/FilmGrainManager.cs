@@ -6,7 +6,7 @@ public class FilmGrainManager : MonoBehaviour
 {
     Volume volume;
     FilmGrain filmGrain;
-    [SerializeField] PostProcessEvents postProcessEvents;
+    [SerializeField] Events postProcessEvents;
     void Start()
     {
         volume = GetComponent<Volume>();

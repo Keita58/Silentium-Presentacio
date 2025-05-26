@@ -14,7 +14,8 @@ GameObject:
   - component: {fileID: 7233993633164315687}
   - component: {fileID: 4056150003607222149}
   - component: {fileID: 2687465721021036246}
-  m_Layer: 9
+  - component: {fileID: 2474353968659151241}
+  m_Layer: 11
   m_Name: SaveImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -150,3 +151,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   item: {fileID: 11400000, guid: b2ff64cb78bb98543b6da124e07ff318, type: 2}
+--- !u!114 &2474353968659151241
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2912784060675606810}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67bc616bdac473e4ab8793e1deb2be30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  events: {fileID: 11400000, guid: f00603c9116a40e4d91df0c25019e760, type: 2}

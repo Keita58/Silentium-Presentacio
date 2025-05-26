@@ -24,28 +24,28 @@ TagManager:
   - Player
   - Weapon
   - Enemy
-  - Item
-  - Doors
-  - ClockPuzzle
-  - Note
-  - Chest
-  - keypad
-  - CellBook
-  - Book
-  - Picture
-  - AKM
-  - Wall
-  - Morse
   - MorseTrigger
   - Atenuacio
-  - Paint
   - Interactuable
-  - 
-  - 
-  - 
-  - 
-  - 
   - Silencer
+  - Wall
+  - Paint
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
   - 
   m_SortingLayers:
   - name: Default
