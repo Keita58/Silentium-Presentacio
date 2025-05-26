@@ -58,13 +58,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: -8010335016654855418, guid: 5d38060f6d8511f438c52747abf7ed8e, type: 3}
-    - {fileID: -7712200726865806215, guid: 5d38060f6d8511f438c52747abf7ed8e, type: 3}
+    - {fileID: 2583484993786655847, guid: 5d38060f6d8511f438c52747abf7ed8e, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3406366306990584737, guid: 5d38060f6d8511f438c52747abf7ed8e, type: 3}
       insertIndex: -1
       addedObject: {fileID: -8070084987489329503}
+    - targetCorrespondingSourceObject: {fileID: 3406366306990584737, guid: 5d38060f6d8511f438c52747abf7ed8e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6783009903341898512}
   m_SourcePrefab: {fileID: 100100000, guid: 5d38060f6d8511f438c52747abf7ed8e, type: 3}
 --- !u!1 &2980271291394529540 stripped
 GameObject:
@@ -79,7 +82,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2980271291394529540}
   serializedVersion: 4
-  m_Mass: 1
+  m_Mass: 3
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -94,7 +97,22 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &6783009903341898512
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2980271291394529540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f07a38bd5b3d904190164275e961850, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundIntensity: 6
+  camaraPrimera: {fileID: 0}
+  events: {fileID: 11400000, guid: f00603c9116a40e4d91df0c25019e760, type: 2}

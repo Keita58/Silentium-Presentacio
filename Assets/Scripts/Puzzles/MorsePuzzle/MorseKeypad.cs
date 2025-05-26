@@ -15,7 +15,7 @@ namespace NavKeypad
         [SerializeField] private UnityEvent onAccessGranted;
         [SerializeField] private UnityEvent onAccessDenied;
         [Header("Combination Code")]
-        [SerializeField] private string keypadCombo = "DEDPIERTA PAPA";
+        [SerializeField] private string keypadCombo = "DESPIERTA PAPA";
 
         [Header("Settings")]
         [SerializeField] private string accessGrantedText = "Granted";

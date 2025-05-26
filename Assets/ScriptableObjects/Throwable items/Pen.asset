@@ -15,7 +15,7 @@ MonoBehaviour:
   nom: Boli
   description: "Bol\xEDgrafo sin tinta."
   sprite: {fileID: 21300000, guid: f54ec9f1d1de92c4d812a9e89c9633f2, type: 3}
-  prefab: {fileID: 0}
+  prefab: {fileID: 6942839218221372295, guid: 41b3d4d4ecc72cd41aa4cc75f7d7c5d8, type: 3}
   prefabInst: {fileID: 6942839218221372295, guid: 4f5cbfad013683e44a260c3b8d56d7b2, type: 3}
   stackable: 0
   itemType: 3

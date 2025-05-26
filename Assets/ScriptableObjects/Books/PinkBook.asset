@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0565a32bb9bd17448a823454a37be7ee, type: 3}
   m_Name: PinkBook
   m_EditorClassIdentifier: 
-  nom: 
-  description: 
-  sprite: {fileID: 0}
+  nom: Libro rosa
+  description: "\xCDtem importante."
+  sprite: {fileID: 21300000, guid: c417763377e310744b275234b5bd7f02, type: 3}
   prefab: {fileID: 3214534961629253321, guid: 9415252a7fc53684dbcebb6ebabb4fbf, type: 3}
+  prefabInst: {fileID: 0}
   itemsToCombine: []
   stackable: 0
   itemType: 11

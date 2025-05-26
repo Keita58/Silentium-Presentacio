@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8049574600830604252}
   - component: {fileID: 4281891301205771071}
   - component: {fileID: 8533132617025582789}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Pen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29,14 +29,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6942839218221372295}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.000000021855696, y: -0.00019570548, z: 4.277279e-12, w: 1}
-  m_LocalPosition: {x: 0.0004011002, y: -0.000053387794, z: 0.0020106058}
-  m_LocalScale: {x: 20.390594, y: 20.390596, z: 20.390594}
-  m_ConstrainProportionsScale: 0
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 3205395483211822582}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!33 &2815223547954590184
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -152,8 +152,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.0015032936, y: 0.0015032938, z: 0.020593867}
-  m_Center: {x: 0.00000023821485, y: 2.3305805e-10, z: -0.000086028595}
+  m_Size: {x: 0.021475624, y: 0.021475628, z: 0.29419816}
+  m_Center: {x: -0.000000003259629, y: 0.000000003725291, z: -0.0012289811}
 --- !u!1 &9141467538220716702
 GameObject:
   m_ObjectHideFlags: 0
@@ -181,7 +181,7 @@ Transform:
   m_GameObject: {fileID: 9141467538220716702}
   serializedVersion: 2
   m_LocalRotation: {x: -0.70709276, y: -0.004457919, z: -0.004457919, w: 0.70709276}
-  m_LocalPosition: {x: 0.00117, y: -0, z: -0.00778}
+  m_LocalPosition: {x: 0.0143, y: -0, z: -0.1052}
   m_LocalScale: {x: 0.42639026, y: 0.4263903, z: 0.4263902}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -297,10 +297,24 @@ public class InventoryManager : MonoBehaviour
 
     public void UseAmmo(int numAmmo, Item item)
     {
-        player.ReloadAmmo(numAmmo);
-        Debug.Log("Player recarrega les bales");
-        inventory.UseItem(item);
-        inventoryUI.Show();
+        if(player.gunAmmo < 12)
+        {
+            if(player.gunAmmo + numAmmo <= 12)
+                player.ReloadAmmo(numAmmo);
+            else
+            {
+                player.gunAmmo = 0;
+                player.ReloadAmmo(12); //Nomes entrara aqui quan sobrepassi el limit de 12 bales
+            }
+
+            Debug.Log("Player recarrega les bales");
+            inventory.UseItem(item);
+            inventoryUI.Show();
+        }
+        else
+        {
+            //Avisar de que no pots carregar bales
+        }
     }
 
     public void UseKeyItem(Item item)

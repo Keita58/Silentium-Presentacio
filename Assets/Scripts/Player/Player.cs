@@ -1,10 +1,9 @@
-using NUnit.Framework;
 using System;
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+
 using UnityEngine.VFX;
 public class Player : MonoBehaviour
 {
@@ -26,7 +25,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float _VelocityMove = 3f;
 
     [Tooltip("Mouse velocity in degrees per second.")]
-    [UnityEngine.Range(10f, 360f)]
+    [Range(10f, 360f)]
     [SerializeField] private float _LookVelocity = 100;
 
     [SerializeField] private bool _InvertY = false;
@@ -54,7 +53,6 @@ public class Player : MonoBehaviour
     [SerializeField] GameObject gunGameObject;
     [SerializeField] LayerMask enemyLayerMask;
     [SerializeField] LayerMask interactLayerMask;
-    //[SerializeField] Camera weaponCamera;
     [SerializeField] GameObject interactiveGameObject;
     [SerializeField] Material material;
     GameObject equippedItem;
@@ -156,9 +154,11 @@ public class Player : MonoBehaviour
             _RunAction.Enable();
             //OnToggleUI?.Invoke(true);
         }
-        if (enableInventory) _inputActions.Player.Inventory.Enable();
-        else _inputActions.Player.Inventory.Disable();
 
+        if (enableInventory) 
+            _inputActions.Player.Inventory.Enable();
+        else 
+            _inputActions.Player.Inventory.Disable();
     }
 
     private void OpenInventory(InputAction.CallbackContext context)
@@ -166,11 +166,8 @@ public class Player : MonoBehaviour
         if (!inventoryOpened && !noteOpened)
         {
             InventoryManager.instance.OpenInventory(this.gameObject);
-        }
         else
-        {
             InventoryManager.instance.CloseInventory();
-        }
     }
 
     private void OpenMenu(InputAction.CallbackContext context)
@@ -311,6 +308,7 @@ public class Player : MonoBehaviour
                 throwable.Lanzar();
                 itemSlotOccuped = false;
                 equipedObject = null;
+                InventoryManager.instance.UseEquippedItem();
             }
         }
     }
@@ -630,7 +628,7 @@ public class Player : MonoBehaviour
     {
         while (true)
         {
-            MakeNoise(30, 3);
+            MakeNoise(8, 3);
             OnMakeSound?.Invoke(4);
             yield return new WaitForSeconds(0.5f);
         }
@@ -641,7 +639,7 @@ public class Player : MonoBehaviour
         while (true)
         {
             Debug.Log("CORUTINACORRER");
-            MakeNoise(37, 7);
+            MakeNoise(18, 7);
             OnMakeSound?.Invoke(7);
             yield return new WaitForSeconds(0.5f);
         }
@@ -652,7 +650,7 @@ public class Player : MonoBehaviour
         while (true)
         {
             Debug.Log("CORUTINACROUCH");
-            MakeNoise(5, 1);
+            MakeNoise(3, 1);
             OnMakeSound?.Invoke(3);
             yield return new WaitForSeconds(0.5f);
         }
@@ -679,7 +677,7 @@ public class Player : MonoBehaviour
     public void ReloadAmmo(int numAmmo)
     {
         this.gunAmmo += numAmmo;
-        OnAmmoChange?.Invoke(numAmmo);
+        OnAmmoChange?.Invoke(gunAmmo);
     }
 
     public void Flashlight(InputAction.CallbackContext context)

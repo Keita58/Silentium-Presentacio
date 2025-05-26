@@ -15,8 +15,9 @@ MonoBehaviour:
   nom: Silenciador
   description: "Silenciador de pacotilla para silenciar los disparos. No servir\xE1
     para muchos tiros..."
-  sprite: {fileID: 0}
+  sprite: {fileID: 21300000, guid: c9b342c7076bf4c45a0d6c06c919f502, type: 3}
   prefab: {fileID: 0}
+  prefabInst: {fileID: 0}
   itemsToCombine: []
   stackable: 0
   itemType: 13
