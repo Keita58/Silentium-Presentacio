@@ -23,6 +23,7 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] NoteInventorySO noteInventory;
     [SerializeField] GameObject notesRoot;
     [SerializeField] GameObject notesDiaryPanel;
+    [SerializeField] GameObject notesDiaryPanelScroll;
     [SerializeField] GameObject unequipButton;
     [SerializeField] GameObject itemDescriptionPanel;
     [SerializeField] GameObject notesPanel;
@@ -346,11 +347,16 @@ public class InventoryManager : MonoBehaviour
         inventoryUI.GetComponent<ShowInventory>().ChangeItemSelected();
     }
 
-    public void OpenNote(NotesSO note)
+    public void OpenDiaryNote(NotesSO note)
     {
         notesDiaryPanel.SetActive(true);
         notesDiaryPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text=note.name;
         notesDiaryPanel.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = note.noteContent;
+    }    public void OpenDiaryNoteScroll(NotesSO note)
+    {
+        notesDiaryPanelScroll.SetActive(true);
+        notesDiaryPanelScroll.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text=note.name;
+        notesDiaryPanelScroll.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = note.noteContent;
     }
 
     public void DiscoverNote(NotesSO note)

@@ -164,7 +164,6 @@ public class Player : MonoBehaviour
     private void OpenInventory(InputAction.CallbackContext context)
     {
         if (!inventoryOpened && !noteOpened)
-        {
             InventoryManager.instance.OpenInventory(this.gameObject);
         else
             InventoryManager.instance.CloseInventory();
