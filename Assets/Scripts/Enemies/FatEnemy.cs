@@ -13,6 +13,7 @@ public class FatEnemy : Enemy
     [SerializeField] private LayerMask _LayerDoor;
     [SerializeField] private GameObject _DetectionSphere;
     [SerializeField] private List<GameObject> _Waypoints;
+    [SerializeField] private GameObject _Waypoint;
 
     private NavMeshAgent _NavMeshAgent;
     private Vector3 _SoundPos;
@@ -20,6 +21,7 @@ public class FatEnemy : Enemy
     [SerializeField] private bool _Patrolling;
     [SerializeField] private bool _Search;
     private bool _OpeningDoor;
+    private Animator _Animator;
 
     private int _Hp;
     public override int hp => _Hp;
@@ -36,6 +38,7 @@ public class FatEnemy : Enemy
 
     private void Awake()
     {
+        _Animator = GetComponent<Animator>();
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
         _PointOfPatrol = transform.position;
@@ -75,14 +78,16 @@ public class FatEnemy : Enemy
         {
             case EnemyStates.PATROL:
                 _Patrolling = false;
-                _PatrolCoroutine = StartCoroutine(Patrol(_RangeSearchSound, _PointOfPatrol));
+                _PatrolCoroutine = StartCoroutine(Patrol());
                 if (_Search)
                     _ChangeToPatrolCoroutine = StartCoroutine(ChangeToPatrol(7));
                 break;
             case EnemyStates.ATTACK:
+                _Animator.SetBool("Attack", true);
                 _AttackCoroutine = StartCoroutine(AttackPlayer());
                 break;
             case EnemyStates.KNOCKED:
+                _Animator.Play("Idle");
                 StartCoroutine(WakeUp());
                 break;
         }
@@ -102,6 +107,7 @@ public class FatEnemy : Enemy
                 break;
             case EnemyStates.ATTACK:
                 StopCoroutine(_AttackCoroutine);
+                _Animator.SetBool("Attack", false);
                 break;
             case EnemyStates.KNOCKED:
                 _Hp = MAXHEALTH;
@@ -111,10 +117,10 @@ public class FatEnemy : Enemy
 
     #endregion 
 
-    // Funci� per moure l'enemic pel mapa
-    IEnumerator Patrol(int range, Vector3 pointOfSearch)
+    // Funcio per moure l'enemic pel mapa
+    IEnumerator Patrol()
     {
-        Vector3 point = Vector3.zero;
+        GameObject waypointToGo = null;
         while (true)
         {
             if (!_Patrolling)
@@ -123,27 +129,32 @@ public class FatEnemy : Enemy
                 {
                     while (true)
                     {
-                        point = _Waypoints[Random.Range(0, _Waypoints.Count)].transform.position;
-                        if (point != _NavMeshAgent.destination)
-                            break;
+                        _Waypoint = _Waypoints[Random.Range(0, _Waypoints.Count)];
+                        if (_Waypoint != waypointToGo)
+                        {
+                            waypointToGo = _Waypoint;
+                            break; 
+                        }
                     }
                 }
                 else
                 {
                     RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
-                    point = coord;
+                    _Waypoint.transform.position = coord;
                 }
-                _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
+                _Animator.SetBool("Idle", false);
+                _NavMeshAgent.SetDestination(_Waypoint.transform.position);
                 _Patrolling = true;
             }
-
-            if (_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
+            
+            if (!_NavMeshAgent.pathPending && _NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
             {
+                _Animator.SetBool("Idle", true);
                 _Patrolling = false;
                 if (!_Search)
                     yield return new WaitForSeconds(2);
                 else
-                    yield return new WaitForSeconds(5);
+                    yield return new WaitForSeconds(1);
             }
             else
                 yield return new WaitForSeconds(0.5f);
@@ -304,7 +315,6 @@ public class FatEnemy : Enemy
     {
         while (true)
         {
-            //Animation -> attack
             transform.LookAt(_Player.transform.position);
             _Player.GetComponent<Player>().TakeDamage(1);
             yield return new WaitForSeconds(0.5f);

@@ -100,7 +100,7 @@ public class SpawnObjects : MonoBehaviour
                 }
                 else if (rand == 1)
                 {
-                    if (countItems[0] == 2)
+                    if (countItems[1] == 2)
                     {
                         pos = 3; // Paracetamol
                         countItems[3]++;
@@ -113,7 +113,7 @@ public class SpawnObjects : MonoBehaviour
                 }
                 else if(rand == 2)
                 {
-                    if (countItems[0] == 2)
+                    if (countItems[2] == 2)
                     {
                         pos = 4; // Bales
                         countItems[4]++;

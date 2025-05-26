@@ -12,5 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c66dbb6545f200340a7d0533ca0960fc, type: 3}
   m_Name: NoteInventory
   m_EditorClassIdentifier: 
-  notes:
-  - {fileID: 11400000, guid: 3b82f2edaa671b24c9c3cb5e4212c8c6, type: 2}
+  notes: []
