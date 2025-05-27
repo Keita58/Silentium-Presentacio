@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 
 [RequireComponent(typeof(InteractuableClock))]
 public class Clock : MonoBehaviour
@@ -31,7 +32,9 @@ public class Clock : MonoBehaviour
     private Coroutine MinutesCoroutine;
     private Coroutine MinutesCoroutineReversed;
     private Coroutine FinishedCoroutine;
-
+    
+    [SerializeField]
+    AudioClip FinishedSound;
     private void Awake()
     {
         inputActions = new InputSystem_Actions();
@@ -57,7 +60,10 @@ public class Clock : MonoBehaviour
         if (context.performed)
             MinutesCoroutine = StartCoroutine(MoveMinutes());
         else
+        {
+            this.transform.parent.GetComponent<AudioSource>().Stop();
             StopCoroutine(MinutesCoroutine);
+        }
     }
     private void HandleMinutesFinished(InputAction.CallbackContext context)
     {
@@ -65,7 +71,8 @@ public class Clock : MonoBehaviour
     }
 
     private IEnumerator MoveMinutes()
-    {
+    {           
+        this.transform.parent.GetComponent<AudioSource>().Play();
         float updateTime = 0.5f;
         while (true)
         {
@@ -81,7 +88,6 @@ public class Clock : MonoBehaviour
             pointerHours.transform.localEulerAngles = new Vector3(0.0f, 0.0f, rotationHours);
             float rotationMinutes = (360.0f / 60.0f) * minutes;
             pointerMinutes.transform.localEulerAngles = new Vector3(0.0f, 0.0f, rotationMinutes);
-
             yield return new WaitForSeconds(updateTime);
             updateTime = Mathf.Max(updateTime * 0.5f, 0.02f);
         }
@@ -92,11 +98,15 @@ public class Clock : MonoBehaviour
         if (context.performed)
             MinutesCoroutineReversed = StartCoroutine(MoveMinutesReverse());
         else
+        {
             StopCoroutine(MinutesCoroutineReversed);
+            this.transform.parent.GetComponent<AudioSource>().Stop();
+        }
     }
 
     private IEnumerator MoveMinutesReverse()
     {
+        this.transform.parent.GetComponent<AudioSource>().Play();
         float updateTime = 0.5f;
         while (true)
         {
@@ -144,6 +154,9 @@ public class Clock : MonoBehaviour
             {
                 GetComponent<InteractuableClock>().isInteractuable = false;
                 PuzzleManager.instance.ClockSolved();
+                this.transform.parent.GetComponent<AudioSource>().clip = FinishedSound;
+                this.transform.parent.GetComponent<AudioSource>().Play();
+                this.transform.parent.GetComponent<AudioSource>().loop = false;
             }
         }
     }

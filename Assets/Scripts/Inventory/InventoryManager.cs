@@ -23,6 +23,7 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] NoteInventorySO noteInventory;
     [SerializeField] GameObject notesRoot;
     [SerializeField] GameObject notesDiaryPanel;
+    [SerializeField] GameObject notesDiaryPanelScroll;
     [SerializeField] GameObject unequipButton;
     [SerializeField] GameObject itemDescriptionPanel;
     [SerializeField] GameObject notesPanel;
@@ -39,12 +40,18 @@ public class InventoryManager : MonoBehaviour
     private Item targetItemToCombine;
     public InputSystem_Actions _inputActions { get; private set; }
 
+    [Header("Audio")]
+    AudioSource inventoryAudioSource;
+    [SerializeField]
+    AudioClip tapeAudio;
     private void Awake()
     {
+
         if (instance == null)
             instance = this;
         _inputActions = new InputSystem_Actions();
         _inputActions.Chest.OpenClose.performed += ToggleChest;
+        inventoryAudioSource = this.GetComponent<AudioSource>();
     }
 
     private void Start()
@@ -227,6 +234,7 @@ public class InventoryManager : MonoBehaviour
 
     public void AddNewItemAfterCombine(Item newItem)
     {
+        inventoryAudioSource.PlayOneShot(tapeAudio);
         inventory.UseItem(itemSelected);
         inventory.UseItem(targetItemToCombine);
         inventory.AddItem(newItem);
@@ -289,6 +297,7 @@ public class InventoryManager : MonoBehaviour
 
     public void UseHealingItem(int healing, Item item)
     {
+        
         Debug.Log("Player usa item de curacion");
         inventory.UseItem(item);
         inventoryUI.Show();
@@ -346,11 +355,16 @@ public class InventoryManager : MonoBehaviour
         inventoryUI.GetComponent<ShowInventory>().ChangeItemSelected();
     }
 
-    public void OpenNote(NotesSO note)
+    public void OpenDiaryNote(NotesSO note)
     {
         notesDiaryPanel.SetActive(true);
         notesDiaryPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text=note.name;
         notesDiaryPanel.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = note.noteContent;
+    }    public void OpenDiaryNoteScroll(NotesSO note)
+    {
+        notesDiaryPanelScroll.SetActive(true);
+        notesDiaryPanelScroll.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text=note.name;
+        notesDiaryPanelScroll.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = note.noteContent;
     }
 
     public void DiscoverNote(NotesSO note)

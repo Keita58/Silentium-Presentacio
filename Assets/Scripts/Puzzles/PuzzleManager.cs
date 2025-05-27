@@ -127,8 +127,14 @@ public class PuzzleManager : MonoBehaviour
     private float FlickeringStrength;
     [SerializeField] Events events;
 
+    [Header("Audio")]
+    private AudioSource glitchAudioSource;
+    [SerializeField]
+    AudioClip glistchAudio;
+
     private void Awake()
     {
+        glitchAudioSource = GetComponent<AudioSource>();
         inputActionPlayer = new InputSystem_Actions();
         if (instance == null)
             instance = this;
@@ -448,6 +454,7 @@ public class PuzzleManager : MonoBehaviour
     {
         player.ToggleInputPlayer(false, false);
         glitchAnimator.Play("Glitch");
+        glitchAudioSource.PlayOneShot(glistchAudio);
         glitchStarted = true;
         animationTime = 0f;
         positionToTeleport = positionAfterHieroglyphic;

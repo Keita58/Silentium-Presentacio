@@ -10,6 +10,9 @@ public class NotesButton : MonoBehaviour
 
     public void OnSelectNote()
     {
-        InventoryManager.instance.OpenNote(note);
+        if (note.noteType != NotesSO.NoteType.Scroll)
+            InventoryManager.instance.OpenDiaryNote(note);
+        else
+            InventoryManager.instance.OpenDiaryNoteScroll(note);
     }
 }
