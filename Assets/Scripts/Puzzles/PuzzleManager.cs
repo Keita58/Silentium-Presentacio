@@ -56,6 +56,12 @@ public class PuzzleManager : MonoBehaviour
     private GameObject book4;
     [SerializeField]
     private GameObject book5;
+    //Llibres de l'estanteria
+    [SerializeField] private GameObject greenBook;
+    [SerializeField] private GameObject redBook;
+    [SerializeField] private GameObject yellowBook;
+    [SerializeField] private GameObject greyBook;
+    [SerializeField] private GameObject pinkBook;
 
     [Header("Poem Puzzle")]
     [SerializeField]
@@ -67,19 +73,19 @@ public class PuzzleManager : MonoBehaviour
     public bool poemPuzzleCompleted { get; set; }
 
     [Header("Morse Puzzle")]
-    [SerializeField]
-    Player player;
-
-    [SerializeField] private InteractuableMorse morsePanel;
-    [SerializeField]
+    [SerializeField] 
+    private Player player;
+    [SerializeField] 
+    private InteractuableMorse morsePanel;
+    [SerializeField] 
     private Camera cam_morse;
-    [SerializeField]
-    MorseKeypad morseKeypad;
-    [SerializeField]
+    [SerializeField] 
+    private MorseKeypad morseKeypad;
+    [SerializeField] 
     private GameObject cam_doorsMorseAnimation;
-    [SerializeField]
+    [SerializeField] 
     private AnimationClip doorsMorseAnimation;
-    [SerializeField]
+    [SerializeField] 
     private Animator morseAnimator;
     public bool isMorseCompleted { get; set; }
 
@@ -108,8 +114,6 @@ public class PuzzleManager : MonoBehaviour
     private float animationTime;
     [SerializeField]
     private AnimationClip fadeOut;
-    [SerializeField]
-    private Animator fadeAnimator;
     private bool fadeOutStarted = false;
     private bool teleported = false;
     private Transform positionToTeleport;
@@ -125,7 +129,8 @@ public class PuzzleManager : MonoBehaviour
     private float scanLinesStrength;
     [SerializeField]
     private float FlickeringStrength;
-    [SerializeField] Events events;
+    [SerializeField] 
+    private Events events;
 
     [Header("Audio")]
     private AudioSource glitchAudioSource;
@@ -329,6 +334,12 @@ public class PuzzleManager : MonoBehaviour
             book4.SetActive(false);
             book5.SetActive(false);
             bookWall.SetActive(false);
+            
+            greenBook.SetActive(true);
+            redBook.SetActive(true);
+            greyBook.SetActive(true);
+            yellowBook.SetActive(true);
+            pinkBook.SetActive(true);
         }
     }
 
