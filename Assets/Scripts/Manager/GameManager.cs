@@ -23,11 +23,6 @@ public class GameManager : MonoBehaviour
         _Load = false;
     }
 
-    private void Start()
-    {
-        onLoadedScene?.Invoke();
-    }
-
     public void SceneNewGame()
     {
         SceneManager.LoadScene("MapaHector");

@@ -55,9 +55,7 @@ public class Player : MonoBehaviour
     [SerializeField] LayerMask interactLayerMask;
     [SerializeField] GameObject interactiveGameObject;
     [SerializeField] Material material;
-    GameObject equippedItem;
     [SerializeField] private Material baseMaterial;
-    private GameObject itemEquipped;
     public bool inventoryOpened;
     public bool itemSlotOccuped;
     [SerializeField] public GameObject equipedObject;

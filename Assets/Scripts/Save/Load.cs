@@ -17,6 +17,7 @@ public class Load : MonoBehaviour
     [SerializeField] private InventorySO _Inventory;
     [SerializeField] private InventorySO _ChestInventory;
     [SerializeField] private NoteInventorySO _NotesInventory;
+    [SerializeField] private ShowInventory _ShowInventory;
 
     [Header("DataBase for the notes")]
     [SerializeField] private BDNotes _Notes;
@@ -50,17 +51,13 @@ public class Load : MonoBehaviour
 
     private void Awake()
     {
-        if (GameManager.instance != null) 
-        {
-            GameManager.instance.onLoadedScene += LoadGame;
-            GameManager.instance.onLoadedScene += LoadConfig;
+        LoadConfig();
+        GameManager.instance.onLoadedScene += LoadGame;
+    }
 
-            GameManager.instance.onNewScene += LoadConfig;
-        }
-        else
-        {
-            LoadConfig();
-        }
+    private void OnDestroy()
+    {
+        GameManager.instance.onLoadedScene -= LoadGame;
     }
 
     public void LoadGame()
@@ -109,6 +106,9 @@ public class Load : MonoBehaviour
             _Inventory.items = Inventory;
             _ChestInventory.items = ChestInventory;
             _NotesInventory.notes = _Notes.FromIDs(info.NotesInventory);
+
+            _ShowInventory.SetEquippedItem(_Items.FromID(info.EquipedItem), true);
+            _Items.FromID(info.EquipedItem).Equip();
 
             //Treure la info del Volume
             Volume VolumeInfo = _Shaders.GetComponent<Volume>();
@@ -165,8 +165,6 @@ public class Load : MonoBehaviour
             if (File.Exists(temporalExistingFile))
                 File.Delete(temporalExistingFile);
         }
-
-        GameManager.instance.onLoadedScene -= LoadGame;
     }
 
     public void LoadConfig()
@@ -187,11 +185,5 @@ public class Load : MonoBehaviour
 
         //_Settings.isInitialScene = true;
         _Settings.StartOptions();
-
-        if(GameManager.instance != null)
-        {
-            GameManager.instance.onLoadedScene -= LoadConfig;
-            GameManager.instance.onNewScene -= LoadConfig;
-        }
     }
 }

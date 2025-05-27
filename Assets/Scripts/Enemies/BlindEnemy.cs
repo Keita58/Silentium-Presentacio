@@ -215,6 +215,7 @@ public class BlindEnemy : Enemy
 
     public override void ListenSound(Vector3 pos, int lvlSound)
     {
+        bool wall = false;
         _SoundPos = pos;
         RaycastHit[] hits = Physics.RaycastAll(this.transform.position, _SoundPos - this.transform.position, Vector3.Distance(_SoundPos, this.transform.position));
 
@@ -223,6 +224,7 @@ public class BlindEnemy : Enemy
             if (hit.collider.TryGetComponent<IAttenuable>(out IAttenuable a))
             {
                 lvlSound = a.AttenuateSound(lvlSound);
+                wall = true;
             }
         }
 
@@ -262,19 +264,6 @@ public class BlindEnemy : Enemy
             }
             else if (lvlSound > 5)
             {
-                _RangeSearchSound = 0.5f;
-                bool wall = false;
-                RaycastHit[] hits2 = Physics.RaycastAll(this.transform.position, _SoundPos - this.transform.position, Vector3.Distance(_SoundPos, this.transform.position));
-
-                foreach (RaycastHit hit in hits2)
-                {
-                    if (hit.collider.tag == "Wall" || hit.collider.gameObject.layer == 10)
-                    {
-                        wall = true;
-                        break;
-                    }
-                }
-
                 if (Vector3.Distance(_SoundPos, transform.position) > 1.5f && Vector3.Distance(_SoundPos, transform.position) <= 8 && !wall && !_Jumping)
                 {
                     Debug.Log("Faig salt!");
@@ -285,7 +274,7 @@ public class BlindEnemy : Enemy
 
                     _NavMeshAgent.enabled = false;
                     GetComponent<Rigidbody>().isKinematic = false;
-                    GetComponent<Rigidbody>().AddForce((end - start) * 70);
+                    GetComponent<Rigidbody>().AddForce((end - start) * 70 * Vector3.Distance(_SoundPos, transform.position));
                     transform.rotation = Quaternion.LookRotation(Vector3.RotateTowards(transform.forward, (end - start), 20, 0));
 
                     _RestoreCoroutine = StartCoroutine(RecoverAgent());

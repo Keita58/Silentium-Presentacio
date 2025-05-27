@@ -32,7 +32,7 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private Events events;
     public event Action<bool> OnNote;
 
-    private Item equippedItem;
+    public Item equippedItem;
 
     public bool isCombining { get; private set; }
     public bool chestOpened { get; private set; }
