@@ -3,8 +3,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-
-using UnityEngine.VFX;
 public class Player : MonoBehaviour
 {
     [SerializeField] Camera _Camera;
@@ -101,15 +99,15 @@ public class Player : MonoBehaviour
     [SerializeField]
     AudioClip ShootGunAudio;
     [SerializeField]
-    AudioClip EmptyShootGunAudio;      
+    AudioClip EmptyShootGunAudio;
     [SerializeField]
-    AudioClip SilencedShootGunAudio;    
+    AudioClip SilencedShootGunAudio;
     [SerializeField]
     AudioClip RechargeGunAudio;
     [SerializeField]
     AudioClip walkAudio;
     [SerializeField]
-    AudioClip runAudio;   
+    AudioClip runAudio;
     [SerializeField]
     AudioClip healthAudio;
     [SerializeField]
@@ -122,12 +120,12 @@ public class Player : MonoBehaviour
     public event Action<GameObject> OnInteractuable;
     //Evento que sirve para limpiar el texto de interactuable.
     public event Action OnNotInteractuable;
-    public event Action<int,int> OnHpChange;
+    public event Action<int, int> OnHpChange;
     public event Action<int> OnPickItem;
     public event Action<int> OnAmmoChange;
     public event Action OnShoot;
     public event Action OnThrow;
-    
+
     private bool noteOpened = false;
 
     private void Awake()
@@ -147,7 +145,7 @@ public class Player : MonoBehaviour
         _Rigidbody = GetComponent<Rigidbody>();
         _inputActions.Player.Enable();
         characterController = GetComponent<CharacterController>();
-        InventoryManager.instance.OnNote+=SetNoteOpened;
+        InventoryManager.instance.OnNote += SetNoteOpened;
         GunAudioSource = gunGameObject.GetComponent<AudioSource>();
         playerAudioSource = this.GetComponent<AudioSource>();
     }
@@ -178,9 +176,9 @@ public class Player : MonoBehaviour
             //OnToggleUI?.Invoke(true);
         }
 
-        if (enableInventory) 
+        if (enableInventory)
             _inputActions.Player.Inventory.Enable();
-        else 
+        else
             _inputActions.Player.Inventory.Disable();
     }
 
@@ -256,10 +254,12 @@ public class Player : MonoBehaviour
                 {
                     if (hit.collider.TryGetComponent<InteractuableDoor>(out InteractuableDoor door))
                     {
+                        door.SoundPlayer();
                         door.Interact(this.transform);
                     }
                 }
-            }else if (interactiveGameObject.GetComponent<IInteractuable>() is InteractuableCellBook)
+            }
+            else if (interactiveGameObject.GetComponent<IInteractuable>() is InteractuableCellBook)
             {
                 if (equipedObject != null)
                 {
@@ -276,7 +276,7 @@ public class Player : MonoBehaviour
             if (interactiveGameObject.GetComponent<IInteractuable>().isRemarkable)
                 interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
 
-            if (interactiveGameObject!=null)
+            if (interactiveGameObject != null)
                 interactiveGameObject = null;
             {
                 OnNotInteractuable?.Invoke();
@@ -337,7 +337,7 @@ public class Player : MonoBehaviour
 
     private void MakeSoundThrowable()
     {
-        
+
         OnMakeImpactSound?.Invoke(8);
     }
 
@@ -357,7 +357,7 @@ public class Player : MonoBehaviour
     {
         if (gunAmmo >= 1)
         {
-            if(!isSilencerEquipped)
+            if (!isSilencerEquipped)
                 GunAudioSource.PlayOneShot(ShootGunAudio);
             else
                 GunAudioSource.PlayOneShot(SilencedShootGunAudio);
@@ -385,7 +385,7 @@ public class Player : MonoBehaviour
             }
             if (Physics.Raycast(shootPosition.transform.position, -shootPosition.transform.right, out RaycastHit e, 25f, enemyLayerMask)) // Canviar layer mask per posar les parets
             {
-                if(e.transform.TryGetComponent<Enemy>(out Enemy enemy))
+                if (e.transform.TryGetComponent<Enemy>(out Enemy enemy))
                     enemy.TakeHealth();
 
                 if (isSilencerEquipped)
@@ -470,13 +470,15 @@ public class Player : MonoBehaviour
                 playerAudioSource.Stop();
                 playerAudioSource.loop = true;
                 playerAudioSource.PlayOneShot(walkAudio);
-                coroutineMove = StartCoroutine(MakeNoiseMove());
+                if (coroutineMove == null)
+                    coroutineMove = StartCoroutine(MakeNoiseMove());
                 break;
             case PlayerStates.RUN:
                 playerAudioSource.Stop();
                 playerAudioSource.PlayOneShot(runAudio);
                 playerAudioSource.loop = true;
-                coroutineRun = StartCoroutine(MakeNoiseRun());
+                if (coroutineRun == null)
+                    coroutineRun = StartCoroutine(MakeNoiseRun());
                 break;
             case PlayerStates.CROUCH:
                 playerAudioSource.Stop();
@@ -485,7 +487,8 @@ public class Player : MonoBehaviour
                 _Camera.transform.localPosition = new Vector3(0f, 0f, -0.198f);
                 cameraShenanigansGameObject.transform.localPosition = Vector3.zero;
                 _VelocityMove /= 2;
-                coroutineCrouch = StartCoroutine(MakeNoiseCrouch());
+                if (coroutineCrouch == null)
+                    coroutineCrouch = StartCoroutine(MakeNoiseCrouch());
                 break;
             case PlayerStates.CROUCH_IDLE:
                 if (coroutineCrouch != null)
@@ -579,13 +582,19 @@ public class Player : MonoBehaviour
                 playerAudioSource.loop = false;
                 playerAudioSource.Stop();
                 if (coroutineMove != null)
+                {
                     StopCoroutine(coroutineMove);
+                    coroutineMove = null;
+                }
                 break;
             case PlayerStates.RUN:
                 playerAudioSource.loop = false;
                 playerAudioSource.Stop();
                 if (coroutineRun != null)
+                {
                     StopCoroutine(coroutineRun);
+                    coroutineRun = null;
+                }
                 break;
             case PlayerStates.CROUCH:
                 //if (coroutineCrouch != null)
@@ -598,6 +607,11 @@ public class Player : MonoBehaviour
                 //    cameraShenanigansGameObject.transform.localPosition = new Vector3(0f, _Camera.transform.localPosition.y, 0f);
                 //    _VelocityMove *= 2;
                 //}
+                if (coroutineCrouch != null)
+                {
+                    StopCoroutine(coroutineCrouch);
+                    coroutineCrouch = null;
+                }
                 break;
             case PlayerStates.CROUCH_IDLE:
                 this.GetComponent<CharacterController>().center = Vector3.zero;
@@ -620,7 +634,8 @@ public class Player : MonoBehaviour
             Debug.DrawRay(_Camera.transform.position, _Camera.transform.forward, Color.magenta, 5f);
             //Lanzar Raycast interactuar con el mundo.
 
-            if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask)){
+            if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask))
+            {
                 if (hit.transform.TryGetComponent<IInteractuable>(out IInteractuable interactuable))
                 {
                     if (interactuable.isInteractuable)
@@ -657,14 +672,14 @@ public class Player : MonoBehaviour
                     }
                     else
                     {
-                        interactiveGameObject=null;
+                        interactiveGameObject = null;
                     }
                 }
                 OnNotInteractuable?.Invoke();
             }
             yield return new WaitForSeconds(0.1f);
         }
-    } 
+    }
 
     #region SOUNDS
 
@@ -728,7 +743,7 @@ public class Player : MonoBehaviour
     public void Flashlight(InputAction.CallbackContext context)
     {
         playerAudioSource.PlayOneShot(flashlightSound);
-        if(!flashlight.activeSelf) flashlight.SetActive(true);
+        if (!flashlight.activeSelf) flashlight.SetActive(true);
         else flashlight.SetActive(false);
         PuzzleManager.instance.IsFlashlightning();
     }

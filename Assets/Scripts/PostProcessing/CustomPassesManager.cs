@@ -9,7 +9,6 @@ public class CustomPassesManager : MonoBehaviour
     {
         weaponCustomPass = this.gameObject;
         postProcessEvents.OnToggleCustomPass += ToggleCustomPass;
-        
     }
 
     private void ToggleCustomPass(bool enable)
