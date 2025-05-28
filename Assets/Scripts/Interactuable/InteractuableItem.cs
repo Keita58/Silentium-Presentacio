@@ -16,9 +16,10 @@ public class InteractuableItem : MonoBehaviour, IInteractuable
 
     public void Interact()
     {
-        if (InventoryManager.instance.inventory.items.Count < 6)
+        Item itemPicked = GetComponent<PickItem>().item;
+        InventoryManager.instance.inventory.GetItem(itemPicked);
+        if (InventoryManager.instance.inventory.items.Count < 6 || (itemPicked != null && itemPicked.isStackable))
         {
-            Item itemPicked = GetComponent<PickItem>().item;
             InventoryManager.instance.AddItem(itemPicked);
             Debug.Log("QUE COJO?" + itemPicked);
 
