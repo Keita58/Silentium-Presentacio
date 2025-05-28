@@ -68,6 +68,7 @@ public class Messages : MonoBehaviour
     {
         player.OnInteractuable -= ShowMessageInteractuable;
         player.OnNotInteractuable -= HideMessage;
+        events.OnWarning -= ShowWarningMessage;
     }
 
 }

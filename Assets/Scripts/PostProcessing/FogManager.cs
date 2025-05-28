@@ -19,4 +19,9 @@ public class FogManager : MonoBehaviour
     {
         fog.enabled.value = enable;
     }
+
+    private void OnDestroy()
+    {
+        postProcessEvent.OnToggleFog -= ActivateFog;
+    }
 }

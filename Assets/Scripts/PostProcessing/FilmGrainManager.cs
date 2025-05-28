@@ -22,4 +22,8 @@ public class FilmGrainManager : MonoBehaviour
 
         filmGrain.intensity.value += intensity;
     }
+    private void OnDestroy()
+    {
+        postProcessEvents.OnIncreaseIntesityFilmGrain -= IncreaseIntensity;
+    }
 }

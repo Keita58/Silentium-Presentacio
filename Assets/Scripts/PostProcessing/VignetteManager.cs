@@ -38,4 +38,9 @@ public class VignetteManager : MonoBehaviour
         vignette.active = false;
         vignette.intensity.value = 0.545f;
     }
+
+    private void OnDestroy()
+    {
+        postProcessEvents.OnVignetteActive -= ActivateVignette;
+    }
 }

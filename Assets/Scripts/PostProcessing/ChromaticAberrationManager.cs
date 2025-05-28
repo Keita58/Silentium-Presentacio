@@ -28,4 +28,11 @@ public class ChromaticAberrationManager : MonoBehaviour
     {
         chAb.maxSamples += number;
     }
+
+    private void OnDestroy()
+    {
+        postProcessEvent.OnIncreaseIntensity -= IncreaseChAbIntensity;
+        postProcessEvent.OnIncreaseSamples -= IncreaseSample; ;
+    }
+}
 }
