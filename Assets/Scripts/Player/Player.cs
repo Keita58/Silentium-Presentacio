@@ -367,36 +367,31 @@ public class Player : MonoBehaviour
             Debug.Log("TIRO DEBUGRAY");
             if (isSilencerEquipped)
             {
-                if (silencerUses > 0)
-                {
-                    Debug.Log("Hago sonido silenciador");
-                    OnMakeImpactSound?.Invoke(5);
-                    MakeNoise(5, 5);
-                    silencerUses--;
-                    Debug.Log("Silenciador usos: " + silencerUses);
-                }
-                else
+                Debug.Log("Hago sonido silenciador");
+                OnMakeImpactSound?.Invoke(5);
+                MakeNoise(5, 5);
+                silencerUses--;
+                Debug.Log("Silenciador usos: " + silencerUses);
+                
+                if (silencerUses == 0)
                 {
                     isSilencerEquipped = false;
                     silencer.SetActive(false);
                 }
             }
+            else
+            {
+                MakeNoise(10, 10); 
+                OnMakeImpactSound?.Invoke(8);
+            }
+            Debug.DrawRay(shootPosition.transform.position, -shootPosition.transform.right);
             if (Physics.Raycast(shootPosition.transform.position, -shootPosition.transform.right, out RaycastHit e, 25f, enemyLayerMask)) // Canviar layer mask per posar les parets
             {
-                if (e.transform.TryGetComponent<Enemy>(out Enemy enemy))
+                if (e.transform.TryGetComponent(out Enemy enemy))
+                {
                     enemy.TakeHealth();
-
-                if (isSilencerEquipped)
-                {
-                    Debug.Log("Hago sonido silenciador");
-                    MakeNoise(5, 5);
+                    Debug.Log("Enemy hit");
                 }
-                else
-                {
-                    MakeNoise(10, 10);
-                    OnMakeImpactSound?.Invoke(8);
-                }
-                Debug.Log("Enemy hit");
             }
         }
         else

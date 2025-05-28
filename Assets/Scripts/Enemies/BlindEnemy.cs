@@ -14,6 +14,7 @@ public class BlindEnemy : Enemy
     [SerializeField] private LayerMask _LayerObjectsAndPlayer;
     [SerializeField] private LayerMask _LayerDoor;
     [SerializeField] private GameObject _DetectionSphere;
+    [SerializeField] private GameObject _DetectionDoors;
     [SerializeField] private List<GameObject> _WaypointsFirstPart;
     [SerializeField] private List<GameObject> _WaypointsSecondPart;
     [SerializeField] private Door _DoorLocked;
@@ -54,19 +55,19 @@ public class BlindEnemy : Enemy
         _Jumping = false;
         _Hp = MAXHEALTH;
 
-        _DetectionSphere.GetComponent<DetectionSphere>().OnEnter += OnEnter;
-        _DetectionSphere.GetComponent<DetectionSphere>().OnExit += OnExit;
-
-        StartCoroutine(OpenDoors());
-
         _AttackCoroutine = null;
         _ChangeStateToPatrol = null;
+        
+        _DetectionSphere.GetComponent<DetectionSphere>().OnEnter += OnEnter;
+        _DetectionSphere.GetComponent<DetectionSphere>().OnExit += OnExit;
+        _DetectionDoors.GetComponent<DetectionDoorSphere>().OnDetectDoor += OpenDoors;
     }
 
     private void OnDestroy()
     {
         _DetectionSphere.GetComponent<DetectionSphere>().OnEnter -= OnEnter;
         _DetectionSphere.GetComponent<DetectionSphere>().OnExit -= OnExit;
+        _DetectionDoors.GetComponent<DetectionDoorSphere>().OnDetectDoor -= OpenDoors;
     }
 
     private void Start()
@@ -192,7 +193,7 @@ public class BlindEnemy : Enemy
         }
     }
 
-    private bool RandomPoint(Vector3 center, float range, out Vector3 result)
+    private void RandomPoint(Vector3 center, float range, out Vector3 result)
     {
         for (int i = 0; i < 50; i++)
         {
@@ -215,12 +216,10 @@ public class BlindEnemy : Enemy
             if (NavMesh.SamplePosition(point, out NavMeshHit hit, 1.0f, filter))
             {
                 result = hit.position;
-                return true;
             }
         }
         Debug.Log("No he trobat un punt! (Enemic cec)");
         result = center;
-        return false;
     }
 
     public override void ListenSound(Vector3 pos, int lvlSound)
@@ -313,33 +312,24 @@ public class BlindEnemy : Enemy
     IEnumerator WakeUp(int time)
     {
         yield return new WaitForSeconds(time);
+        if(_CurrentState == EnemyStates.KNOCKED)
+            _Hp = MAXHEALTH;
         _Search = false;
         ChangeState(EnemyStates.PATROL);
     }
 
-    IEnumerator OpenDoors()
+    private void OpenDoors(Door door)
     {
-        while (true)
+        if (!door.isLocked && !door.isOpen && !_OpeningDoor)
         {
-            if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 2.5f, _LayerDoor))
-            {
-                Door door = hit.collider.GetComponentInChildren<Door>();
-
-                if (!door.isLocked && !door.isOpen && !_OpeningDoor)
-                {
-                    door.onDoorOpen += Resume;
-                    _NavMeshAgent.isStopped = true;
-                    door.Open(transform.position);
-                    _OpeningDoor = true;
-                }
-                else if (door.isLocked)
-                {
-                    _NavMeshAgent.SetDestination(transform.position);
-                    yield return new WaitForSeconds(2);
-                }
-            }
-
-            yield return new WaitForSeconds(0.1f);
+            door.onDoorOpen += Resume;
+            _NavMeshAgent.isStopped = true;
+            door.Open(transform.position);
+            _OpeningDoor = true;
+        }
+        else if (door.isLocked)
+        {
+            _NavMeshAgent.SetDestination(transform.position);
         }
     }
 

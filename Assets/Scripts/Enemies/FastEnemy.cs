@@ -13,17 +13,18 @@ public class FastEnemy : Enemy
     [SerializeField] private LayerMask _LayerObjectsAndPlayer;
     [SerializeField] private LayerMask _LayerDoor;
     [SerializeField] private GameObject _DetectionSphere;
+    [SerializeField] private GameObject _DetectionDoors;
     [SerializeField] private List<GameObject> _Waypoints;
     [SerializeField] private GameObject _Waypoint;
 
     private NavMeshAgent _NavMeshAgent;
     private Vector3 _SoundPos;
-    private Vector3 _PointOfPatrol;
     private float _BetaDotProduct;
     private float _LastLvlSound;
     private bool _Patrolling;
     private bool _Search;
     private bool _OpeningDoor;
+    private bool _Looking;
     private Animator _Animator;
 
     private int _Hp;
@@ -46,25 +47,29 @@ public class FastEnemy : Enemy
         _Animator = GetComponent<Animator>();
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
-        _PointOfPatrol = transform.position;
         _RangeSearchSound = 30;
         _RangeChaseAfterStop = 12;
-        _BetaDotProduct = 60;
+        _BetaDotProduct = 90;
         _LastLvlSound = 0;
         _Patrolling = false;
         _OpeningDoor = false;
         _Hp = MAXHEALTH;
 
+        _PatrolCoroutine = null;
+        _ChangeToPatrolCoroutine = null;
+        _AttackCoroutine = null;
+        _ActivateLookingCoroutine = null;
+
         _DetectionSphere.GetComponent<DetectionSphere>().OnEnter += ActivateLookingCoroutine;
         _DetectionSphere.GetComponent<DetectionSphere>().OnExit += DeactivateLookingCoroutine;
-
-        StartCoroutine(OpenDoors());
+        _DetectionDoors.GetComponent<DetectionDoorSphere>().OnDetectDoor += OpenDoors;
     }
 
     private void OnDestroy()
     {
         _DetectionSphere.GetComponent<DetectionSphere>().OnEnter -= ActivateLookingCoroutine;
         _DetectionSphere.GetComponent<DetectionSphere>().OnExit -= DeactivateLookingCoroutine;
+        _DetectionDoors.GetComponent<DetectionDoorSphere>().OnDetectDoor -= OpenDoors;
     }
 
     private void Start()
@@ -107,6 +112,8 @@ public class FastEnemy : Enemy
                 _Animator.Play("Attack");
                 break;
             case EnemyStates.KNOCKED:
+                if(_ActivateLookingCoroutine != null)
+                    StopCoroutine(_ActivateLookingCoroutine);
                 _Animator.Play("Idle");
                 StartCoroutine(WakeUp());
                 break;
@@ -168,7 +175,7 @@ public class FastEnemy : Enemy
     }
 
     //Busca punt aleatori dins del NavMesh
-    private bool RandomPoint(Vector3 center, float range, out Vector3 result)
+    private void RandomPoint(Vector3 center, float range, out Vector3 result)
     {
         for (int i = 0; i < 50; i++)
         {
@@ -188,11 +195,9 @@ public class FastEnemy : Enemy
             if (NavMesh.SamplePosition(point, out hit, 1.0f, NavMesh.GetAreaFromName("Walkable")))
             {
                 result = hit.position;
-                return true;
             }
         }
         result = center;
-        return false;
     }
 
     private void ChasePlayer()
@@ -251,7 +256,6 @@ public class FastEnemy : Enemy
                     _NavMeshAgent.SetDestination(_SoundPos);
                 }
 
-                _PointOfPatrol = pos;
                 ChangeState(EnemyStates.PATROL);
             }
 
@@ -317,7 +321,9 @@ public class FastEnemy : Enemy
     IEnumerator WakeUp()
     {
         yield return new WaitForSeconds(5);
+        _Hp = MAXHEALTH;
         Collider[] aux = Physics.OverlapSphere(transform.position, 2f, _LayerPlayer);
+        Collider[] aux2 = Physics.OverlapSphere(transform.position, 15, _LayerPlayer);
         if (aux.Length > 0)
         {
             if (Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit info, _LayerObjectsAndPlayer))
@@ -325,9 +331,13 @@ public class FastEnemy : Enemy
                 if (info.transform.tag == "Player")
                 {
                     ChangeState(EnemyStates.ATTACK);
-                    yield break;
                 }
             }
+        }
+        else if (aux2.Length > 0)
+        {
+            _ActivateLookingCoroutine = StartCoroutine(LookingPlayer());
+            ChangeState(EnemyStates.CHASE);
         }
         else
             ChangeState(EnemyStates.PATROL);
@@ -347,39 +357,18 @@ public class FastEnemy : Enemy
         _Player.GetComponent<Player>().TakeDamage(3);
     }
 
-    // Comptador per parar de perseguir al jugador
-    IEnumerator StopChase()
+    private void OpenDoors(Door door)
     {
-        yield return new WaitForSeconds(10);
-        _RangeSearchSound = 50;
-        _PointOfPatrol = transform.position;
-        _Search = false;
-        ChangeState(EnemyStates.PATROL);
-    }
-
-    IEnumerator OpenDoors()
-    {
-        while (true)
+        if (!door.isLocked && !door.isOpen && !_OpeningDoor)
         {
-            if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 3f, _LayerDoor))
-            {
-                if (hit.transform.TryGetComponent(out InteractuableDoor interactuableDoor) && hit.transform.TryGetComponent(out Door door))
-                {
-                    if (!door.isLocked && !door.isOpen && !_OpeningDoor)
-                    {
-                        door.onDoorOpen += Resume;
-                        _NavMeshAgent.isStopped = true;
-                        door.Open(transform.position);
-                        _OpeningDoor = true;
-                    }
-                    else if (door.isLocked)
-                    {
-                        _NavMeshAgent.SetDestination(transform.position);
-                        yield return new WaitForSeconds(2);
-                    }
-                }
-            }
-            yield return new WaitForSeconds(0.5f);
+            door.onDoorOpen += Resume;
+            _NavMeshAgent.isStopped = true;
+            door.Open(transform.position);
+            _OpeningDoor = true;
+        }
+        else if (door.isLocked)
+        {
+            _NavMeshAgent.SetDestination(transform.position);
         }
     }
 
@@ -397,9 +386,9 @@ public class FastEnemy : Enemy
         door.Close();
     }
 
-    bool mirando = false;
     IEnumerator LookingPlayer()
     {
+        float alphaLook = 0;
         while (true)
         {
             if(_CurrentState != EnemyStates.KNOCKED)
@@ -407,35 +396,40 @@ public class FastEnemy : Enemy
                 Collider[] aux = Physics.OverlapSphere(transform.position, _RangeChaseAfterStop, _LayerPlayer);
                 if (aux.Length > 0)
                 {
-                    float alphaDocProduct = Vector3.Dot(transform.forward, (_Player.transform.position - this.transform.position).normalized);
-                    float alphaLook = Vector3.Dot(transform.forward, _Player.transform.forward);
+                    //Això és l'angle de visio de l'enemic (ho comparem sobre 60 ja que se'ns dona la meitat) de 120º
+                    //float alphaDocProduct = Vector3.Dot(transform.forward, (_Player.transform.position - transform.position).normalized);
+                    
+                    //Això és el càlcul de les direccions de les mirades, si s'estan mirant l'un a l'altre serà -1 i anira augmentant
+                    //fins 1 quan estan mirant cap a la mateixa direcció
+                    alphaLook = Vector3.Dot(transform.forward, _Player.transform.forward);
 
-                    //Fem l'arcos del docProduct per poder comprovar si l'angle és menor a la meitat de l'angle de 
-                    //visió dels enemics
-                    //Ho hem de convertir a graus perque l'arccos retorna radiants de merda
-                    if (Mathf.Acos(alphaDocProduct) * Mathf.Rad2Deg < _BetaDotProduct)
+                    //Raycast amb les layers de paret i player i si tenim la paret no seguim, si no seguim el jugador
+                    //El raycast és de distància 12 per a tenir un marge amb el trigger de l'esfera de deteccio, perquè no es torni boig
+                    Debug.DrawRay(transform.position, (_Player.transform.position - transform.position), Color.blue, 4);
+                    if (Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit info, 12, _LayerObjectsAndPlayer))
                     {
-                        //Raycast amb les layers de paret i player i si tenim la paret no seguim, sinó seguim el jugador
-                        Debug.DrawRay(transform.position, (_Player.transform.position - transform.position), Color.blue, 4);
-                        if (Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit info, 12, _LayerObjectsAndPlayer))
+                        if (info.transform.tag == "Player")
                         {
-                            if (info.transform.tag == "Player")
+                            if (!_Looking)
                             {
-                                if (!mirando)
-                                {
-                                    transform.LookAt(new Vector3(info.transform.position.x, 0.9f, info.transform.position.z));
-                                    mirando = true;
-                                }
+                                transform.LookAt(new Vector3(info.transform.position.x, 0.9f, info.transform.position.z));
+                                _Looking = true;
+                            }
 
-                                if (alphaLook < -0.8f)
+                            if (alphaLook < -0.8f)
+                            {
+                                if(_CurrentState != EnemyStates.STOPPED)
                                 {
-                                    if(_CurrentState != EnemyStates.STOPPED)
-                                    {
-                                        _NavMeshAgent.SetDestination(transform.position);
-                                        ChangeState(EnemyStates.STOPPED);
-                                    }
+                                    _NavMeshAgent.SetDestination(transform.position);
+                                    ChangeState(EnemyStates.STOPPED);
                                 }
-                                else
+                            }
+                            else
+                            {
+                                //Tornem a calcular l'alphaLook per si el jugador encara ens segueix mirant
+                                transform.LookAt(new Vector3(info.transform.position.x, 0.9f, info.transform.position.z));
+                                alphaLook = Vector3.Dot(transform.forward, _Player.transform.forward);
+                                if (alphaLook >= -0.8f)
                                 {
                                     if (Vector3.Distance(info.transform.position, transform.position) > 2)
                                     {
@@ -457,34 +451,34 @@ public class FastEnemy : Enemy
                                     }
                                 }
                             }
-                            else if (_CurrentState == EnemyStates.STOPPED) 
+                        }
+                        else if (_CurrentState == EnemyStates.STOPPED) 
+                        {
+                            Debug.Log("El jugador ha sortit del rang de visió");
+                            if (_CurrentState != EnemyStates.CHASE)
                             {
-                                Debug.Log("El jugador ha sortit del rang de visió");
-                                if (_CurrentState != EnemyStates.CHASE)
-                                {
-                                    mirando = false;
-                                    _RangeChaseAfterStop = 28;
-                                    ChangeState(EnemyStates.CHASE);
-                                }
+                                _Looking = false;
+                                _RangeChaseAfterStop = 28;
+                                ChangeState(EnemyStates.CHASE);
                             }
                         }
-                        else
+                    }
+                    else
+                    {
+                        _Looking = false;
+                        if(_CurrentState == EnemyStates.STOPPED)
                         {
-                            mirando = false;
-                            if(_CurrentState == EnemyStates.STOPPED)
+                            Debug.Log("El jugador ha sortit del rang de visió");
+                            if (_CurrentState != EnemyStates.CHASE)
                             {
-                                Debug.Log("El jugador ha sortit del rang de visió");
-                                if (_CurrentState != EnemyStates.CHASE)
-                                {
-                                    _RangeChaseAfterStop = 28;
-                                    ChangeState(EnemyStates.CHASE);
-                                }
+                                _RangeChaseAfterStop = 28;
+                                ChangeState(EnemyStates.CHASE);
                             }
-                            else if(_CurrentState != EnemyStates.PATROL)
-                            {
-                                Debug.Log("Tiro raycast i no em trobo res");
-                                ChangeState(EnemyStates.PATROL);
-                            }
+                        }
+                        else if(_CurrentState != EnemyStates.PATROL)
+                        {
+                            Debug.Log("Tiro raycast i no em trobo res");
+                            ChangeState(EnemyStates.PATROL);
                         }
                     }
                 }
@@ -495,7 +489,7 @@ public class FastEnemy : Enemy
 
     private void ActivateLookingCoroutine()
     {
-        if (_ActivateLookingCoroutine ==null)
+        if (_ActivateLookingCoroutine == null)
             _ActivateLookingCoroutine = StartCoroutine(LookingPlayer());
     }
 

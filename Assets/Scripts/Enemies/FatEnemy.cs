@@ -12,6 +12,7 @@ public class FatEnemy : Enemy
     [SerializeField] private LayerMask _LayerObjectsAndPlayer;
     [SerializeField] private LayerMask _LayerDoor;
     [SerializeField] private GameObject _DetectionSphere;
+    [SerializeField] private GameObject _DetectionDoors;
     [SerializeField] private List<GameObject> _Waypoints;
     [SerializeField] private GameObject _Waypoint;
 
@@ -50,14 +51,14 @@ public class FatEnemy : Enemy
 
         _DetectionSphere.GetComponent<DetectionSphere>().OnEnter += ActivateAttackCoroutine;
         _DetectionSphere.GetComponent<DetectionSphere>().OnExit += DeactivateAttackCoroutine;
-
-        StartCoroutine(OpenDoors());
+        _DetectionDoors.GetComponent<DetectionDoorSphere>().OnDetectDoor += OpenDoors;
     }
 
     private void OnDestroy()
     {
         _DetectionSphere.GetComponent<DetectionSphere>().OnEnter -= ActivateAttackCoroutine;
         _DetectionSphere.GetComponent<DetectionSphere>().OnExit -= DeactivateAttackCoroutine;
+        _DetectionDoors.GetComponent<DetectionDoorSphere>().OnDetectDoor -= OpenDoors;
     }
 
     private void Start()
@@ -93,6 +94,7 @@ public class FatEnemy : Enemy
                 _AttackCoroutine = StartCoroutine(LookAttackPlayer());
                 break;
             case EnemyStates.KNOCKED:
+                _Hp = MAXHEALTH;
                 _Animator.Play("Idle");
                 StartCoroutine(WakeUp());
                 break;
@@ -168,7 +170,7 @@ public class FatEnemy : Enemy
     }
 
     //Busca punt aleatori dins del NavMesh
-    private bool RandomPoint(Vector3 center, float range, out Vector3 result)
+    private void RandomPoint(Vector3 center, float range, out Vector3 result)
     {
         for (int i = 0; i < 50; i++)
         {
@@ -184,12 +186,10 @@ public class FatEnemy : Enemy
             if (NavMesh.SamplePosition(point, out NavMeshHit hit, 1.0f, NavMesh.GetAreaFromName("Walkable")))
             {
                 result = hit.position;
-                return true;
             }
         }
         Debug.Log("No he trobat un punt! (Enemic gras)");
         result = center;
-        return false;
     }
 
     public override void ListenSound(Vector3 pos, int lvlSound)
@@ -259,29 +259,18 @@ public class FatEnemy : Enemy
         }
     }
 
-    IEnumerator OpenDoors()
+    private void OpenDoors(Door door)
     {
-        while (true)
+        if (!door.isLocked && !door.isOpen && !_OpeningDoor)
         {
-            if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 2.5f, _LayerDoor))
-            {
-                Door door = hit.collider.GetComponentInChildren<Door>();
-
-                if (!door.isLocked && !door.isOpen && !_OpeningDoor)
-                {
-                    door.onDoorOpen += Resume;
-                    _NavMeshAgent.isStopped = true;
-                    door.Open(transform.position);
-                    _OpeningDoor = true;
-                }
-                else if (door.isLocked)
-                {
-                    _NavMeshAgent.SetDestination(transform.position);
-                    yield return new WaitForSeconds(2);
-                }
-            }
-
-            yield return new WaitForSeconds(0.5f);
+            door.onDoorOpen += Resume;
+            _NavMeshAgent.isStopped = true;
+            door.Open(transform.position);
+            _OpeningDoor = true;
+        }
+        else if (door.isLocked)
+        {
+            _NavMeshAgent.SetDestination(transform.position);
         }
     }
 
@@ -302,6 +291,7 @@ public class FatEnemy : Enemy
     IEnumerator WakeUp()
     {
         yield return new WaitForSeconds(5);
+        _Hp = MAXHEALTH;
         Collider[] aux = Physics.OverlapSphere(transform.position, 2f, _LayerPlayer);
         if (aux.Length > 0)
         {
