@@ -35,4 +35,3 @@ public class ChromaticAberrationManager : MonoBehaviour
         postProcessEvent.OnIncreaseSamples -= IncreaseSample; ;
     }
 }
-}

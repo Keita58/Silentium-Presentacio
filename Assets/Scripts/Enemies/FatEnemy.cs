@@ -54,6 +54,12 @@ public class FatEnemy : Enemy
         StartCoroutine(OpenDoors());
     }
 
+    private void OnDestroy()
+    {
+        _DetectionSphere.GetComponent<DetectionSphere>().OnEnter -= ActivateAttackCoroutine;
+        _DetectionSphere.GetComponent<DetectionSphere>().OnExit -= DeactivateAttackCoroutine;
+    }
+
     private void Start()
     {
         InitState(EnemyStates.PATROL);
@@ -84,7 +90,7 @@ public class FatEnemy : Enemy
                 break;
             case EnemyStates.ATTACK:
                 _Animator.SetBool("Attack", true);
-                _AttackCoroutine = StartCoroutine(AttackPlayer());
+                _AttackCoroutine = StartCoroutine(LookAttackPlayer());
                 break;
             case EnemyStates.KNOCKED:
                 _Animator.Play("Idle");
@@ -311,14 +317,18 @@ public class FatEnemy : Enemy
             ChangeState(EnemyStates.PATROL);
     }
 
-    IEnumerator AttackPlayer()
+    IEnumerator LookAttackPlayer()
     {
         while (true)
         {
             transform.LookAt(_Player.transform.position);
-            _Player.GetComponent<Player>().TakeDamage(1);
             yield return new WaitForSeconds(0.5f);
         }
+    }
+
+    private void AttackPlayer()
+    {
+        _Player.GetComponent<Player>().TakeDamage(1);
     }
 
     IEnumerator ChangeToPatrol(float time)

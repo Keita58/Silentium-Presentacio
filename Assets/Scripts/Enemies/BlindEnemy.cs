@@ -25,6 +25,7 @@ public class BlindEnemy : Enemy
     [SerializeField] private bool _Search;
     private bool _OpeningDoor;
     private bool _Jumping;
+    private Animator _Animator;
 
     private int _Hp;
     public override int hp => _Hp;
@@ -42,6 +43,7 @@ public class BlindEnemy : Enemy
 
     private void Awake()
     {
+        _Animator = GetComponent<Animator>();
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
         _PointOfPatrol = transform.position;
@@ -59,6 +61,12 @@ public class BlindEnemy : Enemy
 
         _AttackCoroutine = null;
         _ChangeStateToPatrol = null;
+    }
+
+    private void OnDestroy()
+    {
+        _DetectionSphere.GetComponent<DetectionSphere>().OnEnter -= OnEnter;
+        _DetectionSphere.GetComponent<DetectionSphere>().OnExit -= OnExit;
     }
 
     private void Start()
@@ -163,17 +171,19 @@ public class BlindEnemy : Enemy
                     RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
                     point = coord;
                 }
+                _Animator.enabled = true;
                 _Patrolling = true;
                 _NavMeshAgent.SetDestination(point);
             }
 
-            if (_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
+            if (!_NavMeshAgent.pathPending && _NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
             {
                 if (_Search && _CurrentState != EnemyStates.ATTACK && _ChangeStateToPatrol == null)
                 {
                     Debug.Log("Activo la corutina WakeUp");
                     _ChangeStateToPatrol = StartCoroutine(WakeUp(10));
                 }
+                _Animator.enabled = false;
                 _Patrolling = false;
                 yield return new WaitForSeconds(1);
             }

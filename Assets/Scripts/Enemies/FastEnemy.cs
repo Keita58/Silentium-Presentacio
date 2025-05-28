@@ -61,6 +61,12 @@ public class FastEnemy : Enemy
         StartCoroutine(OpenDoors());
     }
 
+    private void OnDestroy()
+    {
+        _DetectionSphere.GetComponent<DetectionSphere>().OnEnter -= ActivateLookingCoroutine;
+        _DetectionSphere.GetComponent<DetectionSphere>().OnExit -= DeactivateLookingCoroutine;
+    }
+
     private void Start()
     {
         InitState(EnemyStates.PATROL);
@@ -87,19 +93,24 @@ public class FastEnemy : Enemy
             case EnemyStates.PATROL:
                 _Patrolling = false;
                 _PatrolCoroutine = StartCoroutine(Patrol());
+                _Animator.Play("Walk");
                 break;
             case EnemyStates.CHASE:
                 _NavMeshAgent.speed = 5.5f;
+                _Animator.Play("Run");
                 break;
             case EnemyStates.ATTACK:
-                _Animator.SetBool("Attack", true);
-                _AttackCoroutine = StartCoroutine(AttackPlayer());
+                _NavMeshAgent.speed = 0;
+                _NavMeshAgent.SetDestination(transform.position);
+                _AttackCoroutine = StartCoroutine(LookAttackPlayer());
+                _Animator.Play("Attack");
                 break;
             case EnemyStates.KNOCKED:
+                _Animator.Play("Idle");
                 StartCoroutine(WakeUp());
                 break;
             case EnemyStates.STOPPED:
-                _Animator.speed = 0;
+                _Animator.enabled = false;
                 break;
         }
     }
@@ -127,17 +138,17 @@ public class FastEnemy : Enemy
                 _ChangeToPatrolCoroutine = null;
                 break;
             case EnemyStates.CHASE:
-                _NavMeshAgent.speed = 4f;
+                _NavMeshAgent.speed = 3;
                 _RangeChaseAfterStop = 12;
                 break;
             case EnemyStates.ATTACK:
                 StopCoroutine(_AttackCoroutine);
-                _Animator.SetBool("Attack", false);
                 break;
             case EnemyStates.KNOCKED:
                 _Hp = MAXHEALTH;
                 break;
             case EnemyStates.STOPPED:
+                _Animator.enabled = true;
                 break;
         }
     }
@@ -277,14 +288,14 @@ public class FastEnemy : Enemy
                     RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
                     _Waypoint.transform.position = coord;
                 }
-                _Animator.SetBool("Idle", false);
+                _Animator.Play("Walk");
                 _NavMeshAgent.SetDestination(_Waypoint.transform.position);
                 _Patrolling = true;
             }
             
             if (!_NavMeshAgent.pathPending && _NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
             {
-                _Animator.SetBool("Idle", true);
+                _Animator.Play("Idle");
                 _Patrolling = false;
                 if (!_Search)
                     yield return new WaitForSeconds(2);
@@ -315,13 +326,18 @@ public class FastEnemy : Enemy
             ChangeState(EnemyStates.PATROL);
     }
 
-    IEnumerator AttackPlayer()
+    IEnumerator LookAttackPlayer()
     {
         while (true)
         {
-            _Player.GetComponent<Player>().TakeDamage(1);
-            yield return new WaitForSeconds(1);
+            transform.LookAt(_Player.transform.position);
+            yield return new WaitForSeconds(0.5f);
         }
+    }
+
+    private void AttackPlayer()
+    {
+        _Player.GetComponent<Player>().TakeDamage(3);
     }
 
     // Comptador per parar de perseguir al jugador
@@ -409,7 +425,7 @@ public class FastEnemy : Enemy
                                 }
                                 else
                                 {
-                                    if (Vector3.Distance(info.transform.position, transform.position) > 1.5f)
+                                    if (Vector3.Distance(info.transform.position, transform.position) > 2)
                                     {
                                         Debug.Log("Veig al jugador lluny");
                                         if (_CurrentState != EnemyStates.CHASE)
@@ -418,7 +434,7 @@ public class FastEnemy : Enemy
                                             ChangeState(EnemyStates.CHASE);
                                         }
                                     }
-                                    else if (Vector3.Distance(info.transform.position, transform.position) <= 1.5f)
+                                    else if (Vector3.Distance(info.transform.position, transform.position) <= 2)
                                     {
                                         Debug.Log("Tinc al jugador al davant!");
                                         _NavMeshAgent.SetDestination(transform.position);
@@ -463,7 +479,7 @@ public class FastEnemy : Enemy
         }
     }
 
-    private void ActivateLookingCoroutine() // Canviar esfera per a que tingui 15 de radi
+    private void ActivateLookingCoroutine()
     {
         _ActivateLookingCoroutine = StartCoroutine(LookingPlayer());
     }
