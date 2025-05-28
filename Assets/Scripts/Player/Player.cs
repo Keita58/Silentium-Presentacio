@@ -765,6 +765,7 @@ public class Player : MonoBehaviour
             _inputActions.Player.Crouch.performed -= Crouch;
             _inputActions.Player.Throw.performed -= ThrowItem;
             _inputActions.Player.Pause.performed -= OpenMenu;
+            _inputActions.Player.Flashlight.performed -= Flashlight;
         }
     }
 }
