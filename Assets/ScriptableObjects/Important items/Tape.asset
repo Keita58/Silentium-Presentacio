@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e3265da449bb22418b7c9a61178f218, type: 3}
   m_Name: Tape
   m_EditorClassIdentifier: 
-  nom: Cinta
+  itemName: Cinta
   description: "Cinta americana. Si la combinase con otro objeto podr\xEDa hacer
     que la pistola hiciese menos ruido..."
   sprite: {fileID: 21300000, guid: 58767aa96f79cd9419bc0ac16591164c, type: 3}

@@ -48,6 +48,6 @@ public class CameraSave : MonoBehaviour
     IEnumerator DeleteText()
     {
         yield return new WaitForSeconds(5);
-        _SaveText.SetActive(true);
+        _SaveText.SetActive(false);
     }
 }
