@@ -29,6 +29,7 @@ public class LineRendererExample : MonoBehaviour
         _inputAction.Hieroglyphic.Paint.performed += ClickRay;
         _inputAction.Hieroglyphic.Paint.canceled += ClickRay;
         _inputAction.Hieroglyphic.Finish.performed += PaintingFinished;
+        _inputAction.Hieroglyphic.Exit.performed += Exit;
         // _inputAction.Hieroglyphic.Paint.canceled += a; // crea dos quad por esto.
         lineRenderer = new List<LineRenderer>();
         // Set the material
@@ -128,5 +129,31 @@ public class LineRendererExample : MonoBehaviour
         lr.endWidth = 0.05f;
         lineRenderer.Add(lr);
         lineRenderer[lineRenderer.Count - 1].material = new Material(Shader.Find("Sprites/Default"));
+    } 
+    void Exit(InputAction.CallbackContext context)
+    {
+        for (int i = 0; i < this.transform.childCount; i++)
+        {
+            if (!this.transform.GetChild(i).gameObject.TryGetComponent<Camera>(out Camera cam))
+                Destroy(this.transform.GetChild(i).gameObject);
+        }
+        lineRenderer.Clear();
+        GameObject lineObject = new GameObject("Line");
+        lineObject.transform.parent = this.transform;
+        lineObject.layer = 14;
+        lr = lineObject.AddComponent<LineRenderer>();
+        lr.SetColors(Color.black, Color.black);
+        lr.startWidth = 0.05f;                 // Ancho de la linea
+        lr.endWidth = 0.05f;
+        lineRenderer.Add(lr);
+        lineRenderer[lineRenderer.Count - 1].material = new Material(Shader.Find("Sprites/Default"));
+        PuzzleManager.instance.HieroglyphicPuzzleExit(false);
+    }
+    private void OnDestroy()
+    {
+        _inputAction.Hieroglyphic.Paint.performed -= ClickRay;
+        _inputAction.Hieroglyphic.Paint.canceled -= ClickRay;
+        _inputAction.Hieroglyphic.Finish.performed -= PaintingFinished;
+        _inputAction.Hieroglyphic.Exit.performed -= Exit;
     }
 }

@@ -140,7 +140,7 @@ public class Save : MonoBehaviour
             SilencerUses = _Player.silencerUses,
             Ammo = _Player.gunAmmo,
             Position = _Player.transform.position,
-            EquipedItem = _InventoryManager.equippedItem.id,
+            EquipedItem = _InventoryManager.equippedItem != null ? InventoryManager.instance.equippedItem.id : -1,
             ClockPuzzle = _PuzzleManager.clockPuzzleCompleted,
             HieroglyphicPuzzle = _PuzzleManager.isHieroglyphicCompleted,
             BookPuzzle = _PuzzleManager.bookPuzzleCompleted,

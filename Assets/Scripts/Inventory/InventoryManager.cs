@@ -511,5 +511,6 @@ public class InventoryManager : MonoBehaviour
         unequipButton.SetActive(false);
         player.equipedObject = null;
         player.itemSlotOccuped = false;
+        equippedItem = null;
     }
 }

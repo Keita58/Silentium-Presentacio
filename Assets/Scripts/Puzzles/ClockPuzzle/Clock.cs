@@ -160,4 +160,14 @@ public class Clock : MonoBehaviour
             }
         }
     }
+    private void OnDestroy()
+    {
+        inputActions.Clock.MoveClockHand.performed -= HandleInputMinutes;
+        inputActions.Clock.MoveClockHand.canceled -= HandleInputMinutes;
+        inputActions.Clock.MoveClockHandReversed.performed -= HandleInputMinutesReverse;
+        inputActions.Clock.MoveClockHandReversed.canceled -= HandleInputMinutesReverse;
+        inputActions.Clock.FinishClock.started -= HandleMinutesFinished;
+        inputActions.Clock.FinishClock.canceled -= HandleMinutesFinished;
+        inputActions.Clock.Exit.started -= Exit;
+    }
 }

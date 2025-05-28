@@ -16,4 +16,9 @@ public class CustomPassesManager : MonoBehaviour
         weaponCustomPass.GetComponents<CustomPassVolume>()[1].enabled = enable; //weapon
         weaponCustomPass.GetComponents<CustomPassVolume>()[2].enabled = enable; //silencer
     }
+    private void OnDestroy()
+    {
+        postProcessEvents.OnToggleCustomPass -= ToggleCustomPass;
+
+    }
 }

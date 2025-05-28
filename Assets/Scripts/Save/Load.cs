@@ -57,7 +57,7 @@ public class Load : MonoBehaviour
 
     private void OnDestroy()
     {
-        GameManager.instance.onLoadedScene -= LoadGame;
+        //GameManager.instance.onLoadedScene -= LoadGame;
     }
 
     public void LoadGame()
@@ -107,8 +107,11 @@ public class Load : MonoBehaviour
             _ChestInventory.items = ChestInventory;
             _NotesInventory.notes = _Notes.FromIDs(info.NotesInventory);
 
-            _ShowInventory.SetEquippedItem(_Items.FromID(info.EquipedItem), true);
-            _Items.FromID(info.EquipedItem).Equip();
+            if (info.EquipedItem != -1)
+            {
+                _ShowInventory.SetEquippedItem(_Items.FromID(info.EquipedItem), false);
+                _Items.FromID(info.EquipedItem).Equip();
+            }
 
             //Treure la info del Volume
             Volume VolumeInfo = _Shaders.GetComponent<Volume>();
@@ -154,7 +157,9 @@ public class Load : MonoBehaviour
                 {
                     if (cell.cellId == save.cellId)
                     {
+                        cell.GetComponent<Collider>().enabled = false;
                         cell.SetBook(_Books.FromID(_Items.FromID(save.bookGO).id).GetComponent<Book>(), _Books.FromID(_Items.FromID(save.bookGO).id));
+                        
                         GameObject aux = Instantiate(_Books.FromID(_Items.FromID(save.bookGO).id));
                         aux.transform.position = cell.transform.GetChild(0).transform.position;
                         break;

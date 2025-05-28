@@ -135,11 +135,11 @@ public class PuzzleManager : MonoBehaviour
     [Header("Audio")]
     private AudioSource glitchAudioSource;
     [SerializeField]
-    AudioClip glistchAudio;
+    AudioClip glitchAudio;
 
     private void Awake()
     {
-        glitchAudioSource = GetComponent<AudioSource>();
+        glitchAudioSource = this.GetComponent<AudioSource>();
         inputActionPlayer = new InputSystem_Actions();
         if (instance == null)
             instance = this;
@@ -359,6 +359,7 @@ public class PuzzleManager : MonoBehaviour
                     events.ToggleUI(false);
                     player.ToggleInputPlayer(false, false);
                     positionToTeleport = positionAfterPoem;
+                    glitchAudioSource.PlayOneShot(glitchAudio);
                     glitchAnimator.Play("Glitch");
                     glitchStarted = true;
                     animationTime = 0f;
@@ -465,7 +466,7 @@ public class PuzzleManager : MonoBehaviour
     {
         player.ToggleInputPlayer(false, false);
         glitchAnimator.Play("Glitch");
-        glitchAudioSource.PlayOneShot(glistchAudio);
+        glitchAudioSource.PlayOneShot(glitchAudio);
         glitchStarted = true;
         animationTime = 0f;
         positionToTeleport = positionAfterHieroglyphic;

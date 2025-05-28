@@ -7,6 +7,8 @@ public class InteractuableItem : MonoBehaviour, IInteractuable
 
     public bool isInteractuable { get;  set; }
 
+    bool glitchBookAnimation = false;
+
     [SerializeField] Events events;
     private void Awake()
     {
@@ -37,7 +39,11 @@ public class InteractuableItem : MonoBehaviour, IInteractuable
             gameObject.SetActive(false);
             if (itemPicked is ThrowableItem || itemPicked is SilencerItem || itemPicked is SaveItem || itemPicked is HealingItem || itemPicked is AmmunitionItem)
                 events.PickItem(GetComponentInParent<PickObject>().Id);
-            if (itemPicked is BookItem && itemPicked.ItemType == ItemTypes.BOOK2) PuzzleManager.instance.ChangePositionPlayerAfterHieroglyphic();
+            if (itemPicked is BookItem && itemPicked.ItemType == ItemTypes.BOOK2 && !glitchBookAnimation)
+            {
+                PuzzleManager.instance.ChangePositionPlayerAfterHieroglyphic();
+                glitchBookAnimation = true;
+            }
         }
         else
         {
