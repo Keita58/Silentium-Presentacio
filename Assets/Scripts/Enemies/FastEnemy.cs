@@ -102,7 +102,8 @@ public class FastEnemy : Enemy
             case EnemyStates.ATTACK:
                 _NavMeshAgent.speed = 0;
                 _NavMeshAgent.SetDestination(transform.position);
-                _AttackCoroutine = StartCoroutine(LookAttackPlayer());
+                if (_AttackCoroutine == null)
+                    _AttackCoroutine = StartCoroutine(LookAttackPlayer());
                 _Animator.Play("Attack");
                 break;
             case EnemyStates.KNOCKED:
@@ -134,15 +135,21 @@ public class FastEnemy : Enemy
             case EnemyStates.PATROL:
                 StopCoroutine(_PatrolCoroutine);
                 if(_ChangeToPatrolCoroutine != null)
+                {
                     StopCoroutine(_ChangeToPatrolCoroutine);
-                _ChangeToPatrolCoroutine = null;
+                    _ChangeToPatrolCoroutine = null;
+                }
                 break;
             case EnemyStates.CHASE:
                 _NavMeshAgent.speed = 3;
                 _RangeChaseAfterStop = 12;
                 break;
             case EnemyStates.ATTACK:
-                StopCoroutine(_AttackCoroutine);
+                if (_AttackCoroutine != null)
+                {
+                    StopCoroutine(_AttackCoroutine);
+                    _AttackCoroutine = null;
+                }
                 break;
             case EnemyStates.KNOCKED:
                 _Hp = MAXHEALTH;
@@ -390,6 +397,7 @@ public class FastEnemy : Enemy
         door.Close();
     }
 
+    bool mirando = false;
     IEnumerator LookingPlayer()
     {
         while (true)
@@ -413,7 +421,11 @@ public class FastEnemy : Enemy
                         {
                             if (info.transform.tag == "Player")
                             {
-                                transform.LookAt(new Vector3(info.transform.position.x, 0.9f, info.transform.position.z));
+                                if (!mirando)
+                                {
+                                    transform.LookAt(new Vector3(info.transform.position.x, 0.9f, info.transform.position.z));
+                                    mirando = true;
+                                }
 
                                 if (alphaLook < -0.8f)
                                 {
@@ -450,6 +462,7 @@ public class FastEnemy : Enemy
                                 Debug.Log("El jugador ha sortit del rang de visió");
                                 if (_CurrentState != EnemyStates.CHASE)
                                 {
+                                    mirando = false;
                                     _RangeChaseAfterStop = 28;
                                     ChangeState(EnemyStates.CHASE);
                                 }
@@ -457,6 +470,7 @@ public class FastEnemy : Enemy
                         }
                         else
                         {
+                            mirando = false;
                             if(_CurrentState == EnemyStates.STOPPED)
                             {
                                 Debug.Log("El jugador ha sortit del rang de visió");
@@ -481,12 +495,17 @@ public class FastEnemy : Enemy
 
     private void ActivateLookingCoroutine()
     {
-        _ActivateLookingCoroutine = StartCoroutine(LookingPlayer());
+        if (_ActivateLookingCoroutine ==null)
+            _ActivateLookingCoroutine = StartCoroutine(LookingPlayer());
     }
 
     private void DeactivateLookingCoroutine()
     {
-        StopCoroutine(_ActivateLookingCoroutine);
+        if (_ActivateLookingCoroutine != null)
+        {
+            StopCoroutine(_ActivateLookingCoroutine);
+            _ActivateLookingCoroutine = null;
+        }
 
         if (_CurrentState == EnemyStates.STOPPED)
         {
