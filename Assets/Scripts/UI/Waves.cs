@@ -30,7 +30,7 @@ public class Waves : MonoBehaviour
 
         texture = new Texture2D(points, amplitude);
         texture.filterMode = FilterMode.Point;
-        texture.alphaIsTransparency = true;
+        //texture.alphaIsTransparency = true;
         Imatge.GetComponent<RawImage>().texture = texture;
 
         colors = new Color[points * amplitude];

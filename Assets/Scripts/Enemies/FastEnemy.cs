@@ -110,7 +110,7 @@ public class FastEnemy : Enemy
                 _Animator.Play("Walk");
                 break;
             case EnemyStates.CHASE:
-                _NavMeshAgent.speed = 5.5f;
+                _NavMeshAgent.speed = 7f;
                 _Animator.Play("Run");
                 break;
             case EnemyStates.ATTACK:
@@ -262,6 +262,8 @@ public class FastEnemy : Enemy
                 }
                 else if (lvlSound > 7)
                 {
+                    _RangeSearchSound = 1;
+                    _Search = true;
                     _NavMeshAgent.SetDestination(_SoundPos);
                 }
 
@@ -305,8 +307,11 @@ public class FastEnemy : Enemy
                 }
                 else
                 {
-                    RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
-                    _Waypoint.transform.position = coord;
+                    if(_RangeSearchSound > 0)
+                    {
+                        RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
+                        _Waypoint.transform.position = coord;
+                    }
                 }
                 _Animator.Play("Walk");
                 _NavMeshAgent.SetDestination(_Waypoint.transform.position);
@@ -460,11 +465,17 @@ public class FastEnemy : Enemy
                                     }
                                     else if (Vector3.Distance(info.transform.position, transform.position) <= 2)
                                     {
-                                        Debug.Log("Tinc al jugador al davant!");
-                                        _NavMeshAgent.SetDestination(transform.position);
-                                        if (_CurrentState != EnemyStates.ATTACK)
+                                        Physics.Raycast(transform.position,
+                                            (_Player.transform.position - transform.position), out RaycastHit thing, 12,
+                                            _LayerObjectsAndPlayer);
+                                        if (thing.transform.CompareTag("Player"))
                                         {
-                                            ChangeState(EnemyStates.ATTACK);
+                                            Debug.Log("Tinc al jugador al davant!");
+                                            _NavMeshAgent.SetDestination(transform.position);
+                                            if (_CurrentState != EnemyStates.ATTACK)
+                                            {
+                                                ChangeState(EnemyStates.ATTACK);
+                                            }
                                         }
                                     }
                                 }

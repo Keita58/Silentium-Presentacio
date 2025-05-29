@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using UnityEngine;
-using static UnityEditor.Progress;
 
 [CreateAssetMenu(fileName = "BDBooks", menuName = "Scriptable Objects/BDBooks")]
 public class BDBooks : ScriptableObject

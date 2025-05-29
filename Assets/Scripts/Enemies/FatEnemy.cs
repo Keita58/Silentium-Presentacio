@@ -5,7 +5,7 @@ using UnityEngine.AI;
 
 public class FatEnemy : Enemy
 {
-    private enum EnemyStates { PATROL, ATTACK, KNOCKED }
+    private enum EnemyStates { PATROL, ATTACK, KNOCKED, CHASE }
     [SerializeField] private EnemyStates _CurrentState;
     [SerializeField] private GameObject _Player;
     [SerializeField] private LayerMask _LayerPlayer;
@@ -13,12 +13,12 @@ public class FatEnemy : Enemy
     [SerializeField] private LayerMask _LayerDoor;
     [SerializeField] private GameObject _DetectionSphere;
     [SerializeField] private GameObject _DetectionDoors;
+    [SerializeField] private GameObject _DetectionAttack;
     [SerializeField] private List<GameObject> _Waypoints;
     [SerializeField] private GameObject _Waypoint;
 
     private NavMeshAgent _NavMeshAgent;
     private Vector3 _SoundPos;
-    private Vector3 _PointOfPatrol;
     [SerializeField] private bool _Patrolling;
     [SerializeField] private bool _Search;
     private bool _OpeningDoor;
@@ -36,6 +36,7 @@ public class FatEnemy : Enemy
     private Coroutine _PatrolCoroutine;
     private Coroutine _AttackCoroutine;
     private Coroutine _ChangeToPatrolCoroutine;
+    private Coroutine _ChaseCoroutine;
 
     [Header("Audio")]
     private AudioSource _fatAudioSource;
@@ -48,22 +49,27 @@ public class FatEnemy : Enemy
         _Animator = GetComponent<Animator>();
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
-        _PointOfPatrol = transform.position;
         _RangeSearchSound = 25;
         _Patrolling = false;
         _Search = false;
         _OpeningDoor = false;
         _Hp = MAXHEALTH;
 
-        _DetectionSphere.GetComponent<DetectionSphere>().OnEnter += ActivateAttackCoroutine;
-        _DetectionSphere.GetComponent<DetectionSphere>().OnExit += DeactivateAttackCoroutine;
+        _ChaseCoroutine = null;
+
+        _DetectionSphere.GetComponent<DetectionSphere>().OnEnter += ActivateChaseCoroutine;
+        _DetectionSphere.GetComponent<DetectionSphere>().OnExit += DeactivateChaseCoroutine;
+        _DetectionAttack.GetComponent<DetectionSphere>().OnEnter += ActivateAttack;
+        _DetectionAttack.GetComponent<DetectionSphere>().OnExit += DeactivateAttack;
         _DetectionDoors.GetComponent<DetectionDoorSphere>().OnDetectDoor += OpenDoors;
     }
 
     private void OnDestroy()
     {
-        _DetectionSphere.GetComponent<DetectionSphere>().OnEnter -= ActivateAttackCoroutine;
-        _DetectionSphere.GetComponent<DetectionSphere>().OnExit -= DeactivateAttackCoroutine;
+        _DetectionSphere.GetComponent<DetectionSphere>().OnEnter += ActivateChaseCoroutine;
+        _DetectionSphere.GetComponent<DetectionSphere>().OnExit += DeactivateChaseCoroutine;
+        _DetectionAttack.GetComponent<DetectionSphere>().OnEnter += ActivateAttack;
+        _DetectionAttack.GetComponent<DetectionSphere>().OnExit += DeactivateAttack;
         _DetectionDoors.GetComponent<DetectionDoorSphere>().OnDetectDoor -= OpenDoors;
     }
 
@@ -97,13 +103,19 @@ public class FatEnemy : Enemy
                     _ChangeToPatrolCoroutine = StartCoroutine(ChangeToPatrol(7));
                 break;
             case EnemyStates.ATTACK:
-                _Animator.SetBool("Attack", true);
+                _Animator.Play("Attack");
+                _NavMeshAgent.SetDestination(transform.position);
                 _AttackCoroutine = StartCoroutine(LookAttackPlayer());
                 break;
             case EnemyStates.KNOCKED:
-                _Hp = MAXHEALTH;
+                _NavMeshAgent.SetDestination(transform.position);
                 _Animator.Play("Idle");
                 StartCoroutine(WakeUp());
+                break;
+            case EnemyStates.CHASE:
+                _Animator.Play("Walk");
+                if (_ChaseCoroutine == null)
+                    _ChaseCoroutine = StartCoroutine(ChasePlayer());
                 break;
         }
     }
@@ -122,10 +134,17 @@ public class FatEnemy : Enemy
                 break;
             case EnemyStates.ATTACK:
                 StopCoroutine(_AttackCoroutine);
-                _Animator.SetBool("Attack", false);
+                _NavMeshAgent.SetDestination(transform.position);
                 break;
             case EnemyStates.KNOCKED:
                 _Hp = MAXHEALTH;
+                break;
+            case EnemyStates.CHASE:
+                if (_ChaseCoroutine != null)
+                {
+                    StopCoroutine(_ChaseCoroutine);
+                    _ChaseCoroutine = null;
+                }
                 break;
         }
     }
@@ -154,17 +173,20 @@ public class FatEnemy : Enemy
                 }
                 else
                 {
-                    RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
-                    _Waypoint.transform.position = coord;
+                    if(_RangeSearchSound > 0)
+                    {
+                        RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
+                        _Waypoint.transform.position = coord;
+                    }
                 }
-                _Animator.SetBool("Idle", false);
+                _Animator.Play("Walk");
                 _NavMeshAgent.SetDestination(_Waypoint.transform.position);
                 _Patrolling = true;
             }
             
             if (!_NavMeshAgent.pathPending && _NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
             {
-                _Animator.SetBool("Idle", true);
+                _Animator.Play("Idle");
                 _Patrolling = false;
                 if (!_Search)
                     yield return new WaitForSeconds(2);
@@ -247,10 +269,11 @@ public class FatEnemy : Enemy
             }
             else if (lvlSound > 7)
             {
+                _RangeSearchSound = 0;
+                _Search = true;
                 _NavMeshAgent.SetDestination(_SoundPos);
             }
 
-            _PointOfPatrol = pos;
             if (_CurrentState == EnemyStates.PATROL)
                 ChangeState(EnemyStates.PATROL);
         }
@@ -323,6 +346,17 @@ public class FatEnemy : Enemy
         }
     }
 
+    IEnumerator ChasePlayer()
+    {
+        while (true)
+        {
+            transform.LookAt(_Player.transform.position);
+            _NavMeshAgent.SetDestination(_Player.transform.position);
+            Debug.Log(_NavMeshAgent.destination);
+            yield return new WaitForSeconds(0.5f);
+        }
+    }
+
     private void AttackPlayer()
     {
         _Player.GetComponent<Player>().TakeDamage(1);
@@ -335,15 +369,27 @@ public class FatEnemy : Enemy
         ChangeState(EnemyStates.PATROL);
     }
 
-    private void ActivateAttackCoroutine()
+    private void ActivateChaseCoroutine()
     {
-        _NavMeshAgent.SetDestination(transform.position);
-        ChangeState(EnemyStates.ATTACK);
+        ChangeState(EnemyStates.CHASE);
     }
 
-    private void DeactivateAttackCoroutine()
+    private void DeactivateChaseCoroutine()
     {
         _Search = false;
         ChangeState(EnemyStates.PATROL);
+    }
+
+    private void ActivateAttack()
+    {
+        Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit thing, 12,
+            _LayerObjectsAndPlayer);
+        if(thing.transform.CompareTag("Player"))
+            ChangeState(EnemyStates.ATTACK);
+    }
+
+    private void DeactivateAttack()
+    {
+        ChangeState(EnemyStates.CHASE);
     }
 }

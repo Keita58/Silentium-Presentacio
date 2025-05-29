@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93a2625516f24b447be9ad1d9f42861e, type: 3}
   m_Name: Amoxicilina
   m_EditorClassIdentifier: 
-  nom: Amoxicilina
+  itemName: Amoxicilina
   description: Cura de grande efecto. Creada a partir de dos Paracetamoles.
   sprite: {fileID: 21300000, guid: 7e18085c06cb88147aa9e499634e2e71, type: 3}
   healing: 2

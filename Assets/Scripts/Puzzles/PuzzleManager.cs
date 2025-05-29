@@ -64,6 +64,8 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField] private GameObject yellowBook;
     [SerializeField] private GameObject greyBook;
     [SerializeField] private GameObject pinkBook;
+    //Porta del puzle
+    [SerializeField] private Door unlockDoor;
 
     [Header("Poem Puzzle")]
     [SerializeField]
@@ -259,6 +261,7 @@ public class PuzzleManager : MonoBehaviour
             cam_Player.gameObject.SetActive(true);
             Cursor.visible = false;
             animationTime = 0f;
+            unlockDoor.isLocked = false;
         }
     }
 

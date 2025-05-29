@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52406a5ec308eef479ce6fc673d69fb9, type: 3}
   m_Name: Bullets
   m_EditorClassIdentifier: 
-  nom: Caja de balas
+  itemName: Caja de balas
   description: Contiene 6 balas. Ideales para recargar el arma.
   sprite: {fileID: 21300000, guid: 7f45c1ee97473ac4abe2b484d0b6f0c6, type: 3}
   prefab: {fileID: 0}

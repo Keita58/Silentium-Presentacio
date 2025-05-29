@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6440434108134579162}
   - component: {fileID: 8078460229292043164}
   - component: {fileID: 4181423857655222089}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: YellowBook
   m_TagString: Book
   m_Icon: {fileID: 0}

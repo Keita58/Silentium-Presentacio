@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8049574600830604252}
   - component: {fileID: 8533132617025582789}
   - component: {fileID: 1548451762373505935}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Pen throwable
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e436e85ea58c7bf489b7004eb0335253, type: 3}
   m_Name: Bottle
   m_EditorClassIdentifier: 
-  nom: Botella
+  itemName: Botella de cristal
   description: "Botella vac\xEDa de cristal."
   sprite: {fileID: 21300000, guid: 4fa87b6845b1c914983a7defa5da3009, type: 3}
   prefab: {fileID: 2380219917478238670, guid: 07444a5bb38e8044b8b899bf44cc4ed1, type: 3}
