@@ -183,7 +183,8 @@ public class Save : MonoBehaviour
             SFXValue = _Settings.currentSfxValue,
             FPSValue = _Settings.currentFpsValue,
             FOVValue = _Settings.currentFOVValue,
-            VSync = _Settings.currentVSyncState
+            VSync = _Settings.currentVSyncState,
+            Sensitivity = _Settings.currentSensitivityValue
         };
 
         string infoToSave = JsonUtility.ToJson(config, true);

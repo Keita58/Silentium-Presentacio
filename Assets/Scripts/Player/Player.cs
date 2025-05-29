@@ -728,6 +728,11 @@ public class Player : MonoBehaviour
         currentFov = fovLevel;
     }
 
+    public void SetSensitivity(float sensibility)
+    {
+        this._LookVelocity = sensibility;
+    }
+
     public void ReloadAmmo(int numAmmo)
     {
         GunAudioSource.PlayOneShot(RechargeGunAudio);

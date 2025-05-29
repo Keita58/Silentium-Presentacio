@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[RequireComponent(typeof(WeaponPuzzle))]
 public class InteractuableWeapon : MonoBehaviour, IInteractuable
 {
     public bool isRemarkable {  get; private set; }
@@ -7,7 +8,7 @@ public class InteractuableWeapon : MonoBehaviour, IInteractuable
 
     private void Awake()
     {
-        isRemarkable = true;
+        isRemarkable = false;
         isInteractuable = true;
     }
 
