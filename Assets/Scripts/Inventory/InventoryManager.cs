@@ -181,6 +181,7 @@ public class InventoryManager : MonoBehaviour
                 _inputActions.Chest.Enable();
                 player.ToggleInputPlayer(false, false);
                 player.ToggleChestAnimation(true);
+                player.inventoryOpened = true;
                 //player.ResumeInteract(false);
                 break;
             case ActionStates.ACTION_CHEST_SELECT:
@@ -479,6 +480,7 @@ public class InventoryManager : MonoBehaviour
         _inputActions.Chest.Disable();
         inventoryUI.Hide();
         player.ToggleChestAnimation(false);
+        player.inventoryOpened = false;
         ChangeState(ActionStates.NOACTION);
     }
 

@@ -14,16 +14,18 @@ public class Settings : MonoBehaviour
     [SerializeField] Slider fovSlider;
     [SerializeField] Slider musicSlider;
     [SerializeField] Slider sfxSlider;
+    [SerializeField] Slider sensitivitySlider;
 
     [Header("General")]
     //booleano que controla si es la escena inicial o no.
     public bool isInitialScene;
     //Variables temporales para guardar el valor actual
-    [SerializeField] public float currentVolumeValue = 0;
-    [SerializeField] public float currentSfxValue = 0;
+    [SerializeField] public float currentVolumeValue = 1;
+    [SerializeField] public float currentSfxValue = 1;
     [SerializeField] public int currentFpsValue = 0;
     [SerializeField] public int currentVSyncState = 0;
     [SerializeField] public float currentFOVValue = 60;
+    [SerializeField] public float currentSensitivityValue = 30;
 
     public event Action onSaveConfig;
 
@@ -33,13 +35,6 @@ public class Settings : MonoBehaviour
     {
         StartOptions();
     }
-
-    private void Awake()
-    {
-        audioMixer.GetFloat("Music", out currentVolumeValue);
-        Debug.Log("Current Volume Value: " + currentVolumeValue);
-    }
-
     public void StartOptions()
     {
         fovSlider.value = currentFOVValue;
@@ -47,7 +42,7 @@ public class Settings : MonoBehaviour
         fpsDropdown.value = currentFpsValue;
         sfxSlider.value = currentSfxValue;
         musicSlider.value = currentVolumeValue;
-
+        sensitivitySlider.value = currentSensitivityValue;
         ApplySettings();
     }
 
@@ -61,6 +56,14 @@ public class Settings : MonoBehaviour
     {
         float volume = Mathf.Log10(sfxSlider.value) * 20;
         audioMixer.SetFloat("SFX", volume);
+    }
+
+    public void SetSensitivity()
+    {
+        if (!isInitialScene)
+        {
+            player.SetSensitivity(sensitivitySlider.value);
+        }
     }
 
     public void ToggleCheckVSync()
@@ -108,6 +111,7 @@ public class Settings : MonoBehaviour
         currentFpsValue = fpsDropdown.value;
         currentVolumeValue = musicSlider.value;
         currentSfxValue = sfxSlider.value;
+        currentSensitivityValue = sensitivitySlider.value;
     }
 
     public void ApplySettings()
@@ -117,6 +121,7 @@ public class Settings : MonoBehaviour
         SetVSync();
         SetVolume();
         SetSfxValue();
+        SetSensitivity();
         UpdateCurrentValues();
         onSaveConfig?.Invoke();
     }

@@ -9,4 +9,5 @@ public class SaveConfig
     public int FPSValue;
     public float FOVValue;
     public int VSync;
+    public float Sensitivity;
 }

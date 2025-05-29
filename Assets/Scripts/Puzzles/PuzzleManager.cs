@@ -98,6 +98,7 @@ public class PuzzleManager : MonoBehaviour
     private BoxCollider allWeapon;
     public bool weaponPuzzleCompleted { get; set; }
     [SerializeField] private Camera cam_WeaponPuzzle;
+    [SerializeField] private InteractuableWeapon weapon;
 
     [Header("Glitch")]
     [SerializeField]
@@ -239,7 +240,10 @@ public class PuzzleManager : MonoBehaviour
     public void HieroglyphicPuzzleExit(bool isCompleted)
     {
         if (isCompleted)
+        {
             cam_HieroglyphicAnimation2.gameObject.SetActive(false);
+            hieroglyphicAnimator2.enabled = false;
+        }
         else
             cam_Hierogliphic.gameObject.SetActive(false);
 
@@ -281,7 +285,7 @@ public class PuzzleManager : MonoBehaviour
             cam_doorsMorseAnimation.SetActive(false);
         else
             cam_morse.gameObject.SetActive(false);
-
+        
         player.ToggleInputPlayer(true, true);
         events.ToggleCustomPass(true);
         morseKeypad.inputActions.Morse.Disable();
@@ -408,6 +412,7 @@ public class PuzzleManager : MonoBehaviour
     public void ExitWeaponPuzzle()
     {
         cam_WeaponPuzzle.transform.parent.GetComponent<WeaponPuzzle>().inputAction.WeaponPuzzle.Disable();
+        weapon.isInteractuable = false;
         player.ResumeInteract(true);
         events.ToggleCustomPass(true);
         player._inputActions.Player.Enable();
