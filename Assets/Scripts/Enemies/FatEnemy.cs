@@ -18,7 +18,6 @@ public class FatEnemy : Enemy
 
     private NavMeshAgent _NavMeshAgent;
     private Vector3 _SoundPos;
-    private Vector3 _PointOfPatrol;
     [SerializeField] private bool _Patrolling;
     [SerializeField] private bool _Search;
     private bool _OpeningDoor;
@@ -42,7 +41,6 @@ public class FatEnemy : Enemy
         _Animator = GetComponent<Animator>();
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
-        _PointOfPatrol = transform.position;
         _RangeSearchSound = 25;
         _Patrolling = false;
         _Search = false;
@@ -147,8 +145,11 @@ public class FatEnemy : Enemy
                 }
                 else
                 {
-                    RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
-                    _Waypoint.transform.position = coord;
+                    if(_RangeSearchSound > 0)
+                    {
+                        RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
+                        _Waypoint.transform.position = coord;
+                    }
                 }
                 _Animator.SetBool("Idle", false);
                 _NavMeshAgent.SetDestination(_Waypoint.transform.position);
@@ -240,10 +241,11 @@ public class FatEnemy : Enemy
             }
             else if (lvlSound > 7)
             {
+                _RangeSearchSound = 0;
+                _Search = true;
                 _NavMeshAgent.SetDestination(_SoundPos);
             }
 
-            _PointOfPatrol = pos;
             if (_CurrentState == EnemyStates.PATROL)
                 ChangeState(EnemyStates.PATROL);
         }

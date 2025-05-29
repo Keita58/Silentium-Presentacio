@@ -253,6 +253,8 @@ public class FastEnemy : Enemy
                 }
                 else if (lvlSound > 7)
                 {
+                    _RangeSearchSound = 1;
+                    _Search = true;
                     _NavMeshAgent.SetDestination(_SoundPos);
                 }
 
@@ -296,8 +298,11 @@ public class FastEnemy : Enemy
                 }
                 else
                 {
-                    RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
-                    _Waypoint.transform.position = coord;
+                    if(_RangeSearchSound > 0)
+                    {
+                        RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
+                        _Waypoint.transform.position = coord;
+                    }
                 }
                 _Animator.Play("Walk");
                 _NavMeshAgent.SetDestination(_Waypoint.transform.position);

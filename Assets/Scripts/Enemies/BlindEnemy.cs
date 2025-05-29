@@ -169,8 +169,11 @@ public class BlindEnemy : Enemy
                 }
                 else
                 {
-                    RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
-                    point = coord;
+                    if(_RangeSearchSound > 0)
+                    {
+                        RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
+                        point = coord;
+                    }
                 }
                 _Animator.enabled = true;
                 _Patrolling = true;
@@ -291,6 +294,8 @@ public class BlindEnemy : Enemy
                 }
                 else if (Vector3.Distance(_SoundPos, transform.position) > 8)
                 {
+                    _RangeSearchSound = 0;
+                    _Search = true;
                     _NavMeshAgent.SetDestination(_SoundPos);
                 }
             }
