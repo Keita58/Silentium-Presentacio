@@ -57,7 +57,7 @@ public class Load : MonoBehaviour
 
     private void OnDestroy()
     {
-        //GameManager.instance.onLoadedScene -= LoadGame;
+        GameManager.instance.onLoadedScene -= LoadGame;
     }
 
     public void LoadGame()
