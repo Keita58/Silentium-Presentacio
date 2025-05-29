@@ -36,6 +36,8 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField]
     private AnimationClip HieroglyphicAnimation2;
     [SerializeField]
+    private Camera cam_HieroglyphicAnimation2;
+    [SerializeField]
     public bool isHieroglyphicCompleted { get; set; } 
     [SerializeField]
     TextMeshProUGUI riddlerText;
@@ -222,15 +224,20 @@ public class PuzzleManager : MonoBehaviour
         cam_Hierogliphic.transform.parent.GetComponent<InteractuablePaint>().isInteractuable = false;
         cam_HieroglyphicAnimation.gameObject.SetActive(true);
         hieroglyphicAnimator.Play("HieroDoor");
-        hieroglyphicAnimator2.Play(HieroglyphicAnimation2.name);
         animationTime = 0f;
         isHieroglyphicCompleted = true;
     }
 
+    public void HieroglyphicPuzzleExitAnimation2()
+    {
+        cam_HieroglyphicAnimation.gameObject.SetActive(false);
+        cam_HieroglyphicAnimation2.gameObject.SetActive(true);
+        hieroglyphicAnimator2.Play(HieroglyphicAnimation2.name);
+    }
     public void HieroglyphicPuzzleExit(bool isCompleted)
     {
         if (isCompleted)
-            cam_HieroglyphicAnimation.gameObject.SetActive(false);
+            cam_HieroglyphicAnimation2.gameObject.SetActive(false);
         else
             cam_Hierogliphic.gameObject.SetActive(false);
 
@@ -430,16 +437,16 @@ public class PuzzleManager : MonoBehaviour
                 isMorseCompleted = false;
             }
         }
-        else if (isHieroglyphicCompleted)
-        {
-            animationTime += Time.deltaTime;
-            if (animationTime >= 2.4f)
-            {
-                HieroglyphicPuzzleExit(true);
-                animationTime = 0f;
-                isHieroglyphicCompleted = false;
-            }
-        }
+        // else if (isHieroglyphicCompleted)
+        // {
+        //     animationTime += Time.deltaTime;
+        //     if (animationTime >= 2.4f)
+        //     {
+        //         HieroglyphicPuzzleExitAnimation2();
+        //         animationTime = 0f;
+        //         isHieroglyphicCompleted = false;
+        //     }
+        // }
         else if (glitchStarted)
         {
             animationTime += Time.deltaTime;
