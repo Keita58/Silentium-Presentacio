@@ -57,7 +57,7 @@ public class Load : MonoBehaviour
 
     private void OnDestroy()
     {
-        //GameManager.instance.onLoadedScene -= LoadGame;
+        GameManager.instance.onLoadedScene -= LoadGame;
     }
 
     public void LoadGame()
@@ -81,6 +81,8 @@ public class Load : MonoBehaviour
 
             foreach (var item in info.Inventory)
             {
+                Debug.Log(_Items.FromID(item.itemId));
+                Debug.Log(item.amount);
                 Inventory.Add(new ItemSlot(_Items.FromID(item.itemId), item.amount, item.stackable));
             }
 

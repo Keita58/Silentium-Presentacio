@@ -461,15 +461,17 @@ public class Player : MonoBehaviour
                 break;
             case PlayerStates.MOVE:
                 playerAudioSource.Stop();
+                playerAudioSource.resource = walkAudio;
                 playerAudioSource.loop = true;
-                playerAudioSource.PlayOneShot(walkAudio);
+                playerAudioSource.Play();
                 if (coroutineMove == null)
                     coroutineMove = StartCoroutine(MakeNoiseMove());
                 break;
             case PlayerStates.RUN:
                 playerAudioSource.Stop();
-                playerAudioSource.PlayOneShot(runAudio);
+                playerAudioSource.resource = runAudio;
                 playerAudioSource.loop = true;
+                playerAudioSource.Play();
                 if (coroutineRun == null)
                     coroutineRun = StartCoroutine(MakeNoiseRun());
                 break;
