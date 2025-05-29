@@ -475,8 +475,8 @@ public class Player : MonoBehaviour
                 break;
             case PlayerStates.CROUCH:
                 playerAudioSource.Stop();
-                this.GetComponent<CharacterController>().center = new Vector3(0f, crouchedCenterCollider, 0f);
-                this.GetComponent<CharacterController>().height = crouchedHeightCollider;
+                //this.GetComponent<CharacterController>().center = new Vector3(0f, crouchedCenterCollider, 0f);
+                //this.GetComponent<CharacterController>().height = crouchedHeightCollider;
                 _Camera.transform.localPosition = new Vector3(0f, 0f, -0.198f);
                 cameraShenanigansGameObject.transform.localPosition = Vector3.zero;
                 _VelocityMove /= 2;
@@ -543,7 +543,7 @@ public class Player : MonoBehaviour
                 break;
             case PlayerStates.CROUCH:
                 velocity = (transform.right * movementInput.x +
-               transform.forward * movementInput.y).normalized * 1.5f;
+                transform.forward * movementInput.y).normalized * 1.5f;
                 vSpeed -= gravity * Time.deltaTime;
                 velocity.y = vSpeed;
                 if (!crouched || crouched && movementInput == Vector2.zero)
@@ -607,8 +607,8 @@ public class Player : MonoBehaviour
                 }
                 break;
             case PlayerStates.CROUCH_IDLE:
-                this.GetComponent<CharacterController>().center = Vector3.zero;
-                this.GetComponent<CharacterController>().height = 2;
+                //this.GetComponent<CharacterController>().center = Vector3.zero;
+                //this.GetComponent<CharacterController>().height = 2;
                 _Camera.transform.localPosition = cameraPositionBeforeCrouch;
                 cameraShenanigansGameObject.transform.localPosition = new Vector3(0f, _Camera.transform.localPosition.y, 0f);
                 _VelocityMove *= 2;

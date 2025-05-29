@@ -101,7 +101,7 @@ public class FastEnemy : Enemy
                 _Animator.Play("Walk");
                 break;
             case EnemyStates.CHASE:
-                _NavMeshAgent.speed = 5.5f;
+                _NavMeshAgent.speed = 7f;
                 _Animator.Play("Run");
                 break;
             case EnemyStates.ATTACK:
