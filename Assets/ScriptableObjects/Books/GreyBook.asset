@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0565a32bb9bd17448a823454a37be7ee, type: 3}
   m_Name: GreyBook
   m_EditorClassIdentifier: 
-  nom: Libro gris
+  itemName: Libro gris
   description: "\xCDtem importante."
   sprite: {fileID: 21300000, guid: 8dc908b08fd774f468e5552c391a139d, type: 3}
   prefab: {fileID: 3081806356842722468, guid: 12cedb7171e3a4b4abb90fb7b16b8110, type: 3}

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52b09abc5cdd88f4f848ebba177628f0, type: 3}
   m_Name: ImageSave
   m_EditorClassIdentifier: 
-  nom: "Fotograf\xEDa"
+  itemName: "Fotograf\xEDa"
   description: "Radiograf\xEDa de un cerebro da\xF1ado por una enfermedad. Extra\xF1amente
     te resulta familiar..."
   sprite: {fileID: 21300000, guid: 8271d9a15aa1bbd4a9465843f80d401e, type: 3}
