@@ -382,7 +382,10 @@ public class FatEnemy : Enemy
 
     private void ActivateAttack()
     {
-        ChangeState(EnemyStates.ATTACK);
+        Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit thing, 12,
+            _LayerObjectsAndPlayer);
+        if(thing.transform.CompareTag("Player"))
+            ChangeState(EnemyStates.ATTACK);
     }
 
     private void DeactivateAttack()

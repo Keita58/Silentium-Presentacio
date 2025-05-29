@@ -465,11 +465,17 @@ public class FastEnemy : Enemy
                                     }
                                     else if (Vector3.Distance(info.transform.position, transform.position) <= 2)
                                     {
-                                        Debug.Log("Tinc al jugador al davant!");
-                                        _NavMeshAgent.SetDestination(transform.position);
-                                        if (_CurrentState != EnemyStates.ATTACK)
+                                        Physics.Raycast(transform.position,
+                                            (_Player.transform.position - transform.position), out RaycastHit thing, 12,
+                                            _LayerObjectsAndPlayer);
+                                        if (thing.transform.CompareTag("Player"))
                                         {
-                                            ChangeState(EnemyStates.ATTACK);
+                                            Debug.Log("Tinc al jugador al davant!");
+                                            _NavMeshAgent.SetDestination(transform.position);
+                                            if (_CurrentState != EnemyStates.ATTACK)
+                                            {
+                                                ChangeState(EnemyStates.ATTACK);
+                                            }
                                         }
                                     }
                                 }

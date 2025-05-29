@@ -14,7 +14,8 @@ GameObject:
   - component: {fileID: 4933968777634795064}
   - component: {fileID: 5460850022213709527}
   - component: {fileID: 1338587082531646008}
-  m_Layer: 0
+  - component: {fileID: -4099720388793982951}
+  m_Layer: 11
   m_Name: bottle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -67,7 +68,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 1197f919477478b4584a92ad4e5aedeb, type: 2}
+  - {fileID: 2100000, guid: 796f95cb44fbaf64894418705acbb45d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -150,3 +151,16 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.19462459, y: 0.49589843, z: 0.17183739}
   m_Center: {x: -0.0015408173, y: 0.012078911, z: -0.007849555}
+--- !u!114 &-4099720388793982951
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9169805650554429789}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67bc616bdac473e4ab8793e1deb2be30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  events: {fileID: 11400000, guid: f00603c9116a40e4d91df0c25019e760, type: 2}
