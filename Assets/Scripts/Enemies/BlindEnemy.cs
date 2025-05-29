@@ -42,8 +42,13 @@ public class BlindEnemy : Enemy
     private Coroutine _AttackCoroutine;
     private Coroutine _RestoreCoroutine;
 
+    [Header("Audio")]
+    AudioSource _blindAudioSource;
+    [SerializeField]
+    AudioClip _blindAudioClip;
     private void Awake()
     {
+        _blindAudioSource = GetComponent<AudioSource>();
         _Animator = GetComponent<Animator>();
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
@@ -73,6 +78,7 @@ public class BlindEnemy : Enemy
     private void Start()
     {
         InitState(EnemyStates.PATROL);
+        _blindAudioSource.Play();
     }
 
     #region FSM

@@ -41,9 +41,18 @@ public class FastEnemy : Enemy
     private Coroutine _ChangeToPatrolCoroutine;
     private Coroutine _AttackCoroutine;
     private Coroutine _ActivateLookingCoroutine;
-
+    [Header("Audio")]
+    AudioSource _fastAudioSource;
+    [SerializeField]
+    AudioClip _fastAudioClip;
+    [SerializeField]
+    AudioClip _fastShoutAudioClip;
+    [SerializeField]
+    AudioClip _fastRunAudioClip;
+    bool firstTime;
     private void Awake()
     {
+        _fastAudioSource = GetComponent<AudioSource>();
         _Animator = GetComponent<Animator>();
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
@@ -54,12 +63,11 @@ public class FastEnemy : Enemy
         _Patrolling = false;
         _OpeningDoor = false;
         _Hp = MAXHEALTH;
-
+        firstTime = true;
         _PatrolCoroutine = null;
         _ChangeToPatrolCoroutine = null;
         _AttackCoroutine = null;
         _ActivateLookingCoroutine = null;
-
         _DetectionSphere.GetComponent<DetectionSphere>().OnEnter += ActivateLookingCoroutine;
         _DetectionSphere.GetComponent<DetectionSphere>().OnExit += DeactivateLookingCoroutine;
         _DetectionDoors.GetComponent<DetectionDoorSphere>().OnDetectDoor += OpenDoors;
@@ -96,6 +104,7 @@ public class FastEnemy : Enemy
         switch (_CurrentState)
         {
             case EnemyStates.PATROL:
+                firstTime = true;
                 _Patrolling = false;
                 _PatrolCoroutine = StartCoroutine(Patrol());
                 _Animator.Play("Walk");
@@ -415,6 +424,11 @@ public class FastEnemy : Enemy
                     {
                         if (info.transform.tag == "Player")
                         {
+                            if (firstTime)
+                            {
+                                _fastAudioSource.PlayOneShot(_fastShoutAudioClip, 6.5f);
+                                firstTime = false;
+                            }
                             if (!_Looking)
                             {
                                 transform.LookAt(new Vector3(info.transform.position.x, 0.9f, info.transform.position.z));
@@ -423,8 +437,10 @@ public class FastEnemy : Enemy
 
                             if (alphaLook < -0.8f)
                             {
-                                if(_CurrentState != EnemyStates.STOPPED)
+                                if (_CurrentState != EnemyStates.STOPPED)
                                 {
+                                    _fastAudioSource.resource = _fastAudioClip;
+                                    _fastAudioSource.Play();
                                     _NavMeshAgent.SetDestination(transform.position);
                                     ChangeState(EnemyStates.STOPPED);
                                 }
@@ -441,6 +457,8 @@ public class FastEnemy : Enemy
                                         Debug.Log("Veig al jugador lluny");
                                         if (_CurrentState != EnemyStates.CHASE)
                                         {
+                                            _fastAudioSource.resource = _fastRunAudioClip;
+                                            _fastAudioSource.Play();
                                             _RangeChaseAfterStop = 28;
                                             ChangeState(EnemyStates.CHASE);
                                         }
@@ -494,8 +512,9 @@ public class FastEnemy : Enemy
 
     private void ActivateLookingCoroutine()
     {
+
         if (_ActivateLookingCoroutine == null)
-            _ActivateLookingCoroutine = StartCoroutine(LookingPlayer());
+            _ActivateLookingCoroutine = StartCoroutine(LookingPlayer());        
     }
 
     private void DeactivateLookingCoroutine()
