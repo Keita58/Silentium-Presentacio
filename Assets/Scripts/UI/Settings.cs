@@ -19,19 +19,25 @@ public class Settings : MonoBehaviour
     //booleano que controla si es la escena inicial o no.
     public bool isInitialScene;
     //Variables temporales para guardar el valor actual
-    [SerializeField] public float currentVolumeValue;
-    [SerializeField] public float currentSfxValue;
+    [SerializeField] public float currentVolumeValue = 0;
+    [SerializeField] public float currentSfxValue = 0;
     [SerializeField] public int currentFpsValue = 0;
     [SerializeField] public int currentVSyncState = 0;
     [SerializeField] public float currentFOVValue = 60;
 
     public event Action onSaveConfig;
 
-    //Cuando el usuario abre el menu de opciones se ponen los valores de los componentes según el valor de las variables temporales
-    //si no se ha modificado nada, pues se quedan los valores mínimos, si no se ponen los valores guardados anteriormente.
+    //Cuando el usuario abre el menu de opciones se ponen los valores de los componentes segun el valor de las variables temporales
+    //si no se ha modificado nada, pues se quedan los valores minimos, si no se ponen los valores guardados anteriormente.
     private void OnEnable()
     {
         StartOptions();
+    }
+
+    private void Awake()
+    {
+        audioMixer.GetFloat("Music", out currentVolumeValue);
+        Debug.Log("Current Volume Value: " + currentVolumeValue);
     }
 
     public void StartOptions()
@@ -39,17 +45,22 @@ public class Settings : MonoBehaviour
         fovSlider.value = currentFOVValue;
         vSyncToggle.isOn = currentVSyncState == 1 ? true:false;
         fpsDropdown.value = currentFpsValue;
+        sfxSlider.value = currentSfxValue;
+        musicSlider.value = currentVolumeValue;
 
         ApplySettings();
     }
 
     public void SetVolume()
     {
-        audioMixer.SetFloat("Volume", musicSlider.value);
+        float volume = Mathf.Log10(musicSlider.value) * 20;
+        audioMixer.SetFloat("Music", volume);
     }
 
     public void SetSfxValue()
     {
+        float volume = Mathf.Log10(sfxSlider.value) * 20;
+        audioMixer.SetFloat("SFX", volume);
     }
 
     public void ToggleCheckVSync()
@@ -68,7 +79,6 @@ public class Settings : MonoBehaviour
             3=> 120,
             _ => -1 //default
         };
-
     }
 
     public void ChangeTextVSync()
@@ -90,12 +100,14 @@ public class Settings : MonoBehaviour
         }
     }
 
-    //Si se le da al botón de aplicar actualizamos las variables temporales.
+    //Si se le da al botï¿½n de aplicar actualizamos las variables temporales.
     private void UpdateCurrentValues()
     {
         currentFOVValue = fovSlider.value;
         currentVSyncState = QualitySettings.vSyncCount;
         currentFpsValue = fpsDropdown.value;
+        currentVolumeValue = musicSlider.value;
+        currentSfxValue = sfxSlider.value;
     }
 
     public void ApplySettings()
@@ -103,9 +115,9 @@ public class Settings : MonoBehaviour
         SetFPS();
         SetFOV();
         SetVSync();
+        SetVolume();
+        SetSfxValue();
         UpdateCurrentValues();
-        //SetVolume();
-        //SetSfxValue();
         onSaveConfig?.Invoke();
     }
 
