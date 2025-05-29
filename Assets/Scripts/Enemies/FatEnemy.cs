@@ -37,8 +37,14 @@ public class FatEnemy : Enemy
     private Coroutine _AttackCoroutine;
     private Coroutine _ChangeToPatrolCoroutine;
 
+    [Header("Audio")]
+    private AudioSource _fatAudioSource;
+    [SerializeField]
+    AudioClip _fatAudioClip;
     private void Awake()
     {
+        _fatAudioSource = GetComponent<AudioSource>();
+        _fatAudioSource.loop = true;
         _Animator = GetComponent<Animator>();
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
@@ -64,6 +70,7 @@ public class FatEnemy : Enemy
     private void Start()
     {
         InitState(EnemyStates.PATROL);
+        _fatAudioSource.Play();
     }
 
     #region FSM
