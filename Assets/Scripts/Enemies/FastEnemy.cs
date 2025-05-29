@@ -68,6 +68,7 @@ public class FastEnemy : Enemy
         _ChangeToPatrolCoroutine = null;
         _AttackCoroutine = null;
         _ActivateLookingCoroutine = null;
+        
         _DetectionSphere.GetComponent<DetectionSphere>().OnEnter += ActivateLookingCoroutine;
         _DetectionSphere.GetComponent<DetectionSphere>().OnExit += DeactivateLookingCoroutine;
         _DetectionDoors.GetComponent<DetectionDoorSphere>().OnDetectDoor += OpenDoors;
@@ -106,7 +107,8 @@ public class FastEnemy : Enemy
             case EnemyStates.PATROL:
                 firstTime = true;
                 _Patrolling = false;
-                _PatrolCoroutine = StartCoroutine(Patrol());
+                if(_PatrolCoroutine == null)
+                    _PatrolCoroutine = StartCoroutine(Patrol());
                 _Animator.Play("Walk");
                 break;
             case EnemyStates.CHASE:
@@ -149,7 +151,11 @@ public class FastEnemy : Enemy
         switch (exitState)
         {
             case EnemyStates.PATROL:
-                StopCoroutine(_PatrolCoroutine);
+                if (_PatrolCoroutine != null)
+                {
+                    StopCoroutine(_PatrolCoroutine);
+                    _PatrolCoroutine = null;
+                }
                 if(_ChangeToPatrolCoroutine != null)
                 {
                     StopCoroutine(_ChangeToPatrolCoroutine);
@@ -266,10 +272,8 @@ public class FastEnemy : Enemy
                     _Search = true;
                     _NavMeshAgent.SetDestination(_SoundPos);
                 }
-
                 ChangeState(EnemyStates.PATROL);
             }
-
             _LastLvlSound = lvlSound;
         }
 
@@ -350,7 +354,8 @@ public class FastEnemy : Enemy
         }
         else if (aux2.Length > 0)
         {
-            _ActivateLookingCoroutine = StartCoroutine(LookingPlayer());
+            if(_ActivateLookingCoroutine == null)
+                _ActivateLookingCoroutine = StartCoroutine(LookingPlayer());
             ChangeState(EnemyStates.CHASE);
         }
         else

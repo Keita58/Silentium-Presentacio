@@ -60,6 +60,7 @@ public class BlindEnemy : Enemy
         _Jumping = false;
         _Hp = MAXHEALTH;
 
+        _PatrolCoroutine = null;
         _AttackCoroutine = null;
         _ChangeStateToPatrol = null;
         
@@ -85,8 +86,6 @@ public class BlindEnemy : Enemy
 
     private void ChangeState(EnemyStates newState)
     {
-        //if (_CurrentState == newState) return;
-
         Debug.Log($"---------------------- Sortint de {_CurrentState} a {newState} ------------------------");
         ExitState(_CurrentState);
 
@@ -101,7 +100,8 @@ public class BlindEnemy : Enemy
         switch (_CurrentState)
         {
             case EnemyStates.PATROL:
-                _PatrolCoroutine = StartCoroutine(Patrol());
+                if(_PatrolCoroutine == null)
+                    _PatrolCoroutine = StartCoroutine(Patrol());
                 break;
             case EnemyStates.ATTACK:
                 _NavMeshAgent.isStopped = true;
@@ -118,7 +118,11 @@ public class BlindEnemy : Enemy
         {
             case EnemyStates.PATROL:
                 _Patrolling = false;
-                StopCoroutine(_PatrolCoroutine);
+                if (_PatrolCoroutine != null)
+                {
+                    StopCoroutine(_PatrolCoroutine);
+                    _PatrolCoroutine = null;
+                }
                 if (_ChangeStateToPatrol != null)
                 {
                     StopCoroutine(_ChangeStateToPatrol);
@@ -157,7 +161,7 @@ public class BlindEnemy : Enemy
                         }
                         else
                         {
-                            int random = Random.Range(0, 2);
+                            int random = Random.Range(0, 3);
 
                             switch (random)
                             {
@@ -165,6 +169,7 @@ public class BlindEnemy : Enemy
                                     point = _WaypointsFirstPart[Random.Range(0, _WaypointsFirstPart.Count)].transform.position;
                                     break;
                                 case 1:
+                                case 2:
                                     point = _WaypointsSecondPart[Random.Range(0, _WaypointsSecondPart.Count)].transform.position;
                                     break;
                             }
