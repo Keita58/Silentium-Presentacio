@@ -8,13 +8,13 @@ public class DetectionSphere : MonoBehaviour
     
     private void OnTriggerEnter(Collider other)
     {
-        if (other.transform.CompareTag("Player"))
+        if (other.TryGetComponent(out Player player))
             OnEnter?.Invoke();
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if(other.transform.CompareTag("Player"))
+        if(other.TryGetComponent(out Player player))
             OnExit?.Invoke();
     }
 }

@@ -357,11 +357,6 @@ public class FatEnemy : Enemy
         }
     }
 
-    private void AttackPlayer()
-    {
-        _Player.GetComponent<Player>().TakeDamage(1);
-    }
-
     IEnumerator ChangeToPatrol(float time)
     {
         yield return new WaitForSeconds(time);

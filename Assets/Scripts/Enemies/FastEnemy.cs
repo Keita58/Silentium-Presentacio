@@ -371,11 +371,6 @@ public class FastEnemy : Enemy
         }
     }
 
-    private void AttackPlayer()
-    {
-        _Player.GetComponent<Player>().TakeDamage(3);
-    }
-
     private void OpenDoors(Door door)
     {
         if (!door.isLocked && !door.isOpen && !_OpeningDoor)

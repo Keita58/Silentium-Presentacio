@@ -64,14 +64,12 @@ public class BlindEnemy : Enemy
         _ChangeStateToPatrol = null;
         
         _DetectionSphere.GetComponent<DetectionSphere>().OnEnter += OnEnter;
-        _DetectionSphere.GetComponent<DetectionSphere>().OnExit += OnExit;
         _DetectionDoors.GetComponent<DetectionDoorSphere>().OnDetectDoor += OpenDoors;
     }
 
     private void OnDestroy()
     {
         _DetectionSphere.GetComponent<DetectionSphere>().OnEnter -= OnEnter;
-        _DetectionSphere.GetComponent<DetectionSphere>().OnExit -= OnExit;
         _DetectionDoors.GetComponent<DetectionDoorSphere>().OnDetectDoor -= OpenDoors;
     }
 
@@ -383,17 +381,6 @@ public class BlindEnemy : Enemy
         _Jumping = false;
     }
 
-    IEnumerator Attack()
-    {
-        while (true)
-        {
-            Debug.Log("Entro a l'atac");
-            _Player.GetComponent<Player>().TakeDamage(2);
-            Debug.Log("Estic fent mal (Enemic cec)");
-            yield return new WaitForSeconds(1);
-        }
-    }
-
     private void OnEnter()
     {
         if(_CurrentState != EnemyStates.KNOCKED)
@@ -409,25 +396,6 @@ public class BlindEnemy : Enemy
                 _NavMeshAgent.enabled = true;
             if(_CurrentState != EnemyStates.ATTACK)
                 ChangeState(EnemyStates.ATTACK);
-            if (_AttackCoroutine == null)
-                _AttackCoroutine = StartCoroutine(Attack());
-        }
-    }
-
-    private void OnExit()
-    {
-        if(_CurrentState != EnemyStates.KNOCKED)
-        {
-            if (_AttackCoroutine != null)
-            {
-                StopCoroutine(_AttackCoroutine);
-                _AttackCoroutine = null;
-            }
-
-            _Search = true;
-            _RangeSearchSound = 0.5f;
-            ChangeState(EnemyStates.PATROL);
-            Debug.Log("Activo l'estat de Patrol");
         }
     }
 }
