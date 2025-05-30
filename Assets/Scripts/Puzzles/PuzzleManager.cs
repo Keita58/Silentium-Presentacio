@@ -266,6 +266,7 @@ public class PuzzleManager : MonoBehaviour
             Cursor.visible = false;
             animationTime = 0f;
             unlockDoor.isLocked = false;
+            unlockDoor.Open(new Vector3());
         }
     }
 

@@ -37,6 +37,7 @@ public class FatEnemy : Enemy
     private Coroutine _AttackCoroutine;
     private Coroutine _ChangeToPatrolCoroutine;
     private Coroutine _ChaseCoroutine;
+    private Coroutine _ChangeToChase;
 
     [Header("Audio")]
     private AudioSource _fatAudioSource;
@@ -56,6 +57,7 @@ public class FatEnemy : Enemy
         _Hp = MAXHEALTH;
 
         _ChaseCoroutine = null;
+        _ChangeToChase = null;
 
         _DetectionSphere.GetComponent<DetectionSphere>().OnEnter += ActivateChaseCoroutine;
         _DetectionSphere.GetComponent<DetectionSphere>().OnExit += DeactivateChaseCoroutine;
@@ -133,7 +135,16 @@ public class FatEnemy : Enemy
                 }
                 break;
             case EnemyStates.ATTACK:
-                StopCoroutine(_AttackCoroutine);
+                if(_AttackCoroutine != null)
+                {
+                    StopCoroutine(_AttackCoroutine);
+                    _AttackCoroutine = null;
+                }
+                if(_ChangeToChase != null)
+                {
+                    StopCoroutine(_ChangeToChase);
+                    _ChangeToChase = null;
+                }
                 _NavMeshAgent.SetDestination(transform.position);
                 break;
             case EnemyStates.KNOCKED:
@@ -379,12 +390,31 @@ public class FatEnemy : Enemy
     {
         Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit thing, 12,
             _LayerObjectsAndPlayer);
-        if(thing.transform.CompareTag("Player"))
+        if(thing.transform.gameObject.TryGetComponent(out Player player))
+        {
+            _Animator.SetBool("Chase", false);
             ChangeState(EnemyStates.ATTACK);
+        }
     }
 
     private void DeactivateAttack()
     {
-        ChangeState(EnemyStates.CHASE);
+        _Animator.SetBool("Chase", true);
+        if(_ChangeToChase == null)
+            StartCoroutine(ChangeToChase());
+    }
+
+    IEnumerator ChangeToChase()
+    {
+        while(true)
+        {
+            if (!_Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack"))
+            {
+                ChangeState(EnemyStates.CHASE);
+                break;
+            }
+
+            yield return new WaitForSeconds(0.1f);
+        }
     }
 }
