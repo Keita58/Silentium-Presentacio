@@ -45,6 +45,8 @@ public class BlindEnemy : Enemy
     AudioSource _BlindAudioSource;
     [SerializeField]
     AudioClip _blindAudioClip;
+    [SerializeField]
+    AudioClip _blindAttackAudioClip;
     private void Awake()
     {
         _Rigidbody = GetComponent<Rigidbody>();
@@ -99,7 +101,9 @@ public class BlindEnemy : Enemy
         switch (_CurrentState)
         {
             case EnemyStates.PATROL:
-                if(_PatrolCoroutine == null)
+                _BlindAudioSource.resource = _blindAudioClip;
+                _BlindAudioSource.Play();
+                if (_PatrolCoroutine == null)
                     _PatrolCoroutine = StartCoroutine(Patrol());
                 break;
             case EnemyStates.ATTACK:
@@ -302,6 +306,7 @@ public class BlindEnemy : Enemy
 
                     //No necessiten comprovació ja que només entrarà aquí quan pugui tornar a saltar,
                     //que es recupera quan acaba la corutina de RecoverJump
+                    _BlindAudioSource.PlayOneShot(_blindAttackAudioClip);
                     StartCoroutine(RecoverAgent());
                     StartCoroutine(RecoverJump());
                 }

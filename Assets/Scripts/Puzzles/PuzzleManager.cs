@@ -261,7 +261,7 @@ public class PuzzleManager : MonoBehaviour
         if(isHieroglyphicCompleted)
         {
             cam_Hierogliphic.gameObject.SetActive(false);
-            cam_Hierogliphic.transform.parent.GetComponent<Keypad>().inputActions.Hieroglyphic.Disable();
+            cam_Hierogliphic.transform.parent.GetComponent<LineRendererExample>()._inputAction.Hieroglyphic.Disable();
             cam_Player.gameObject.SetActive(true);
             Cursor.visible = false;
             animationTime = 0f;
