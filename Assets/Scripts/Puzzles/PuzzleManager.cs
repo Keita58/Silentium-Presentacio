@@ -301,7 +301,7 @@ public class PuzzleManager : MonoBehaviour
         cam_Player.gameObject.SetActive(false);
         cam_morse.gameObject.SetActive(true);
         events.ToggleCustomPass(true);
-        player._inputActions.Player.Disable();
+        player.ToggleInputPlayer(false, false);
         morseKeypad.inputActions.Morse.Enable();
         player.ResumeInteract(false);
         Cursor.visible = true;

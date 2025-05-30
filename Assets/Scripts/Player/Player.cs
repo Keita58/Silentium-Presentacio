@@ -160,6 +160,7 @@ public class Player : MonoBehaviour
             _inputActions.Player.Crouch.Disable();
             _inputActions.Player.PickUpItem.Disable();
             _RunAction.Disable();
+            _MoveAction.Disable();
         }
         else
         {
@@ -171,6 +172,7 @@ public class Player : MonoBehaviour
             _inputActions.Player.Crouch.Enable();
             _inputActions.Player.PickUpItem.Enable();
             _RunAction.Enable();
+            _MoveAction.Enable();
             //OnToggleUI?.Invoke(true);
         }
 
