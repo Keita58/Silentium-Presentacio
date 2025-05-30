@@ -14,10 +14,8 @@ public class StartMenuButtons : MonoBehaviour
     {
         string temporalExistingFile = Application.persistentDataPath + "/" + _TemporalSavefileName;
         string existingFile = Application.persistentDataPath + "/" + _SavefileName;
-
-        string jsonContent = "";
-
-       loadButton.interactable = File.Exists(temporalExistingFile) || File.Exists(existingFile) ? true : false;
+        
+        loadButton.interactable = File.Exists(temporalExistingFile) || File.Exists(existingFile);
     }
 
     public void NewGame()

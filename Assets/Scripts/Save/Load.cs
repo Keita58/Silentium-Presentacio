@@ -188,6 +188,7 @@ public class Load : MonoBehaviour
             _Settings.currentFpsValue = info.FPSValue;
             _Settings.currentFOVValue = info.FOVValue;
             _Settings.currentVSyncState = info.VSync;
+            _Settings.currentSensitivityValue = info.Sensitivity;
         }
 
         //_Settings.isInitialScene = true;

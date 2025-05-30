@@ -21,12 +21,12 @@ public class BlindEnemy : Enemy
 
     private NavMeshAgent _NavMeshAgent;
     private Vector3 _SoundPos;
-    private Vector3 _PointOfPatrol;
     [SerializeField] private bool _Patrolling;
     [SerializeField] private bool _Search;
     private bool _OpeningDoor;
     private bool _Jumping;
     private Animator _Animator;
+    private Rigidbody _Rigidbody;
 
     private int _Hp;
     public override int hp => _Hp;
@@ -40,19 +40,18 @@ public class BlindEnemy : Enemy
     private Coroutine _PatrolCoroutine;
     private Coroutine _ChangeStateToPatrol;
     private Coroutine _AttackCoroutine;
-    private Coroutine _RestoreCoroutine;
 
     [Header("Audio")]
-    AudioSource _blindAudioSource;
+    AudioSource _BlindAudioSource;
     [SerializeField]
     AudioClip _blindAudioClip;
     private void Awake()
     {
-        _blindAudioSource = GetComponent<AudioSource>();
+        _Rigidbody = GetComponent<Rigidbody>();
+        _BlindAudioSource = GetComponent<AudioSource>();
         _Animator = GetComponent<Animator>();
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
-        _PointOfPatrol = transform.position;
         _RangeSearchSound = 55;
         _Patrolling = false;
         _Search = false;
@@ -79,7 +78,7 @@ public class BlindEnemy : Enemy
     private void Start()
     {
         InitState(EnemyStates.PATROL);
-        _blindAudioSource.Play();
+        _BlindAudioSource.Play();
     }
 
     #region FSM
@@ -130,7 +129,6 @@ public class BlindEnemy : Enemy
                 }
                 break;
             case EnemyStates.ATTACK:
-                _PointOfPatrol = transform.position;
                 _RangeSearchSound = 25;
                 _NavMeshAgent.isStopped = false;
                 break;
@@ -240,7 +238,7 @@ public class BlindEnemy : Enemy
     {
         bool wall = false;
         _SoundPos = pos;
-        RaycastHit[] hits = Physics.RaycastAll(this.transform.position, _SoundPos - this.transform.position, Vector3.Distance(_SoundPos, this.transform.position));
+        RaycastHit[] hits = Physics.RaycastAll(transform.position, _SoundPos - transform.position, Vector3.Distance(_SoundPos, this.transform.position));
 
         foreach (RaycastHit hit in hits)
         {
@@ -251,10 +249,11 @@ public class BlindEnemy : Enemy
             }
         }
 
-        float dist = Vector3.Distance(this.transform.position, _SoundPos);
+        //Distància del cec fins al punt del so
+        float dist = Vector3.Distance(transform.position, _SoundPos);
         Debug.Log($"Distància entre cec i punt de so: {dist}");
 
-        if (dist < 10 && Physics.Raycast(this.transform.position, (_Player.transform.position - transform.position), out RaycastHit info, dist, _LayerObjectsAndPlayer))
+        if (dist < 10 && Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit info, dist, _LayerObjectsAndPlayer))
         {
             if (info.collider.TryGetComponent<Player>(out _))
             {
@@ -262,7 +261,7 @@ public class BlindEnemy : Enemy
             }
             else
             {
-                lvlSound = 2;
+                lvlSound = 3;
             }
         }
 
@@ -287,20 +286,23 @@ public class BlindEnemy : Enemy
             }
             else if (lvlSound > 5)
             {
-                if (Vector3.Distance(_SoundPos, transform.position) > 1.5f && Vector3.Distance(_SoundPos, transform.position) <= 8 && !wall && !_Jumping)
+                if (dist > 1.5f && dist <= 8 && !wall && !_Jumping)
                 {
                     Debug.Log("Faig salt!");
                     _Jumping = true;
                     ExitState(_CurrentState);
+                    _Animator.enabled = false;
                     Vector3 start = transform.position;
                     Vector3 end = _SoundPos;
 
                     _NavMeshAgent.enabled = false;
-                    GetComponent<Rigidbody>().isKinematic = false;
-                    GetComponent<Rigidbody>().AddForce((end - start) * 70 * Vector3.Distance(_SoundPos, transform.position));
+                    _Rigidbody.isKinematic = false;
+                    _Rigidbody.AddForce((end - start) * 100);
                     transform.rotation = Quaternion.LookRotation(Vector3.RotateTowards(transform.forward, (end - start), 20, 0));
 
-                    _RestoreCoroutine = StartCoroutine(RecoverAgent());
+                    //No necessiten comprovació ja que només entrarà aquí quan pugui tornar a saltar,
+                    //que es recupera quan acaba la corutina de RecoverJump
+                    StartCoroutine(RecoverAgent());
                     StartCoroutine(RecoverJump());
                 }
                 else if (Vector3.Distance(_SoundPos, transform.position) > 8)
@@ -308,10 +310,12 @@ public class BlindEnemy : Enemy
                     _RangeSearchSound = 0;
                     _Search = true;
                     _NavMeshAgent.SetDestination(_SoundPos);
+                    Debug.Log($"Soc l'enemic cec i vaig al punt {_NavMeshAgent.destination}");
                 }
             }
-
-            ChangeState(EnemyStates.PATROL);
+            
+            if(lvlSound <= 5)
+                ChangeState(EnemyStates.PATROL);
         }
     }
 
@@ -366,8 +370,9 @@ public class BlindEnemy : Enemy
     IEnumerator RecoverAgent()
     {
         yield return new WaitForSeconds(1f);
-        GetComponent<Rigidbody>().isKinematic = true;
+        _Rigidbody.isKinematic = true;
         _NavMeshAgent.enabled = true;
+        _Animator.enabled = true;
         if (_CurrentState != EnemyStates.ATTACK)
             ChangeState(EnemyStates.PATROL);
     }
@@ -402,7 +407,8 @@ public class BlindEnemy : Enemy
 
             if (!_NavMeshAgent.enabled)
                 _NavMeshAgent.enabled = true;
-            ChangeState(EnemyStates.ATTACK);
+            if(_CurrentState != EnemyStates.ATTACK)
+                ChangeState(EnemyStates.ATTACK);
             if (_AttackCoroutine == null)
                 _AttackCoroutine = StartCoroutine(Attack());
         }
@@ -420,7 +426,6 @@ public class BlindEnemy : Enemy
 
             _Search = true;
             _RangeSearchSound = 0.5f;
-            _PointOfPatrol = transform.position;
             ChangeState(EnemyStates.PATROL);
             Debug.Log("Activo l'estat de Patrol");
         }

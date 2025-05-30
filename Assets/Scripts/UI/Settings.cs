@@ -35,6 +35,7 @@ public class Settings : MonoBehaviour
     {
         StartOptions();
     }
+    
     public void StartOptions()
     {
         fovSlider.value = currentFOVValue;
