@@ -253,6 +253,7 @@ public class BlindEnemy : Enemy
 
         //Distància del cec fins al punt del so
         float dist = Vector3.Distance(transform.position, _SoundPos);
+        float distPlayer = Vector3.Distance(transform.position, _Player.transform.position);
         Debug.Log($"Distància entre cec i punt de so: {dist}");
 
         if (dist < 10 && Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit info, dist, _LayerObjectsAndPlayer))
@@ -299,8 +300,10 @@ public class BlindEnemy : Enemy
 
                     _NavMeshAgent.enabled = false;
                     _Rigidbody.isKinematic = false;
+
+                    //transform.rotation = Quaternion.LookRotation(Vector3.RotateTowards(transform.forward, _SoundPos, 20, 0));
+                    transform.LookAt(_SoundPos);
                     _Rigidbody.AddForce((end - start) * 100);
-                    transform.rotation = Quaternion.LookRotation(Vector3.RotateTowards(transform.forward, (end - start), 20, 0));
 
                     //No necessiten comprovació ja que només entrarà aquí quan pugui tornar a saltar,
                     //que es recupera quan acaba la corutina de RecoverJump
@@ -399,8 +402,6 @@ public class BlindEnemy : Enemy
 
             if (!_NavMeshAgent.enabled)
                 _NavMeshAgent.enabled = true;
-            if(_CurrentState != EnemyStates.ATTACK)
-                ChangeState(EnemyStates.ATTACK);
         }
     }
 }

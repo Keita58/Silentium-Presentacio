@@ -112,7 +112,7 @@ public class FastEnemy : Enemy
                 _Animator.Play("Walk");
                 break;
             case EnemyStates.CHASE:
-                _NavMeshAgent.speed = 7f;
+                _NavMeshAgent.speed = 6f;
                 _Animator.Play("Run");
                 break;
             case EnemyStates.ATTACK:
@@ -124,7 +124,10 @@ public class FastEnemy : Enemy
                 break;
             case EnemyStates.KNOCKED:
                 if(_ActivateLookingCoroutine != null)
+                {
                     StopCoroutine(_ActivateLookingCoroutine);
+                    _ActivateLookingCoroutine = null;
+                }
                 _Animator.Play("Idle");
                 StartCoroutine(WakeUp());
                 break;
