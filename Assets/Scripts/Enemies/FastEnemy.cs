@@ -121,6 +121,7 @@ public class FastEnemy : Enemy
                 if (_AttackCoroutine == null)
                     _AttackCoroutine = StartCoroutine(LookAttackPlayer());
                 _Animator.Play("Attack");
+                _Animator.speed = 1.75f;
                 break;
             case EnemyStates.KNOCKED:
                 if(_ActivateLookingCoroutine != null)
@@ -175,6 +176,7 @@ public class FastEnemy : Enemy
                     StopCoroutine(_AttackCoroutine);
                     _AttackCoroutine = null;
                 }
+                _Animator.speed = 1;
                 break;
             case EnemyStates.KNOCKED:
                 _Hp = MAXHEALTH;

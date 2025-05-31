@@ -37,7 +37,6 @@ public class PuzzleManager : MonoBehaviour
     private AnimationClip HieroglyphicAnimation2;
     [SerializeField]
     private Camera cam_HieroglyphicAnimation2;
-    [SerializeField]
     public bool isHieroglyphicCompleted { get; set; } 
     [SerializeField]
     TextMeshProUGUI riddlerText;
@@ -261,7 +260,6 @@ public class PuzzleManager : MonoBehaviour
         if(isHieroglyphicCompleted)
         {
             cam_Hierogliphic.gameObject.SetActive(false);
-            cam_Hierogliphic.transform.parent.GetComponent<LineRendererExample>()._inputAction.Hieroglyphic.Disable();
             cam_Player.gameObject.SetActive(true);
             Cursor.visible = false;
             animationTime = 0f;

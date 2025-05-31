@@ -112,7 +112,10 @@ public class BlindEnemy : Enemy
                     _PatrolCoroutine = StartCoroutine(Patrol());
                 break;
             case EnemyStates.ATTACK:
-                _NavMeshAgent.isStopped = true;
+                _Animator.enabled = false;
+                _NavMeshAgent.enabled = false;
+                _Rigidbody.isKinematic = false;
+                _Collider.enabled = false;
                 break;
             case EnemyStates.KNOCKED:
                 StartCoroutine(WakeUp(5));
@@ -139,7 +142,12 @@ public class BlindEnemy : Enemy
                 break;
             case EnemyStates.ATTACK:
                 _RangeSearchSound = 25;
-                _NavMeshAgent.isStopped = false;
+                if(!_NavMeshAgent.enabled)
+                    _NavMeshAgent.enabled = true;
+        
+                _Rigidbody.isKinematic = true;
+                _Animator.enabled = true;
+                _Collider.enabled = true;
                 break;
             case EnemyStates.KNOCKED:
                 _Hp = MAXHEALTH;
@@ -300,14 +308,14 @@ public class BlindEnemy : Enemy
                 {
                     Debug.Log("Faig salt!");
                     _Jumping = true;
-                    ExitState(_CurrentState);
-                    _Animator.enabled = false;
+                    ChangeState(EnemyStates.ATTACK);
                     Vector3 start = transform.position;
                     Vector3 end = _SoundPos;
 
-                    _NavMeshAgent.enabled = false;
-                    _Rigidbody.isKinematic = false;
-                    _Collider.enabled = false;
+                    //_Animator.enabled = false;
+                    //_NavMeshAgent.enabled = false;
+                    //_Rigidbody.isKinematic = false;
+                    //_Collider.enabled = false;
 
                     //transform.rotation = Quaternion.LookRotation(Vector3.RotateTowards(transform.forward, _SoundPos, 20, 0));
                     //transform.LookAt(_SoundPos);
@@ -385,12 +393,12 @@ public class BlindEnemy : Enemy
     IEnumerator RecoverAgent()
     {
         yield return new WaitForSeconds(1f);
-        if(!_NavMeshAgent.enabled)
-            _NavMeshAgent.enabled = true;
-        
-        _Rigidbody.isKinematic = true;
-        _Animator.enabled = true;
-        _Collider.enabled = true;
+        //if(!_NavMeshAgent.enabled)
+        //    _NavMeshAgent.enabled = true;
+        //
+        //_Rigidbody.isKinematic = true;
+        //_Animator.enabled = true;
+        //_Collider.enabled = true;
         if (_CurrentState != EnemyStates.ATTACK)
             ChangeState(EnemyStates.PATROL);
     }
