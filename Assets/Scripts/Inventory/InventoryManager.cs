@@ -19,7 +19,7 @@ public class InventoryManager : MonoBehaviour
 
     [SerializeField] Player player;
     [SerializeField] public InventorySO inventory;
-    [SerializeField] InventorySO chestInventory;
+    [SerializeField] public InventorySO chestInventory;
     [SerializeField] NoteInventorySO noteInventory;
     [SerializeField] GameObject notesRoot;
     [SerializeField] GameObject notesDiaryPanel;
@@ -282,7 +282,6 @@ public class InventoryManager : MonoBehaviour
         Cursor.visible = true;
         player.inventoryOpened = true;
         player.ToggleInputPlayer(false, true);
-        inventoryUI.target = target;
         inventoryUI.Show();
         ChangeState(ActionStates.NOACTION);
     }
@@ -292,7 +291,6 @@ public class InventoryManager : MonoBehaviour
         Cursor.visible = false;
         player.inventoryOpened = false;
         player.ToggleInputPlayer(true, true);
-        inventoryUI.target = null;
         inventoryUI.Hide();
     }
 
@@ -361,7 +359,8 @@ public class InventoryManager : MonoBehaviour
         notesDiaryPanel.SetActive(true);
         notesDiaryPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text=note.name;
         notesDiaryPanel.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = note.noteContent;
-    }    public void OpenDiaryNoteScroll(NotesSO note)
+    }  
+    public void OpenDiaryNoteScroll(NotesSO note)
     {
         notesDiaryPanelScroll.SetActive(true);
         notesDiaryPanelScroll.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text=note.name;
