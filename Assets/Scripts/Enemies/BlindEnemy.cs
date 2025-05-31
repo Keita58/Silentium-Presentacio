@@ -118,7 +118,7 @@ public class BlindEnemy : Enemy
                 _Collider.enabled = false;
                 break;
             case EnemyStates.KNOCKED:
-                StartCoroutine(WakeUp(5));
+                StartCoroutine(WakeUp(10));
                 break;
         }
     }

@@ -331,7 +331,7 @@ public class FatEnemy : Enemy
 
     IEnumerator WakeUp()
     {
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(10);
         _Hp = MAXHEALTH;
         Collider[] aux = Physics.OverlapSphere(transform.position, 2f, _LayerPlayer);
         if (aux.Length > 0)
