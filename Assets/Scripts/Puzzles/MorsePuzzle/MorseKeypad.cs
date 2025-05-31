@@ -11,9 +11,6 @@ namespace NavKeypad
 {
     public class MorseKeypad : MonoBehaviour
     {
-        [Header("Events")]
-        [SerializeField] private UnityEvent onAccessGranted;
-        [SerializeField] private UnityEvent onAccessDenied;
         [Header("Combination Code")]
         [SerializeField] private string keypadCombo = "DESPIERTA PAPA";
 
@@ -35,7 +32,7 @@ namespace NavKeypad
         [SerializeField] Door door;
         [SerializeField]
         private string currentInput;
-        private string currentMorseCharacter = "";
+        [SerializeField] private string currentMorseCharacter = "";
         private bool displayingResult = false;
         private bool accessWasGranted = false;
         [SerializeField] private GameObject panelCollider;
@@ -144,7 +141,6 @@ namespace NavKeypad
         private void AccessDenied()
         {
             keypadDisplayText.text = accessDeniedText;
-            onAccessDenied?.Invoke();
             audioSource.PlayOneShot(accessDeniedSfx);
         }
 

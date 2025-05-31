@@ -157,6 +157,7 @@ public class Clock : MonoBehaviour
                 this.transform.parent.GetComponent<AudioSource>().clip = FinishedSound;
                 this.transform.parent.GetComponent<AudioSource>().Play();
                 this.transform.parent.GetComponent<AudioSource>().loop = false;
+                StartCoroutine(MoveMinutes());
             }
         }
     }
