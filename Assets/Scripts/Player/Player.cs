@@ -207,7 +207,7 @@ public class Player : MonoBehaviour
 
         hp = 6;
         maxHp = 6;
-        gunAmmo = 20;
+        gunAmmo = 12;
         maxSilencerUses = 10;
         OnAmmoChange?.Invoke(gunAmmo);
     }

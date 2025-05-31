@@ -273,7 +273,7 @@ public class FastEnemy : Enemy
                 }
                 else if (lvlSound > 7)
                 {
-                    _RangeSearchSound = 1;
+                    _RangeSearchSound = 0;
                     _Search = true;
                     _NavMeshAgent.SetDestination(_SoundPos);
                 }

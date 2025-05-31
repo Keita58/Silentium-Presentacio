@@ -333,7 +333,8 @@ public class FatEnemy : Enemy
     {
         yield return new WaitForSeconds(10);
         _Hp = MAXHEALTH;
-        Collider[] aux = Physics.OverlapSphere(transform.position, 2f, _LayerPlayer);
+        Collider[] aux = Physics.OverlapSphere(transform.position, 1.5f, _LayerPlayer);
+        Collider[] aux2 = Physics.OverlapSphere(transform.position, 4f, _LayerPlayer);
         if (aux.Length > 0)
         {
             if (Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit info, _LayerObjectsAndPlayer))
@@ -343,6 +344,10 @@ public class FatEnemy : Enemy
                     ChangeState(EnemyStates.ATTACK);
                 }
             }
+        }
+        else if (aux2.Length > 0)
+        {
+            ChangeState(EnemyStates.CHASE);
         }
         else
             ChangeState(EnemyStates.PATROL);
