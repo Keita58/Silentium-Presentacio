@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
 public class BlindEnemy : Enemy
 {
@@ -27,6 +29,7 @@ public class BlindEnemy : Enemy
     private bool _Jumping;
     private Animator _Animator;
     private Rigidbody _Rigidbody;
+    private Collider _Collider;
 
     private int _Hp;
     public override int hp => _Hp;
@@ -47,8 +50,12 @@ public class BlindEnemy : Enemy
     AudioClip _blindAudioClip;
     [SerializeField]
     AudioClip _blindAttackAudioClip;
+
+    public event Action OnJump;
+    
     private void Awake()
     {
+        _Collider = GetComponent<Collider>();
         _Rigidbody = GetComponent<Rigidbody>();
         _BlindAudioSource = GetComponent<AudioSource>();
         _Animator = GetComponent<Animator>();
@@ -300,10 +307,12 @@ public class BlindEnemy : Enemy
 
                     _NavMeshAgent.enabled = false;
                     _Rigidbody.isKinematic = false;
+                    _Collider.enabled = false;
 
                     //transform.rotation = Quaternion.LookRotation(Vector3.RotateTowards(transform.forward, _SoundPos, 20, 0));
-                    transform.LookAt(_SoundPos);
-                    _Rigidbody.AddForce((end - start) * 100);
+                    //transform.LookAt(_SoundPos);
+                    _Rigidbody.AddForce((end - start) * 140);
+                    OnJump?.Invoke();
 
                     //No necessiten comprovació ja que només entrarà aquí quan pugui tornar a saltar,
                     //que es recupera quan acaba la corutina de RecoverJump
@@ -376,9 +385,12 @@ public class BlindEnemy : Enemy
     IEnumerator RecoverAgent()
     {
         yield return new WaitForSeconds(1f);
+        if(!_NavMeshAgent.enabled)
+            _NavMeshAgent.enabled = true;
+        
         _Rigidbody.isKinematic = true;
-        _NavMeshAgent.enabled = true;
         _Animator.enabled = true;
+        _Collider.enabled = true;
         if (_CurrentState != EnemyStates.ATTACK)
             ChangeState(EnemyStates.PATROL);
     }
