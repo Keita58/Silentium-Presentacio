@@ -419,7 +419,7 @@ public class BlindEnemy : Enemy
     
     IEnumerator RecoverJump()
     {
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(5f);
         _Jumping = false;
     }
 

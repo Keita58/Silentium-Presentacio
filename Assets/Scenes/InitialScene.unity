@@ -1288,7 +1288,7 @@ VideoPlayer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 141956359}
   m_Enabled: 1
-  m_VideoClip: {fileID: 32900000, guid: 55026d2c4437a404ca1b849e6ac226a6, type: 3}
+  m_VideoClip: {fileID: 32900000, guid: da587f7e08b4b984aa82f370703992ca, type: 3}
   m_TargetCameraAlpha: 1
   m_TargetCamera3DLayout: 0
   m_TargetCamera: {fileID: 116970011}
@@ -6149,10 +6149,11 @@ MonoBehaviour:
   _ChestInventory: {fileID: 0}
   _NotesInventory: {fileID: 0}
   _ShowInventory: {fileID: 0}
+  _InventoryManager: {fileID: 0}
   _Notes: {fileID: 0}
   _Items: {fileID: 0}
   _Books: {fileID: 0}
-  _Shaders: {fileID: 0}
+  _Shader: {fileID: 0}
   _Player: {fileID: 0}
   _PuzzleManager: {fileID: 0}
   _Settings: {fileID: 275697634}

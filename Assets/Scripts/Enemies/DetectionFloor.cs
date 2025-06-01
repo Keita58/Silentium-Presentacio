@@ -35,6 +35,7 @@ public class DetectionFloor : MonoBehaviour
             _Animator.enabled = true;
             _Collider.enabled = true;
             _Enemy.ActivatePatrol();
+            _IsJumping = false;
         }
     }
 }
