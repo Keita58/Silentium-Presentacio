@@ -31,6 +31,7 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private GameObject imagePanel;
     [SerializeField] private GameObject bookPanel;
     [SerializeField] private Events events;
+    [SerializeField] public bool glitchDone = false;
     public event Action<bool> OnNote;
 
     public Item equippedItem;
