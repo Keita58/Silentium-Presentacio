@@ -206,6 +206,7 @@ public class BlindEnemy : Enemy
                         if (point != _NavMeshAgent.destination)
                             break;
                     }
+                    _NavMeshAgent.SetDestination(point);
                 }
                 else
                 {
@@ -215,11 +216,11 @@ public class BlindEnemy : Enemy
                     {
                         RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
                         point = coord;
+                        _NavMeshAgent.SetDestination(point);
                     }
                 }
                 _Animator.enabled = true;
                 _Patrolling = true;
-                _NavMeshAgent.SetDestination(point);
             }
 
             if (!_NavMeshAgent.pathPending && _NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)

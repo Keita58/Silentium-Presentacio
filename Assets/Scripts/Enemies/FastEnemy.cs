@@ -331,6 +331,7 @@ public class FastEnemy : Enemy
                             break; 
                         }
                     }
+                    _NavMeshAgent.SetDestination(_Waypoint.transform.position);
                 }
                 else
                 {
@@ -340,10 +341,10 @@ public class FastEnemy : Enemy
                     {
                         RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
                         _Waypoint.transform.position = coord;
+                        _NavMeshAgent.SetDestination(_Waypoint.transform.position);
                     }
                 }
                 _Animator.Play("Walk");
-                _NavMeshAgent.SetDestination(_Waypoint.transform.position);
                 _Patrolling = true;
             }
             

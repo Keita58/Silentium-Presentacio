@@ -197,6 +197,7 @@ public class FatEnemy : Enemy
                             break; 
                         }
                     }
+                    _NavMeshAgent.SetDestination(_Waypoint.transform.position);
                 }
                 else
                 {
@@ -206,10 +207,10 @@ public class FatEnemy : Enemy
                     {
                         RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
                         _Waypoint.transform.position = coord;
+                        _NavMeshAgent.SetDestination(_Waypoint.transform.position);
                     }
                 }
                 _Animator.Play("Walk");
-                _NavMeshAgent.SetDestination(_Waypoint.transform.position);
                 _Patrolling = true;
             }
             
@@ -444,7 +445,7 @@ public class FatEnemy : Enemy
         while(true)
         {
             //Esperem que el monstre acabi l'animació d'atac per poder canviar d'estat
-            if (!_Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack"))
+            if (!_Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack") && _CurrentState != EnemyStates.KNOCKED)
             {
                 //Si aquest està a prop del jugador el perseguirà, si no passarà a patrullar.
                 if(Vector3.Distance(transform.position, _Player.transform.position) <= 3.5f)
