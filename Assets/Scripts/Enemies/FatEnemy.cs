@@ -23,6 +23,7 @@ public class FatEnemy : Enemy
     [SerializeField] private bool _Search;
     private bool _OpeningDoor;
     private Animator _Animator;
+    private Collider _Collider;
 
     private int _Hp;
     public override int hp => _Hp;
@@ -45,6 +46,7 @@ public class FatEnemy : Enemy
     AudioClip _fatAudioClip;
     private void Awake()
     {
+        _Collider = GetComponent<Collider>();
         _fatAudioSource = GetComponent<AudioSource>();
         _fatAudioSource.loop = true;
         _Animator = GetComponent<Animator>();
@@ -68,10 +70,10 @@ public class FatEnemy : Enemy
 
     private void OnDestroy()
     {
-        _DetectionSphere.GetComponent<DetectionSphere>().OnEnter += ActivateChaseCoroutine;
-        _DetectionSphere.GetComponent<DetectionSphere>().OnExit += DeactivateChaseCoroutine;
-        _DetectionAttack.GetComponent<DetectionSphere>().OnEnter += ActivateAttack;
-        _DetectionAttack.GetComponent<DetectionSphere>().OnExit += DeactivateAttack;
+        _DetectionSphere.GetComponent<DetectionSphere>().OnEnter -= ActivateChaseCoroutine;
+        _DetectionSphere.GetComponent<DetectionSphere>().OnExit -= DeactivateChaseCoroutine;
+        _DetectionAttack.GetComponent<DetectionSphere>().OnEnter -= ActivateAttack;
+        _DetectionAttack.GetComponent<DetectionSphere>().OnExit -= DeactivateAttack;
         _DetectionDoors.GetComponent<DetectionDoorSphere>().OnDetectDoor -= OpenDoors;
     }
 
@@ -110,6 +112,7 @@ public class FatEnemy : Enemy
                 _AttackCoroutine = StartCoroutine(LookAttackPlayer());
                 break;
             case EnemyStates.KNOCKED:
+                _Collider.enabled = false;
                 _NavMeshAgent.SetDestination(transform.position);
                 _Animator.Play("Idle");
                 StartCoroutine(WakeUp());
@@ -148,6 +151,7 @@ public class FatEnemy : Enemy
                 _NavMeshAgent.SetDestination(transform.position);
                 break;
             case EnemyStates.KNOCKED:
+                _Collider.enabled = true;
                 _Hp = MAXHEALTH;
                 break;
             case EnemyStates.CHASE:
@@ -382,7 +386,8 @@ public class FatEnemy : Enemy
 
     private void ActivateChaseCoroutine()
     {
-        ChangeState(EnemyStates.CHASE);
+        if(_CurrentState != EnemyStates.KNOCKED)
+            ChangeState(EnemyStates.CHASE);
     }
 
     private void DeactivateChaseCoroutine()
@@ -393,12 +398,15 @@ public class FatEnemy : Enemy
 
     private void ActivateAttack()
     {
-        Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit thing, 12,
-            _LayerObjectsAndPlayer);
-        if(thing.transform.gameObject.TryGetComponent(out Player player))
+        if (_CurrentState != EnemyStates.KNOCKED)
         {
-            _Animator.SetBool("Chase", false);
-            ChangeState(EnemyStates.ATTACK);
+            Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit thing, 12,
+                _LayerObjectsAndPlayer);
+            if(thing.transform.gameObject.TryGetComponent(out Player player))
+            {
+                _Animator.SetBool("Chase", false);
+                ChangeState(EnemyStates.ATTACK);
+            }
         }
     }
 
@@ -415,7 +423,11 @@ public class FatEnemy : Enemy
         {
             if (!_Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack"))
             {
-                ChangeState(EnemyStates.CHASE);
+                if(Vector3.Distance(transform.position, _Player.transform.position) <= 3.5f)
+                    ChangeState(EnemyStates.CHASE);
+                else
+                    ChangeState(EnemyStates.PATROL);
+                
                 break;
             }
 

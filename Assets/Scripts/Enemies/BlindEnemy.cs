@@ -118,6 +118,7 @@ public class BlindEnemy : Enemy
                 _Collider.enabled = false;
                 break;
             case EnemyStates.KNOCKED:
+                _Collider.enabled = false;
                 StartCoroutine(WakeUp(10));
                 break;
         }
@@ -150,6 +151,7 @@ public class BlindEnemy : Enemy
                 _Collider.enabled = true;
                 break;
             case EnemyStates.KNOCKED:
+                _Collider.enabled = true;
                 _Hp = MAXHEALTH;
                 break;
         }

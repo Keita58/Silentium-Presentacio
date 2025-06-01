@@ -26,6 +26,7 @@ public class FastEnemy : Enemy
     private bool _OpeningDoor;
     private bool _Looking;
     private Animator _Animator;
+    private Collider _Collider;
 
     private int _Hp;
     public override int hp => _Hp;
@@ -52,6 +53,7 @@ public class FastEnemy : Enemy
     bool firstTime;
     private void Awake()
     {
+        _Collider = GetComponent<Collider>();
         _fastAudioSource = GetComponent<AudioSource>();
         _Animator = GetComponent<Animator>();
         _NavMeshAgent = GetComponent<NavMeshAgent>();
@@ -129,6 +131,7 @@ public class FastEnemy : Enemy
                     StopCoroutine(_ActivateLookingCoroutine);
                     _ActivateLookingCoroutine = null;
                 }
+                _Collider.enabled = false;
                 _Animator.Play("Idle");
                 StartCoroutine(WakeUp());
                 break;
@@ -179,6 +182,7 @@ public class FastEnemy : Enemy
                 _Animator.speed = 1;
                 break;
             case EnemyStates.KNOCKED:
+                _Collider.enabled = true;
                 _Hp = MAXHEALTH;
                 break;
             case EnemyStates.STOPPED:
