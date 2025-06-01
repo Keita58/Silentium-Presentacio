@@ -26,7 +26,7 @@ public class Messages : MonoBehaviour
             else if (interactuable is InteractuableNote) messageText.text = "Pulsa E para coger la nota";
             else if (interactuable is InteractuableItem)
             {
-                string itemName = interactableGameObject.GetComponent<PickItem>().item.name;
+                string itemName = interactableGameObject.GetComponent<PickItem>().item.Name;
                 messageText.text = "Pulsa E para coger " + itemName;
             }else
                 messageText.text = "Pulsa E para interactuar";

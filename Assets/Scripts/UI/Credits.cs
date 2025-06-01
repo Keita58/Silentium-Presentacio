@@ -9,6 +9,7 @@ public class Credits : MonoBehaviour
     [SerializeField] Canvas canvas;
     private void Awake()
     {
+        Cursor.visible = true;
         video = GetComponent<VideoPlayer>();
         video.enabled = false;
     }

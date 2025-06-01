@@ -324,6 +324,7 @@ public class PuzzleManager : MonoBehaviour
         events.ToggleCustomPass(false);
         glitchAnimator.Play("Glitch");
         glitchStarted = true;
+        teleported = false;
         animationTime = 0f;
         bookPuzzleCompleted = true;
     }
@@ -367,6 +368,7 @@ public class PuzzleManager : MonoBehaviour
                     glitchAudioSource.PlayOneShot(glitchAudio);
                     glitchAnimator.Play("Glitch");
                     glitchStarted = true;
+                    teleported = false;
                     animationTime = 0f;
                     poemPuzzleCompleted = true;
                 }
@@ -436,16 +438,6 @@ public class PuzzleManager : MonoBehaviour
                 isMorseCompleted = false;
             }
         }
-        // else if (isHieroglyphicCompleted)
-        // {
-        //     animationTime += Time.deltaTime;
-        //     if (animationTime >= 2.4f)
-        //     {
-        //         HieroglyphicPuzzleExitAnimation2();
-        //         animationTime = 0f;
-        //         isHieroglyphicCompleted = false;
-        //     }
-        // }
         else if (glitchStarted)
         {
             animationTime += Time.deltaTime;
