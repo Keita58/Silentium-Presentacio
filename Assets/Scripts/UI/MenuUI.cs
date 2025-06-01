@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 
@@ -36,10 +37,18 @@ public class MenuUI : MonoBehaviour
         player.OnAmmoChange += ChangeNumAmmo;
     }
 
+    private void OnDestroy()
+    {
+        events.OnToggleUI -= ToggleUI;
+        player.OnAmmoChange -= ChangeNumAmmo;
+    }
+
     private void ToggleUI(bool active)
     {
-       waves.SetActive(active);
-       ammoQuantity.gameObject.SetActive(active);
+        if (waves !=null)
+            waves.SetActive(active);
+        if (ammoQuantity!=null)
+            ammoQuantity.gameObject.SetActive(active);
     }
 
     private void ChangeNumAmmo(int ammo)

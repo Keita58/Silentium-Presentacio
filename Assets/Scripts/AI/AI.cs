@@ -28,6 +28,17 @@ public class AI : MonoBehaviour
     private bool Seventh = false;
     [SerializeField] 
      private bool Eighth = false;
+    [Header("Audio")]
+    AudioSource audioSource;
+    [SerializeField]
+    AudioClip correct;
+    [SerializeField]
+    AudioClip incorrect;
+
+    private void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
     void Start()
     {
         runtimeModel = ModelLoader.Load(modelAsset);
@@ -81,57 +92,97 @@ public class AI : MonoBehaviour
             Debug.Log("Er 0:" + scores[0]);
             if (scores[0] > 0.6f)
             {
+                audioSource.PlayOneShot(correct);
                 First = true;
+            }
+            else
+            {
+                audioSource.PlayOneShot(incorrect);
             }
         }
         else if (!Second)
         {
             if (scores[1] > 0.8f)
             {
+                audioSource.PlayOneShot(correct);
                 Second = true;
+            }
+            else
+            {
+                audioSource.PlayOneShot(incorrect);
             }
         }
         else if (!Third)
         {
             if (scores[2] > 0.8f)
             {
+                audioSource.PlayOneShot(correct);
                 Third = true;
+            }
+            else
+            {
+                audioSource.PlayOneShot(incorrect);
             }
         }
         else if (!Fourth)
         {
             if (scores[3] > 0.8f)
             {
+                audioSource.PlayOneShot(correct);
                 Fourth = true;
+            }
+            else
+            {
+                audioSource.PlayOneShot(incorrect);
             }
         }
         else if (!Fifth)
         {
             if (scores[1] > 0.8f)
             {
+                audioSource.PlayOneShot(correct);
                 Fifth = true;
+            }
+            else
+            {
+                audioSource.PlayOneShot(incorrect);
             }
         }
         else if (!Sixth)
         {
             if (scores[0] > 0.8f)
             {
+                audioSource.PlayOneShot(correct);
                 Sixth = true;
+            }
+            else
+            {
+                audioSource.PlayOneShot(incorrect);
             }
         }
         else if (!Seventh)
         {
             if (scores[4] > 0.8f)
             {
+                audioSource.PlayOneShot(correct);
                 Seventh = true;
+            }
+            else
+            {
+                audioSource.PlayOneShot(incorrect);
             }
         }
         else if (!Eighth)
         {
             if (scores[5] > 0.8f)
             {
+                audioSource.PlayOneShot(correct);
                 Eighth = true;
                 PuzzleManager.instance.HieroglyphicPuzzleExitAnimation();
+            }
+            else
+            {
+                audioSource.PlayOneShot(incorrect);
             }
         }
         input.Dispose();

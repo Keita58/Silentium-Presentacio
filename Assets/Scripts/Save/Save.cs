@@ -25,6 +25,7 @@ public class Save : MonoBehaviour
     [SerializeField] private InventorySO _Inventory;
     [SerializeField] private InventorySO _ChestInventory;
     [SerializeField] private NoteInventorySO _NotesInventory;
+    [SerializeField] private InventoryManager _InventoryManager;
 
     [Header("DataBase for the notes")]
     [SerializeField] private BDNotes _Notes;
@@ -69,6 +70,16 @@ public class Save : MonoBehaviour
     private void Start()
     {
         _Settings.onSaveConfig += SaveConfigMenu;
+    }
+
+    private void OnDestroy()
+    {
+        if(_Camera1 != null && _Camera2 != null)
+        {
+            _Camera1.onSaveGame -= SaveGame;
+            _Camera2.onSaveGame -= SaveGame;
+        }
+        _Settings.onSaveConfig -= SaveConfigMenu;
     }
 
     public void SaveGame()
@@ -139,12 +150,14 @@ public class Save : MonoBehaviour
             SilencerUses = _Player.silencerUses,
             Ammo = _Player.gunAmmo,
             Position = _Player.transform.position,
+            EquipedItem = _InventoryManager.equippedItem != null ? InventoryManager.instance.equippedItem.id : -1,
             ClockPuzzle = _PuzzleManager.clockPuzzleCompleted,
             HieroglyphicPuzzle = _PuzzleManager.isHieroglyphicCompleted,
             BookPuzzle = _PuzzleManager.bookPuzzleCompleted,
             PoemPuzzle = _PuzzleManager.poemPuzzleCompleted,
             MorsePuzzle = _PuzzleManager.isMorseCompleted,
             WeaponPuzzle = _PuzzleManager.weaponPuzzleCompleted,
+            GlithDone = _InventoryManager.glitchDone,
             ChromaticAberration = Chromatic.active,
             IntensityChromaticAberration = Chromatic.intensity.value,
             Samples = Chromatic.maxSamples,
@@ -161,6 +174,8 @@ public class Save : MonoBehaviour
 
         string infoToSave = JsonUtility.ToJson(info, true);
         File.WriteAllText(filepath, infoToSave);
+        
+        Time.timeScale = 1;
     }
 
     public void TemporalSaveGame()
@@ -168,6 +183,7 @@ public class Save : MonoBehaviour
         filepath = Application.persistentDataPath + "/" + _TemporalSavefileName;
         _Temp = true;
         SaveGame();
+        Application.Quit();
     }
 
     public void SaveConfigMenu()
@@ -180,7 +196,8 @@ public class Save : MonoBehaviour
             SFXValue = _Settings.currentSfxValue,
             FPSValue = _Settings.currentFpsValue,
             FOVValue = _Settings.currentFOVValue,
-            VSync = _Settings.currentVSyncState
+            VSync = _Settings.currentVSyncState,
+            Sensitivity = _Settings.currentSensitivityValue
         };
 
         string infoToSave = JsonUtility.ToJson(config, true);

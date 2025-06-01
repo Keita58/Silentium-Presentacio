@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e3265da449bb22418b7c9a61178f218, type: 3}
   m_Name: Bottle
   m_EditorClassIdentifier: 
-  nom: "Botella de pl\xE1stico"
+  itemName: Botella
   description: "Botella de pl\xE1stico. Si la combinase con algo m\xE1s podr\xEDa
     hacer que la pistla hiciese menos ruido para no atraer a los monstruos..."
   sprite: {fileID: 21300000, guid: 877d643155b453f41b16b32c4f55ca36, type: 3}

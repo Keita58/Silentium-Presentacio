@@ -19,6 +19,7 @@ public class SaveInfo
     public int SilencerUses;
     public int Ammo;
     public Vector3 Position;
+    public int EquipedItem;
 
     //Puzles
     public bool ClockPuzzle;
@@ -27,6 +28,7 @@ public class SaveInfo
     public bool PoemPuzzle;
     public bool MorsePuzzle;
     public bool WeaponPuzzle;
+    public bool GlithDone;
 
     //Puzle llibres
     public List<CellBookSave> CellBooks;

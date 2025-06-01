@@ -14,7 +14,8 @@ GameObject:
   - component: {fileID: 3689685586202225444}
   - component: {fileID: 592312795309154974}
   - component: {fileID: 8096834843455510016}
-  m_Layer: 9
+  - component: {fileID: -6932076660250080558}
+  m_Layer: 11
   m_Name: Beer bootle.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -150,3 +151,16 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.0011742788, y: 0.0011742786, z: 0.00438044}
   m_Center: {x: 0, y: -2.9103825e-11, z: 0.0021913855}
+--- !u!114 &-6932076660250080558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2380219917478238670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67bc616bdac473e4ab8793e1deb2be30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  events: {fileID: 11400000, guid: f00603c9116a40e4d91df0c25019e760, type: 2}

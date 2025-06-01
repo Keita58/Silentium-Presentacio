@@ -56,6 +56,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Book pickable throw
       objectReference: {fileID: 0}
+    - target: {fileID: 7148273389606660492, guid: 5d38060f6d8511f438c52747abf7ed8e, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: fe57762aa14483649a1ed1b46c1f14f2, type: 2}
     m_RemovedComponents:
     - {fileID: -8010335016654855418, guid: 5d38060f6d8511f438c52747abf7ed8e, type: 3}
     m_RemovedGameObjects: []

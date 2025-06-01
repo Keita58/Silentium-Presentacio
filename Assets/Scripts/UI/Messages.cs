@@ -8,6 +8,7 @@ public class Messages : MonoBehaviour
     [SerializeField] private Player player;
     [SerializeField] private TextMeshProUGUI messageText;
     [SerializeField] private Events events;
+    private Coroutine doActionCoroutine;
 
     private void Awake()
     {
@@ -25,7 +26,7 @@ public class Messages : MonoBehaviour
             else if (interactuable is InteractuableNote) messageText.text = "Pulsa E para coger la nota";
             else if (interactuable is InteractuableItem)
             {
-                string itemName = interactableGameObject.GetComponent<PickItem>().item.name;
+                string itemName = interactableGameObject.GetComponent<PickItem>().item.Name;
                 messageText.text = "Pulsa E para coger " + itemName;
             }else
                 messageText.text = "Pulsa E para interactuar";
@@ -42,6 +43,7 @@ public class Messages : MonoBehaviour
         messageText.text = "";
         player.OnInteractuable += ShowMessageInteractuable;
         player.OnNotInteractuable += HideMessage;
+        doActionCoroutine = null;
     }
 
     private void ShowWarningMessage(string text)
@@ -49,7 +51,8 @@ public class Messages : MonoBehaviour
         player.OnInteractuable -= ShowMessageInteractuable;
         player.OnNotInteractuable -= HideMessage;
         messageText.text = text;    
-        StartCoroutine(DoAction(3f, () => HideMessageWarning()));
+        if (doActionCoroutine == null)
+            doActionCoroutine = StartCoroutine(DoAction(3f, () => HideMessageWarning()));
     }
 
     IEnumerator DoAction(float waitTime, Action action)
@@ -65,6 +68,7 @@ public class Messages : MonoBehaviour
     {
         player.OnInteractuable -= ShowMessageInteractuable;
         player.OnNotInteractuable -= HideMessage;
+        events.OnWarning -= ShowWarningMessage;
     }
 
 }

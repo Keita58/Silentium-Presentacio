@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-[RequireComponent(typeof(LineRendererExample))]
+[RequireComponent(typeof(LineRenderer))]
 public class InteractuablePaint : MonoBehaviour, IInteractuable
 {
     public bool isRemarkable { get; private set; }
