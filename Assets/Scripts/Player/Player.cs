@@ -371,7 +371,7 @@ public class Player : MonoBehaviour
             {
                 Debug.Log("Hago sonido silenciador");
                 OnMakeImpactSound?.Invoke(5);
-                MakeNoise(5, 5);
+                MakeNoise(10, 5);
                 silencerUses--;
                 Debug.Log("Silenciador usos: " + silencerUses);
                 
@@ -383,7 +383,7 @@ public class Player : MonoBehaviour
             }
             else
             {
-                MakeNoise(10, 10); 
+                MakeNoise(20, 25); 
                 OnMakeImpactSound?.Invoke(8);
             }
             Debug.DrawRay(shootPosition.transform.position, -shootPosition.transform.right);
@@ -440,7 +440,7 @@ public class Player : MonoBehaviour
 
     #region FSM
 
-    enum PlayerStates { IDLE, MOVE, RUN, HURT, RUNMOVE, CROUCH, CROUCH_IDLE }
+    enum PlayerStates { IDLE, MOVE, RUN, CROUCH, CROUCH_IDLE }
     [SerializeField] PlayerStates actualState;
     [SerializeField] float stateTime;
 

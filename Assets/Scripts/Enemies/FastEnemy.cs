@@ -5,56 +5,64 @@ using UnityEngine.AI;
 
 public class FastEnemy : Enemy
 {
+    private readonly int MAXHEALTH = 3;
     private enum EnemyStates { PATROL, CHASE, ATTACK, KNOCKED, STOPPED }
+    
+    [Header("States")]
     [SerializeField] private EnemyStates _CurrentState;
     [SerializeField] private float _StateTime;
+    
+    [Header("Player")]
     [SerializeField] private GameObject _Player;
-    [SerializeField] private LayerMask _LayerPlayer;
+    
+    [Header("Layers")]
     [SerializeField] private LayerMask _LayerObjectsAndPlayer;
+    [SerializeField] private LayerMask _LayerPlayer;
     [SerializeField] private LayerMask _LayerDoor;
-    [SerializeField] private GameObject _DetectionSphere;
-    [SerializeField] private GameObject _DetectionDoors;
+    
+    [Header("Waypoints")]
     [SerializeField] private List<GameObject> _Waypoints;
     [SerializeField] private GameObject _Waypoint;
+    
+    [Header("Detection spheres")]
+    [SerializeField] private GameObject _DetectionSphere;
+    [SerializeField] private GameObject _DetectionDoors;
 
+    [Header("Audio")] 
+    [SerializeField] private AudioClip _fastShoutAudioClip;
+    [SerializeField] private AudioClip _fastRunAudioClip;
+    [SerializeField] private AudioClip _fastAudioClip;
+    
+    private AudioSource _FastAudioSource;
     private NavMeshAgent _NavMeshAgent;
+    private Collider _Collider;
+    private Animator _Animator;
     private Vector3 _SoundPos;
+    private int _RangeChaseAfterStop;
+    private int _RangeSearchSound;
     private float _BetaDotProduct;
     private float _LastLvlSound;
-    private bool _Patrolling;
-    private bool _Search;
     private bool _OpeningDoor;
+    private bool _Patrolling;
+    private bool _FirstTime;
     private bool _Looking;
-    private Animator _Animator;
-    private Collider _Collider;
-
-    private int _Hp;
-    public override int hp => _Hp;
-
-    private int _DownTime;
-    public override int downTime => _DownTime;
-
-    private readonly int MAXHEALTH = 3;
-    private int _RangeSearchSound;
-    private int _RangeChaseAfterStop;
+    private bool _Search;
 
     private Coroutine _PatrolCoroutine;
     private Coroutine _ChangeToPatrolCoroutine;
     private Coroutine _AttackCoroutine;
     private Coroutine _ActivateLookingCoroutine;
-    [Header("Audio")]
-    AudioSource _fastAudioSource;
-    [SerializeField]
-    AudioClip _fastAudioClip;
-    [SerializeField]
-    AudioClip _fastShoutAudioClip;
-    [SerializeField]
-    AudioClip _fastRunAudioClip;
-    bool firstTime;
+    
+    private int _Hp;
+    public override int hp => _Hp;
+
+    private int _DownTime;
+    public override int downTime => _DownTime;
+    
     private void Awake()
     {
         _Collider = GetComponent<Collider>();
-        _fastAudioSource = GetComponent<AudioSource>();
+        _FastAudioSource = GetComponent<AudioSource>();
         _Animator = GetComponent<Animator>();
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
@@ -65,7 +73,7 @@ public class FastEnemy : Enemy
         _Patrolling = false;
         _OpeningDoor = false;
         _Hp = MAXHEALTH;
-        firstTime = true;
+        _FirstTime = true;
         _PatrolCoroutine = null;
         _ChangeToPatrolCoroutine = null;
         _AttackCoroutine = null;
@@ -107,7 +115,7 @@ public class FastEnemy : Enemy
         switch (_CurrentState)
         {
             case EnemyStates.PATROL:
-                firstTime = true;
+                _FirstTime = true;
                 _Patrolling = false;
                 if(_PatrolCoroutine == null)
                     _PatrolCoroutine = StartCoroutine(Patrol());
@@ -205,16 +213,9 @@ public class FastEnemy : Enemy
         {
             //Agafa un punt aleatori dins de l'esfera amb el radi que passem per parametre
             Vector3 randomPoint = new Vector3(center.x, center.y, center.z) + Random.insideUnitSphere * range;
-            Debug.Log($"Punt: {randomPoint}");
-
-            //Aquí s'haurà de comprovar si la y que hem extret està en algun dels pisos de l'edifici.
-            //Si està aprop la transformem en aquest i ja
-
             Vector3 point = new Vector3(randomPoint.x, randomPoint.y, randomPoint.z);
 
             NavMeshHit hit;
-            print(NavMesh.GetAreaNames().Length);
-
             //Comprovem que el punt que hem agafat esta dins del NavMesh
             if (NavMesh.SamplePosition(point, out hit, 1.0f, NavMesh.GetAreaFromName("Walkable")))
             {
@@ -229,11 +230,16 @@ public class FastEnemy : Enemy
         _NavMeshAgent.SetDestination(_Player.transform.position);
     }
 
+    //Funcio que criden tant els objectes llençables com el jugador
+    //per notificar als enemics que han fet un so, i que aquests actuin acorde
     public override void ListenSound(Vector3 pos, int lvlSound)
     {
         _SoundPos = pos;
+        //Fem un raycast des de la posicio de l'enemic fins a l'origen del so i recollim tots els objectes que hem tocat en el cami
         RaycastHit[] hits = Physics.RaycastAll(this.transform.position, _SoundPos - this.transform.position, Vector3.Distance(_SoundPos, this.transform.position));
 
+        //Per cada objecte que hem tocat mirem si són objectes que atenuen el so
+        //Si ho són reduïm el valor del so rebut per paràmetre pel valor que ens dona l'objecte.
         foreach (RaycastHit hit in hits)
         {
             if (hit.collider.TryGetComponent<IAttenuable>(out IAttenuable a))
@@ -241,9 +247,12 @@ public class FastEnemy : Enemy
                 lvlSound = a.AttenuateSound(lvlSound);
             }
         }
-
+        //Distància del cec fins al punt del so
         float dist = Vector3.Distance(this.transform.position, _SoundPos);
         Debug.Log($"Distància entre ràpid i punt de so: {dist}");
+        
+        //Si la distància entre l'origen del so i el monstre és menor a 10 i el monstre té visió directa amb el jugador,
+        //el monstre passarà al valor més agressiu de resposta al so.
         if (dist < 10 && Physics.Raycast(this.transform.position, (_Player.transform.position - transform.position), out RaycastHit info, dist, _LayerObjectsAndPlayer))
         {
             if (info.collider.TryGetComponent<Player>(out _))
@@ -255,7 +264,9 @@ public class FastEnemy : Enemy
                 lvlSound = 3;
             }
         }
-
+        
+        //Llista de resposta al so per part del monstre. Com més fort és el nivell de so
+        //més a prop d'aquest va, fins que si és molt alt el monstre atacarà.
         if(lvlSound >= _LastLvlSound)
         {
             if (lvlSound > 0 && _CurrentState == EnemyStates.PATROL)
@@ -310,6 +321,9 @@ public class FastEnemy : Enemy
                 {
                     while (true)
                     {
+                        //L'enemic agafa un punt aleatori de l'array de waypoints que té disponibles,
+                        //excepte si el que ha agafat és al que anava actualment. En aquest cas agafarà un
+                        //altre punt.
                         _Waypoint = _Waypoints[Random.Range(0, _Waypoints.Count)];
                         if (_Waypoint != waypointToGo)
                         {
@@ -320,6 +334,8 @@ public class FastEnemy : Enemy
                 }
                 else
                 {
+                    //Aquesta comprovació és per evitar que si ha sentit un so
+                    //molt fort elimini el SetDestination() cap al punt
                     if(_RangeSearchSound > 0)
                     {
                         RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
@@ -345,6 +361,8 @@ public class FastEnemy : Enemy
         }
     }
 
+    //Corutina per detectar a quina distància està el jugador una vegada l'enemic es recuperi del noqueig.
+    //Depenent de quina distància estigui el jugador o l'atacarà, el perseguirà o passarà a patrullar els waypoints
     IEnumerator WakeUp()
     {
         yield return new WaitForSeconds(10);
@@ -409,6 +427,7 @@ public class FastEnemy : Enemy
         door.Close();
     }
 
+    //Corutina que realitza tot el càlcul per saber si el jugador i l'enemic s'estan mirant i actuar
     IEnumerator LookingPlayer()
     {
         float alphaLook = 0;
@@ -416,12 +435,10 @@ public class FastEnemy : Enemy
         {
             if(_CurrentState != EnemyStates.KNOCKED)
             {
+                //Primer mirem si el jugador està dins de l'àrea per actuar.
                 Collider[] aux = Physics.OverlapSphere(transform.position, _RangeChaseAfterStop, _LayerPlayer);
                 if (aux.Length > 0)
                 {
-                    //Això és l'angle de visio de l'enemic (ho comparem sobre 60 ja que se'ns dona la meitat) de 120º
-                    //float alphaDocProduct = Vector3.Dot(transform.forward, (_Player.transform.position - transform.position).normalized);
-                    
                     //Això és el càlcul de les direccions de les mirades, si s'estan mirant l'un a l'altre serà -1 i anira augmentant
                     //fins 1 quan estan mirant cap a la mateixa direcció
                     alphaLook = Vector3.Dot(transform.forward, _Player.transform.forward);
@@ -433,10 +450,10 @@ public class FastEnemy : Enemy
                     {
                         if (info.transform.tag == "Player")
                         {
-                            if (firstTime)
+                            if (_FirstTime)
                             {
-                                _fastAudioSource.PlayOneShot(_fastShoutAudioClip, 6.5f);
-                                firstTime = false;
+                                _FastAudioSource.PlayOneShot(_fastShoutAudioClip, 6.5f);
+                                _FirstTime = false;
                             }
                             if (!_Looking)
                             {
@@ -444,12 +461,14 @@ public class FastEnemy : Enemy
                                 _Looking = true;
                             }
 
+                            //Si el càlcul del Vector3.Dot ens dona que l'enemic i el jugador s'estan mirant 
+                            //l'enemic passarà a l'estat d'aturat, on no es mourà, només mirarà al jugador constantment.
                             if (alphaLook < -0.8f)
                             {
                                 if (_CurrentState != EnemyStates.STOPPED)
                                 {
-                                    _fastAudioSource.resource = _fastAudioClip;
-                                    _fastAudioSource.Play();
+                                    _FastAudioSource.resource = _fastAudioClip;
+                                    _FastAudioSource.Play();
                                     _NavMeshAgent.SetDestination(transform.position);
                                     ChangeState(EnemyStates.STOPPED);
                                 }
@@ -459,19 +478,24 @@ public class FastEnemy : Enemy
                                 //Tornem a calcular l'alphaLook per si el jugador encara ens segueix mirant
                                 transform.LookAt(new Vector3(info.transform.position.x, 0.9f, info.transform.position.z));
                                 alphaLook = Vector3.Dot(transform.forward, _Player.transform.forward);
+                                
+                                //Si després de tornar a calcular el Vector3.Dot l'enemic i el jugador no s'estan mirant canviarem l'estat de l'enemic
+                                //per actuar contra el jugador
                                 if (alphaLook >= -0.8f)
                                 {
+                                    //Si el jugador està lluny canviarà a chase i el perseguirà
                                     if (Vector3.Distance(info.transform.position, transform.position) > 2)
                                     {
                                         Debug.Log("Veig al jugador lluny");
                                         if (_CurrentState != EnemyStates.CHASE)
                                         {
-                                            _fastAudioSource.resource = _fastRunAudioClip;
-                                            _fastAudioSource.Play();
+                                            _FastAudioSource.resource = _fastRunAudioClip;
+                                            _FastAudioSource.Play();
                                             _RangeChaseAfterStop = 28;
                                             ChangeState(EnemyStates.CHASE);
                                         }
                                     }
+                                    //Si es troba prou a prop l'atacarà directament
                                     else if (Vector3.Distance(info.transform.position, transform.position) <= 2)
                                     {
                                         Physics.Raycast(transform.position,
@@ -490,6 +514,8 @@ public class FastEnemy : Enemy
                                 }
                             }
                         }
+                        //Si estava aturat i el jugador surt de la seva àrea de detecció perseguirà també al jugador,
+                        //no es pot escapar una vegada s'han mirat.
                         else if (_CurrentState == EnemyStates.STOPPED) 
                         {
                             Debug.Log("El jugador ha sortit del rang de visió");
@@ -501,9 +527,12 @@ public class FastEnemy : Enemy
                             }
                         }
                     }
+                    //Si el jugador s'ha amagat darrere alguna paret o a un dels armaris que hi ha també el perseguirà
                     else
                     {
                         _Looking = false;
+                        //Si estava en aquest moment aturat el perseguirà, ja que
+                        //s'estaven mirant
                         if(_CurrentState == EnemyStates.STOPPED)
                         {
                             Debug.Log("El jugador ha sortit del rang de visió");
@@ -513,6 +542,7 @@ public class FastEnemy : Enemy
                                 ChangeState(EnemyStates.CHASE);
                             }
                         }
+                        //Si no estava aturat passarà a patrulla
                         else if(_CurrentState != EnemyStates.PATROL)
                         {
                             Debug.Log("Tiro raycast i no em trobo res");

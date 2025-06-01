@@ -8,50 +8,60 @@ using Random = UnityEngine.Random;
 
 public class BlindEnemy : Enemy
 {
+    private readonly int MAXHEALTH = 2;
     private enum EnemyStates { PATROL, ATTACK, KNOCKED }
+    
+    [Header("States")]
     [SerializeField] private EnemyStates _CurrentState;
     [SerializeField] private float _StateTime;
+    
+    [Header("Player")]
     [SerializeField] private GameObject _Player;
+    
+    [Header("Layers")]
     [SerializeField] private LayerMask _LayerPlayer;
     [SerializeField] private LayerMask _LayerObjectsAndPlayer;
     [SerializeField] private LayerMask _LayerDoor;
+    
+    [Header("Detection spheres")]
     [SerializeField] private GameObject _DetectionSphere;
     [SerializeField] private GameObject _DetectionDoors;
+    
+    [Header("Waypoints")]
     [SerializeField] private List<GameObject> _WaypointsFirstPart;
     [SerializeField] private List<GameObject> _WaypointsSecondPart;
+    
+    [Header("Door to change rooms")]
     [SerializeField] private Door _DoorLocked;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip _blindAudioClip;
+    [SerializeField] private AudioClip _blindAttackAudioClip;
+    
+    
+    private AudioSource _BlindAudioSource;
     private NavMeshAgent _NavMeshAgent;
-    private Vector3 _SoundPos;
-    [SerializeField] private bool _Patrolling;
-    [SerializeField] private bool _Search;
-    private bool _OpeningDoor;
-    private bool _Jumping;
-    private Animator _Animator;
     private Rigidbody _Rigidbody;
     private Collider _Collider;
+    private Animator _Animator;
+    private Vector3 _SoundPos;
+    private float _RangeSearchSound;
+    private bool _OpeningDoor;
+    private bool _Patrolling;
+    private bool _Jumping;
+    private bool _Search;
 
+    private Coroutine _PatrolCoroutine;
+    private Coroutine _ChangeStateToPatrol;
+    private Coroutine _AttackCoroutine;
+    
+    public event Action OnJump;
+    
     private int _Hp;
     public override int hp => _Hp;
 
     private int _DownTime;
     public override int downTime => _DownTime;
-
-    private float _RangeSearchSound;
-    private int MAXHEALTH = 2;
-
-    private Coroutine _PatrolCoroutine;
-    private Coroutine _ChangeStateToPatrol;
-    private Coroutine _AttackCoroutine;
-
-    [Header("Audio")]
-    AudioSource _BlindAudioSource;
-    [SerializeField]
-    AudioClip _blindAudioClip;
-    [SerializeField]
-    AudioClip _blindAttackAudioClip;
-
-    public event Action OnJump;
     
     private void Awake()
     {
@@ -159,19 +169,21 @@ public class BlindEnemy : Enemy
 
     #endregion 
 
-    // Funci� per moure l'enemic pel mapa
+    // Funcio per moure l'enemic pel mapa
     IEnumerator Patrol()
     {
         Vector3 point = Vector3.zero;
         while (true)
         {
-            //Debug.Log("Entro al Patrol");
             if (!_Patrolling)
             {
                 if (!_Search)
                 {
                     while (true)
                     {
+                        //Aquest monstre pot anar entre dues parts del mapa, però una d'aquestes
+                        //està tancada fins a superar el puzle dels jeroglifics,
+                        //per això la comprovació de la porta.
                         if (_DoorLocked.isLocked)
                         {
                             point = _WaypointsFirstPart[Random.Range(0, _WaypointsFirstPart.Count)].transform.position;
@@ -197,6 +209,8 @@ public class BlindEnemy : Enemy
                 }
                 else
                 {
+                    //Aquesta comprovació és per evitar que si ha sentit un so
+                    //molt fort elimini el SetDestination() cap al punt
                     if(_RangeSearchSound > 0)
                     {
                         RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
@@ -210,6 +224,9 @@ public class BlindEnemy : Enemy
 
             if (!_NavMeshAgent.pathPending && _NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
             {
+                //Si l'enemic està investigant el so (el booleà _Search) i no s'ha activat la corutina
+                //específica l'activem. Aquesta corutina és la que farà canviar al monstre d'estat perquè
+                //torni a patrullar pels seus waypoints.
                 if (_Search && _CurrentState != EnemyStates.ATTACK && _ChangeStateToPatrol == null)
                 {
                     Debug.Log("Activo la corutina WakeUp");
@@ -224,23 +241,20 @@ public class BlindEnemy : Enemy
         }
     }
 
+    //Aquesta funcio busca un als navmesh punt aleatori donat un punt i el radi de la circumferencia.
     private void RandomPoint(Vector3 center, float range, out Vector3 result)
     {
         for (int i = 0; i < 50; i++)
         {
             //Agafa un punt aleatori dins de l'esfera amb el radi que passem per parametre
             Vector3 randomPoint = new Vector3(center.x, center.y, center.z) + Random.insideUnitSphere * range;
-            // Debug.Log($"Punt: {randomPoint}");
-
-            //Aqu� s'haur� de comprovar si la y que hem extret est� en algun dels pisos de l'edifici.
-            //Si est� aprop la transformem en aquest i ja
-
             Vector3 point = new Vector3(randomPoint.x, randomPoint.y, randomPoint.z);
 
+            //Filtre per seleccionar les superficies que utilitza l'agent
             NavMeshQueryFilter filter = new()
             {
                 agentTypeID = _NavMeshAgent.agentTypeID,
-                areaMask = _NavMeshAgent.areaMask,
+                areaMask = _NavMeshAgent.areaMask
             };
 
             //Comprovem que el punt que hem agafat esta dins del NavMesh
@@ -253,12 +267,17 @@ public class BlindEnemy : Enemy
         result = center;
     }
 
+    //Funcio que criden tant els objectes llençables com el jugador
+    //per notificar als enemics que han fet un so, i que aquests actuin acorde
     public override void ListenSound(Vector3 pos, int lvlSound)
     {
         bool wall = false;
         _SoundPos = pos;
-        RaycastHit[] hits = Physics.RaycastAll(transform.position, _SoundPos - transform.position, Vector3.Distance(_SoundPos, this.transform.position));
+        //Fem un raycast des de la posicio de l'enemic fins a l'origen del so i recollim tots els objectes que hem tocat en el cami
+        RaycastHit[] hits = Physics.RaycastAll(transform.position, _SoundPos - transform.position, Vector3.Distance(_SoundPos, transform.position));
 
+        //Per cada objecte que hem tocat mirem si són objectes que atenuen el so
+        //Si ho són reduïm el valor del so rebut per paràmetre pel valor que ens dona l'objecte.
         foreach (RaycastHit hit in hits)
         {
             if (hit.collider.TryGetComponent<IAttenuable>(out IAttenuable a))
@@ -270,9 +289,10 @@ public class BlindEnemy : Enemy
 
         //Distància del cec fins al punt del so
         float dist = Vector3.Distance(transform.position, _SoundPos);
-        float distPlayer = Vector3.Distance(transform.position, _Player.transform.position);
         Debug.Log($"Distància entre cec i punt de so: {dist}");
 
+        //Si la distància entre l'origen del so i el monstre és menor a 10 i el monstre té visió directa amb el jugador,
+        //el monstre passarà al valor més agressiu de resposta al so.
         if (dist < 10 && Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit info, dist, _LayerObjectsAndPlayer))
         {
             if (info.collider.TryGetComponent<Player>(out _))
@@ -287,6 +307,8 @@ public class BlindEnemy : Enemy
 
         Debug.Log($"Nivell so: {lvlSound}");
 
+        //Llista de resposta al so per part del monstre. Com més fort és el nivell de so
+        //més a prop d'aquest va, fins que si és molt alt el monstre atacarà.
         if (lvlSound > 0 && _CurrentState == EnemyStates.PATROL)
         {
             if (lvlSound > 0 && lvlSound <= 2)
@@ -306,6 +328,8 @@ public class BlindEnemy : Enemy
             }
             else if (lvlSound > 5)
             {
+                //Si la distància calculada anteriorment està entre 1.5 i 8, no té cap paret davant i pot saltar,
+                //saltarà cap a la font de so, independentment de si aquesta és produïda pel jugador o per un objecte.
                 if (dist > 1.5f && dist <= 8 && !wall && !_Jumping)
                 {
                     Debug.Log("Faig salt!");
@@ -313,14 +337,7 @@ public class BlindEnemy : Enemy
                     ChangeState(EnemyStates.ATTACK);
                     Vector3 start = transform.position;
                     Vector3 end = _SoundPos;
-
-                    //_Animator.enabled = false;
-                    //_NavMeshAgent.enabled = false;
-                    //_Rigidbody.isKinematic = false;
-                    //_Collider.enabled = false;
-
-                    //transform.rotation = Quaternion.LookRotation(Vector3.RotateTowards(transform.forward, _SoundPos, 20, 0));
-                    //transform.LookAt(_SoundPos);
+                    
                     _Rigidbody.AddForce((end - start) * 140);
                     OnJump?.Invoke();
 
@@ -330,6 +347,7 @@ public class BlindEnemy : Enemy
                     StartCoroutine(RecoverAgent());
                     StartCoroutine(RecoverJump());
                 }
+                //Si la distància és massa gran només anirà fins al punt d'orígen del so.
                 else if (Vector3.Distance(_SoundPos, transform.position) > 8)
                 {
                     _RangeSearchSound = 0;
@@ -395,12 +413,6 @@ public class BlindEnemy : Enemy
     IEnumerator RecoverAgent()
     {
         yield return new WaitForSeconds(1f);
-        //if(!_NavMeshAgent.enabled)
-        //    _NavMeshAgent.enabled = true;
-        //
-        //_Rigidbody.isKinematic = true;
-        //_Animator.enabled = true;
-        //_Collider.enabled = true;
         if (_CurrentState != EnemyStates.ATTACK)
             ChangeState(EnemyStates.PATROL);
     }

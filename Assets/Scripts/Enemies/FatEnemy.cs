@@ -5,45 +5,54 @@ using UnityEngine.AI;
 
 public class FatEnemy : Enemy
 {
+    private readonly int MAXHEALTH = 6;
     private enum EnemyStates { PATROL, ATTACK, KNOCKED, CHASE }
+    
+    [Header("States")]
     [SerializeField] private EnemyStates _CurrentState;
+    
+    [Header("Player")]
     [SerializeField] private GameObject _Player;
-    [SerializeField] private LayerMask _LayerPlayer;
+    
+    [Header("Layers")]
     [SerializeField] private LayerMask _LayerObjectsAndPlayer;
+    [SerializeField] private LayerMask _LayerPlayer;
     [SerializeField] private LayerMask _LayerDoor;
-    [SerializeField] private GameObject _DetectionSphere;
-    [SerializeField] private GameObject _DetectionDoors;
-    [SerializeField] private GameObject _DetectionAttack;
+    
+    [Header("Waypoints")]
     [SerializeField] private List<GameObject> _Waypoints;
     [SerializeField] private GameObject _Waypoint;
+    
+    [Header("Detection spheres")]
+    [SerializeField] private GameObject _DetectionSphere;
+    [SerializeField] private GameObject _DetectionAttack;
+    [SerializeField] private GameObject _DetectionDoors;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip _fatAudioClip;
+    private AudioSource _fatAudioSource;
+    
     private NavMeshAgent _NavMeshAgent;
-    private Vector3 _SoundPos;
-    [SerializeField] private bool _Patrolling;
-    [SerializeField] private bool _Search;
-    private bool _OpeningDoor;
-    private Animator _Animator;
     private Collider _Collider;
+    private Animator _Animator;
+    private Vector3 _SoundPos;
+    private int _RangeSearchSound;
+    private bool _OpeningDoor;
+    private bool _Patrolling;
+    private bool _Search;
 
     private int _Hp;
     public override int hp => _Hp;
 
     private int _DownTime;
     public override int downTime => _DownTime;
-
-    private readonly int MAXHEALTH = 6;
-    private int _RangeSearchSound;
-
+    
+    private Coroutine _ChangeToPatrolCoroutine;
     private Coroutine _PatrolCoroutine;
     private Coroutine _AttackCoroutine;
-    private Coroutine _ChangeToPatrolCoroutine;
     private Coroutine _ChaseCoroutine;
     private Coroutine _ChangeToChase;
 
-    [Header("Audio")]
-    private AudioSource _fatAudioSource;
-    [SerializeField]
-    AudioClip _fatAudioClip;
     private void Awake()
     {
         _Collider = GetComponent<Collider>();
@@ -178,6 +187,9 @@ public class FatEnemy : Enemy
                 {
                     while (true)
                     {
+                        //L'enemic agafa un punt aleatori de l'array de waypoints que té disponibles,
+                        //excepte si el que ha agafat és al que anava actualment. En aquest cas agafarà un
+                        //altre punt.
                         _Waypoint = _Waypoints[Random.Range(0, _Waypoints.Count)];
                         if (_Waypoint != waypointToGo)
                         {
@@ -188,6 +200,8 @@ public class FatEnemy : Enemy
                 }
                 else
                 {
+                    //Aquesta comprovació és per evitar que si ha sentit un so
+                    //molt fort elimini el SetDestination() cap al punt
                     if(_RangeSearchSound > 0)
                     {
                         RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
@@ -220,10 +234,6 @@ public class FatEnemy : Enemy
         {
             //Agafa un punt aleatori dins de l'esfera amb el radi que passem per parametre
             Vector3 randomPoint = new Vector3(center.x, center.y, center.z) + Random.insideUnitSphere * range;
-
-            //Aqu� s'haur� de comprovar si la y que hem extret est� en algun dels pisos de l'edifici.
-            //Si est� aprop la transformem en aquest i ja
-
             Vector3 point = new Vector3(randomPoint.x, randomPoint.y, randomPoint.z);
 
             //Comprovem que el punt que hem agafat esta dins del NavMesh
@@ -236,11 +246,16 @@ public class FatEnemy : Enemy
         result = center;
     }
 
+    //Funcio que criden tant els objectes llençables com el jugador
+    //per notificar als enemics que han fet un so, i que aquests actuin acorde
     public override void ListenSound(Vector3 pos, int lvlSound)
     {
         _SoundPos = pos;
-        RaycastHit[] hits = Physics.RaycastAll(this.transform.position, _SoundPos - this.transform.position, Vector3.Distance(_SoundPos, this.transform.position));
+        //Fem un raycast des de la posicio de l'enemic fins a l'origen del so i recollim tots els objectes que hem tocat en el cami
+        RaycastHit[] hits = Physics.RaycastAll(transform.position, _SoundPos - transform.position, Vector3.Distance(_SoundPos, transform.position));
 
+        //Per cada objecte que hem tocat mirem si són objectes que atenuen el so
+        //Si ho són reduïm el valor del so rebut per paràmetre pel valor que ens dona l'objecte.
         foreach (RaycastHit hit in hits)
         {
             if (hit.collider.TryGetComponent<IAttenuable>(out IAttenuable a))
@@ -248,9 +263,13 @@ public class FatEnemy : Enemy
                 lvlSound = a.AttenuateSound(lvlSound);
             }
         }
-
+        
+        //Distància del cec fins al punt del so
         float dist = Vector3.Distance(this.transform.position, _SoundPos);
         Debug.Log($"Distància entre cec i punt de so: {dist}");
+        
+        //Si la distància entre l'origen del so i el monstre és menor a 10 i el monstre té visió directa amb el jugador,
+        //el monstre passarà al valor més agressiu de resposta al so.
         if (dist < 10 && Physics.Raycast(this.transform.position, (_Player.transform.position - transform.position), out RaycastHit info, dist, _LayerObjectsAndPlayer))
         {
             if (info.collider.TryGetComponent<Player>(out _))
@@ -264,7 +283,9 @@ public class FatEnemy : Enemy
         }
 
         Debug.Log(lvlSound);
-
+        
+        //Llista de resposta al so per part del monstre. Com més fort és el nivell de so
+        //més a prop d'aquest va, fins que si és molt alt el monstre atacarà.
         if (lvlSound > 0 && _CurrentState == EnemyStates.PATROL)
         {
             if (lvlSound > 0 && lvlSound <= 2)
@@ -400,6 +421,7 @@ public class FatEnemy : Enemy
     {
         if (_CurrentState != EnemyStates.KNOCKED)
         {
+            //Si el jugador està davant de l'enemic quan entra dins de l'àrea d'atac (i aquest no està noquejat) l'atacarà.
             Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit thing, 12,
                 _LayerObjectsAndPlayer);
             if(thing.transform.gameObject.TryGetComponent(out Player player))
@@ -421,8 +443,10 @@ public class FatEnemy : Enemy
     {
         while(true)
         {
+            //Esperem que el monstre acabi l'animació d'atac per poder canviar d'estat
             if (!_Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack"))
             {
+                //Si aquest està a prop del jugador el perseguirà, si no passarà a patrullar.
                 if(Vector3.Distance(transform.position, _Player.transform.position) <= 3.5f)
                     ChangeState(EnemyStates.CHASE);
                 else
