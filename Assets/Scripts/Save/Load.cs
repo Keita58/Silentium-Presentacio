@@ -17,14 +17,18 @@ public class Load : MonoBehaviour
     [SerializeField] private InventorySO _Inventory;
     [SerializeField] private InventorySO _ChestInventory;
     [SerializeField] private NoteInventorySO _NotesInventory;
+    [SerializeField] private ShowInventory _ShowInventory;
+    [SerializeField] private InventoryManager _InventoryManager;
 
     [Header("DataBase for the notes")]
     [SerializeField] private BDNotes _Notes;
     [SerializeField] private BDItems _Items;
     [SerializeField] private BDBooks _Books;
 
-    [Header("Shaders")]
-    [SerializeField] private GameObject _Shaders;
+    [Header("Shaders")] 
+    [SerializeField] private GameObject _Shader;
+    private ChromaticAberration _Chromatic;
+    private FilmGrain _FilmGrain;
 
     [Header("Player")]
     [SerializeField] private Player _Player;
@@ -50,17 +54,25 @@ public class Load : MonoBehaviour
 
     private void Awake()
     {
-        if (GameManager.instance != null) 
-        {
-            GameManager.instance.onLoadedScene += LoadGame;
-            GameManager.instance.onLoadedScene += LoadConfig;
+        LoadConfig();
+        GameManager.instance.onLoadedScene += LoadGame;
+        GameManager.instance.onNewScene += NewGameLoad;
+    }
 
-            GameManager.instance.onNewScene += LoadConfig;
-        }
-        else
+    private void OnDestroy()
+    {
+        if (GameManager.instance != null)
         {
-            LoadConfig();
+            GameManager.instance.onLoadedScene -= LoadGame;
+            GameManager.instance.onNewScene -= NewGameLoad;
         }
+    }
+
+    private void NewGameLoad()
+    {
+        _ChestInventory.items.Clear();
+        _Inventory.items.Clear();
+        _NotesInventory.notes.Clear();
     }
 
     public void LoadGame()
@@ -84,6 +96,8 @@ public class Load : MonoBehaviour
 
             foreach (var item in info.Inventory)
             {
+                Debug.Log(_Items.FromID(item.itemId));
+                Debug.Log(item.amount);
                 Inventory.Add(new ItemSlot(_Items.FromID(item.itemId), item.amount, item.stackable));
             }
 
@@ -110,27 +124,32 @@ public class Load : MonoBehaviour
             _ChestInventory.items = ChestInventory;
             _NotesInventory.notes = _Notes.FromIDs(info.NotesInventory);
 
+            if (info.EquipedItem != -1)
+            {
+                _ShowInventory.SetEquippedItem(_Items.FromID(info.EquipedItem), false);
+                _Items.FromID(info.EquipedItem).Equip();
+            }
+
             //Treure la info del Volume
-            Volume VolumeInfo = _Shaders.GetComponent<Volume>();
+            Volume VolumeInfo = _Shader.GetComponent<Volume>();
 
-            VolumeInfo.profile.TryGet(out ChromaticAberration Chromatic);
-            Chromatic.active = info.ChromaticAberration;
-            Chromatic.intensity.value = info.IntensityChromaticAberration;
-            Chromatic.maxSamples = info.Samples;
+            VolumeInfo.profile.TryGet(out _Chromatic);
+            _Chromatic.active = info.ChromaticAberration;
+            _Chromatic.intensity.value = info.IntensityChromaticAberration;
+            _Chromatic.maxSamples = info.Samples;
 
-            VolumeInfo.profile.TryGet(out FilmGrain Film);
-            Film.active = info.FilmGrain;
-            Film.intensity.value = info.IntensityFilmGrain;
-            
-            VolumeInfo.profile.TryGet(out Fog Fog);
-            Fog.active = info.Fog;
+            VolumeInfo.profile.TryGet(out _FilmGrain);
+            _FilmGrain.active = info.FilmGrain;
+            _FilmGrain.intensity.value = info.IntensityFilmGrain;
 
             //Info del jugador
             _Player.hp = info.Hp;
             _Player.isSilencerEquipped = info.Silencer;
             _Player.silencerUses = info.SilencerUses;
             _Player.gunAmmo = info.Ammo;
+            _Player.GetComponent<CharacterController>().enabled = false;
             _Player.transform.position = info.Position;
+            _Player.GetComponent<CharacterController>().enabled = true;
 
             //Puzles
             _PuzzleManager.clockPuzzleCompleted = info.ClockPuzzle;
@@ -139,6 +158,7 @@ public class Load : MonoBehaviour
             _PuzzleManager.poemPuzzleCompleted = info.PoemPuzzle;
             _PuzzleManager.isMorseCompleted = info .MorsePuzzle;
             _PuzzleManager.weaponPuzzleCompleted = info.WeaponPuzzle;
+            _InventoryManager.glitchDone = info.GlithDone;
 
             _PuzzleManager.LoadGame();
 
@@ -154,7 +174,9 @@ public class Load : MonoBehaviour
                 {
                     if (cell.cellId == save.cellId)
                     {
+                        cell.GetComponent<Collider>().enabled = false;
                         cell.SetBook(_Books.FromID(_Items.FromID(save.bookGO).id).GetComponent<Book>(), _Books.FromID(_Items.FromID(save.bookGO).id));
+                        
                         GameObject aux = Instantiate(_Books.FromID(_Items.FromID(save.bookGO).id));
                         aux.transform.position = cell.transform.GetChild(0).transform.position;
                         break;
@@ -164,9 +186,9 @@ public class Load : MonoBehaviour
 
             if (File.Exists(temporalExistingFile))
                 File.Delete(temporalExistingFile);
+            
+            Time.timeScale = 1;
         }
-
-        GameManager.instance.onLoadedScene -= LoadGame;
     }
 
     public void LoadConfig()
@@ -183,15 +205,10 @@ public class Load : MonoBehaviour
             _Settings.currentFpsValue = info.FPSValue;
             _Settings.currentFOVValue = info.FOVValue;
             _Settings.currentVSyncState = info.VSync;
+            _Settings.currentSensitivityValue = info.Sensitivity;
         }
 
         //_Settings.isInitialScene = true;
         _Settings.StartOptions();
-
-        if(GameManager.instance != null)
-        {
-            GameManager.instance.onLoadedScene -= LoadConfig;
-            GameManager.instance.onNewScene -= LoadConfig;
-        }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -12,16 +13,21 @@ public class Loading : MonoBehaviour
         GameManager.instance.onLoadedScene += ActivateLoading;
     }
 
+    private void OnDestroy()
+    {
+        GameManager.instance.onLoadedScene -= ActivateLoading;
+    }
+
     private void ActivateLoading()
     {
         animator.Play("Loading");
-        this.gameObject.SetActive(true);
+        gameObject.SetActive(true);
         StartCoroutine(LoadingCoroutine());
     }
 
     private IEnumerator LoadingCoroutine()
     {
         yield return new WaitForSeconds(5f);
-        this.gameObject.SetActive(false);
+        gameObject.SetActive(false);
     }
 }

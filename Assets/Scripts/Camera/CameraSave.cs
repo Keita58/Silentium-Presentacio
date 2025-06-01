@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using TMPro;
 using UnityEngine;
 
 public class CameraSave : MonoBehaviour
@@ -10,13 +9,14 @@ public class CameraSave : MonoBehaviour
     [SerializeField] private GameObject _Player;
     [SerializeField] private InventorySO _Inventory;
     [SerializeField] private GameObject _SaveText;
+    [SerializeField] private Events events;
 
     private bool _SavedGame;
 
-    private void Start()
+    private void Awake()
     {
         _SavedGame = false;
-        _Player.GetComponent<Player>().onCameraClick += Save;
+        GetComponent<InteractuableCamera>().OnCameraClick += Save;
     }
 
     public void Save()
@@ -25,10 +25,7 @@ public class CameraSave : MonoBehaviour
         {
             if(item.item.GetType() == typeof(SaveItem))
             {
-                if (item.amount >= 2)
-                    _Inventory.UseItem(item.item);
-                else
-                    _Inventory.items.Remove(item);
+               _Inventory.UseItem(item.item);
 
                 _SavedGame = true;
                 onSaveGame?.Invoke();
@@ -42,11 +39,15 @@ public class CameraSave : MonoBehaviour
             StartCoroutine(DeleteText());
             _SavedGame = false;
         }
+        else
+        {
+            events.ShowWarning("No tienes el objeto necesario para guardar!");
+        }
     }
 
     IEnumerator DeleteText()
     {
         yield return new WaitForSeconds(5);
-        _SaveText.SetActive(true);
+        _SaveText.SetActive(false);
     }
 }

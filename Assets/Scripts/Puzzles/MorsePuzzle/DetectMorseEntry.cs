@@ -10,11 +10,11 @@ public class DetectMorseEntry : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         Debug.Log("Entro collider:" + other.name);
-        if (other.transform.gameObject.layer==6) onMorseRoomEnter?.Invoke();
+        if (other.TryGetComponent(out Player player)) onMorseRoomEnter?.Invoke();
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.transform.gameObject.layer == 6) onMorseRoomLeave?.Invoke();
+        if (other.TryGetComponent(out Player player)) onMorseRoomLeave?.Invoke();
     }
 }

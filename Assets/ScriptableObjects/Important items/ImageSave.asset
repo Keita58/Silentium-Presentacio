@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52b09abc5cdd88f4f848ebba177628f0, type: 3}
   m_Name: ImageSave
   m_EditorClassIdentifier: 
-  nom: Imagen
-  description: "Foto donde aparece una familia feliz. Cuando la ves te invade una
-    sesaci\xF3n de haber vivido ese momento."
-  sprite: {fileID: 0}
+  itemName: "Fotograf\xEDa"
+  description: "Radiograf\xEDa de un cerebro da\xF1ado por una enfermedad. Extra\xF1amente
+    te resulta familiar..."
+  sprite: {fileID: 21300000, guid: 8271d9a15aa1bbd4a9465843f80d401e, type: 3}
   prefab: {fileID: 0}
   prefabInst: {fileID: 2912784060675606810, guid: eb36d61e4f97cab4aa94f2c91f0ac2fc, type: 3}
   itemsToCombine: []

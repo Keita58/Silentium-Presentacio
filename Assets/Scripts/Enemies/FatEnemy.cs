@@ -5,55 +5,91 @@ using UnityEngine.AI;
 
 public class FatEnemy : Enemy
 {
-    private enum EnemyStates { PATROL, ATTACK, KNOCKED }
+    private readonly int MAXHEALTH = 6;
+    private enum EnemyStates { PATROL, ATTACK, KNOCKED, CHASE }
+    
+    [Header("States")]
     [SerializeField] private EnemyStates _CurrentState;
+    
+    [Header("Player")]
     [SerializeField] private GameObject _Player;
-    [SerializeField] private LayerMask _LayerPlayer;
+    
+    [Header("Layers")]
     [SerializeField] private LayerMask _LayerObjectsAndPlayer;
+    [SerializeField] private LayerMask _LayerPlayer;
     [SerializeField] private LayerMask _LayerDoor;
-    [SerializeField] private GameObject _DetectionSphere;
+    
+    [Header("Waypoints")]
     [SerializeField] private List<GameObject> _Waypoints;
+    [SerializeField] private GameObject _Waypoint;
+    
+    [Header("Detection spheres")]
+    [SerializeField] private GameObject _DetectionSphere;
+    [SerializeField] private GameObject _DetectionAttack;
+    [SerializeField] private GameObject _DetectionDoors;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip _fatAudioClip;
+    private AudioSource _fatAudioSource;
+    
     private NavMeshAgent _NavMeshAgent;
+    private Collider _Collider;
+    private Animator _Animator;
     private Vector3 _SoundPos;
-    private Vector3 _PointOfPatrol;
-    [SerializeField] private bool _Patrolling;
-    [SerializeField] private bool _Search;
+    private int _RangeSearchSound;
     private bool _OpeningDoor;
+    private bool _Patrolling;
+    private bool _Search;
 
     private int _Hp;
     public override int hp => _Hp;
 
     private int _DownTime;
     public override int downTime => _DownTime;
-
-    private readonly int MAXHEALTH = 6;
-    private int _RangeSearchSound;
-
+    
+    private Coroutine _ChangeToPatrolCoroutine;
     private Coroutine _PatrolCoroutine;
     private Coroutine _AttackCoroutine;
-    private Coroutine _ChangeToPatrolCoroutine;
+    private Coroutine _ChaseCoroutine;
+    private Coroutine _ChangeToChase;
 
     private void Awake()
     {
+        _Collider = GetComponent<Collider>();
+        _fatAudioSource = GetComponent<AudioSource>();
+        _fatAudioSource.loop = true;
+        _Animator = GetComponent<Animator>();
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
-        _PointOfPatrol = transform.position;
         _RangeSearchSound = 25;
         _Patrolling = false;
         _Search = false;
         _OpeningDoor = false;
         _Hp = MAXHEALTH;
 
-        _DetectionSphere.GetComponent<DetectionSphere>().OnEnter += ActivateAttackCoroutine;
-        _DetectionSphere.GetComponent<DetectionSphere>().OnExit += DeactivateAttackCoroutine;
+        _ChaseCoroutine = null;
+        _ChangeToChase = null;
 
-        StartCoroutine(OpenDoors());
+        _DetectionSphere.GetComponent<DetectionSphere>().OnEnter += ActivateChaseCoroutine;
+        _DetectionSphere.GetComponent<DetectionSphere>().OnExit += DeactivateChaseCoroutine;
+        _DetectionAttack.GetComponent<DetectionSphere>().OnEnter += ActivateAttack;
+        _DetectionAttack.GetComponent<DetectionSphere>().OnExit += DeactivateAttack;
+        _DetectionDoors.GetComponent<DetectionDoorSphere>().OnDetectDoor += OpenDoors;
+    }
+
+    private void OnDestroy()
+    {
+        _DetectionSphere.GetComponent<DetectionSphere>().OnEnter -= ActivateChaseCoroutine;
+        _DetectionSphere.GetComponent<DetectionSphere>().OnExit -= DeactivateChaseCoroutine;
+        _DetectionAttack.GetComponent<DetectionSphere>().OnEnter -= ActivateAttack;
+        _DetectionAttack.GetComponent<DetectionSphere>().OnExit -= DeactivateAttack;
+        _DetectionDoors.GetComponent<DetectionDoorSphere>().OnDetectDoor -= OpenDoors;
     }
 
     private void Start()
     {
         InitState(EnemyStates.PATROL);
+        _fatAudioSource.Play();
     }
 
     #region FSM
@@ -75,15 +111,25 @@ public class FatEnemy : Enemy
         {
             case EnemyStates.PATROL:
                 _Patrolling = false;
-                _PatrolCoroutine = StartCoroutine(Patrol(_RangeSearchSound, _PointOfPatrol));
+                _PatrolCoroutine = StartCoroutine(Patrol());
                 if (_Search)
                     _ChangeToPatrolCoroutine = StartCoroutine(ChangeToPatrol(7));
                 break;
             case EnemyStates.ATTACK:
-                _AttackCoroutine = StartCoroutine(AttackPlayer());
+                _Animator.Play("Attack");
+                _NavMeshAgent.SetDestination(transform.position);
+                _AttackCoroutine = StartCoroutine(LookAttackPlayer());
                 break;
             case EnemyStates.KNOCKED:
+                _Collider.enabled = false;
+                _NavMeshAgent.SetDestination(transform.position);
+                _Animator.Play("Idle");
                 StartCoroutine(WakeUp());
+                break;
+            case EnemyStates.CHASE:
+                _Animator.Play("Walk");
+                if (_ChaseCoroutine == null)
+                    _ChaseCoroutine = StartCoroutine(ChasePlayer());
                 break;
         }
     }
@@ -101,20 +147,38 @@ public class FatEnemy : Enemy
                 }
                 break;
             case EnemyStates.ATTACK:
-                StopCoroutine(_AttackCoroutine);
+                if(_AttackCoroutine != null)
+                {
+                    StopCoroutine(_AttackCoroutine);
+                    _AttackCoroutine = null;
+                }
+                if(_ChangeToChase != null)
+                {
+                    StopCoroutine(_ChangeToChase);
+                    _ChangeToChase = null;
+                }
+                _NavMeshAgent.SetDestination(transform.position);
                 break;
             case EnemyStates.KNOCKED:
+                _Collider.enabled = true;
                 _Hp = MAXHEALTH;
+                break;
+            case EnemyStates.CHASE:
+                if (_ChaseCoroutine != null)
+                {
+                    StopCoroutine(_ChaseCoroutine);
+                    _ChaseCoroutine = null;
+                }
                 break;
         }
     }
 
     #endregion 
 
-    // Funci� per moure l'enemic pel mapa
-    IEnumerator Patrol(int range, Vector3 pointOfSearch)
+    // Funcio per moure l'enemic pel mapa
+    IEnumerator Patrol()
     {
-        Vector3 point = Vector3.zero;
+        GameObject waypointToGo = null;
         while (true)
         {
             if (!_Patrolling)
@@ -123,27 +187,41 @@ public class FatEnemy : Enemy
                 {
                     while (true)
                     {
-                        point = _Waypoints[Random.Range(0, _Waypoints.Count)].transform.position;
-                        if (point != _NavMeshAgent.destination)
-                            break;
+                        //L'enemic agafa un punt aleatori de l'array de waypoints que té disponibles,
+                        //excepte si el que ha agafat és al que anava actualment. En aquest cas agafarà un
+                        //altre punt.
+                        _Waypoint = _Waypoints[Random.Range(0, _Waypoints.Count)];
+                        if (_Waypoint != waypointToGo)
+                        {
+                            waypointToGo = _Waypoint;
+                            break; 
+                        }
                     }
+                    _NavMeshAgent.SetDestination(_Waypoint.transform.position);
                 }
                 else
                 {
-                    RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
-                    point = coord;
+                    //Aquesta comprovació és per evitar que si ha sentit un so
+                    //molt fort elimini el SetDestination() cap al punt
+                    if(_RangeSearchSound > 0)
+                    {
+                        RandomPoint(_SoundPos, _RangeSearchSound, out Vector3 coord);
+                        _Waypoint.transform.position = coord;
+                        _NavMeshAgent.SetDestination(_Waypoint.transform.position);
+                    }
                 }
-                _NavMeshAgent.SetDestination(new Vector3(point.x, point.y, point.z));
+                _Animator.Play("Walk");
                 _Patrolling = true;
             }
-
-            if (_NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
+            
+            if (!_NavMeshAgent.pathPending && _NavMeshAgent.remainingDistance <= _NavMeshAgent.stoppingDistance)
             {
+                _Animator.Play("Idle");
                 _Patrolling = false;
                 if (!_Search)
                     yield return new WaitForSeconds(2);
                 else
-                    yield return new WaitForSeconds(5);
+                    yield return new WaitForSeconds(1);
             }
             else
                 yield return new WaitForSeconds(0.5f);
@@ -151,45 +229,48 @@ public class FatEnemy : Enemy
     }
 
     //Busca punt aleatori dins del NavMesh
-    private bool RandomPoint(Vector3 center, float range, out Vector3 result)
+    private void RandomPoint(Vector3 center, float range, out Vector3 result)
     {
         for (int i = 0; i < 50; i++)
         {
             //Agafa un punt aleatori dins de l'esfera amb el radi que passem per parametre
             Vector3 randomPoint = new Vector3(center.x, center.y, center.z) + Random.insideUnitSphere * range;
-
-            //Aqu� s'haur� de comprovar si la y que hem extret est� en algun dels pisos de l'edifici.
-            //Si est� aprop la transformem en aquest i ja
-
             Vector3 point = new Vector3(randomPoint.x, randomPoint.y, randomPoint.z);
 
             //Comprovem que el punt que hem agafat esta dins del NavMesh
             if (NavMesh.SamplePosition(point, out NavMeshHit hit, 1.0f, NavMesh.GetAreaFromName("Walkable")))
             {
                 result = hit.position;
-                return true;
             }
         }
         Debug.Log("No he trobat un punt! (Enemic gras)");
         result = center;
-        return false;
     }
 
+    //Funcio que criden tant els objectes llençables com el jugador
+    //per notificar als enemics que han fet un so, i que aquests actuin acorde
     public override void ListenSound(Vector3 pos, int lvlSound)
     {
         _SoundPos = pos;
-        RaycastHit[] hits = Physics.RaycastAll(this.transform.position, _SoundPos - this.transform.position, Vector3.Distance(_SoundPos, this.transform.position));
+        //Fem un raycast des de la posicio de l'enemic fins a l'origen del so i recollim tots els objectes que hem tocat en el cami
+        RaycastHit[] hits = Physics.RaycastAll(transform.position, _SoundPos - transform.position, Vector3.Distance(_SoundPos, transform.position));
 
+        //Per cada objecte que hem tocat mirem si són objectes que atenuen el so
+        //Si ho són reduïm el valor del so rebut per paràmetre pel valor que ens dona l'objecte.
         foreach (RaycastHit hit in hits)
         {
-            if (hit.collider.TryGetComponent<IAtenuacio>(out IAtenuacio a))
+            if (hit.collider.TryGetComponent<IAttenuable>(out IAttenuable a))
             {
-                lvlSound = a.atenuarSo(lvlSound);
+                lvlSound = a.AttenuateSound(lvlSound);
             }
         }
-
+        
+        //Distància del cec fins al punt del so
         float dist = Vector3.Distance(this.transform.position, _SoundPos);
         Debug.Log($"Distància entre cec i punt de so: {dist}");
+        
+        //Si la distància entre l'origen del so i el monstre és menor a 10 i el monstre té visió directa amb el jugador,
+        //el monstre passarà al valor més agressiu de resposta al so.
         if (dist < 10 && Physics.Raycast(this.transform.position, (_Player.transform.position - transform.position), out RaycastHit info, dist, _LayerObjectsAndPlayer))
         {
             if (info.collider.TryGetComponent<Player>(out _))
@@ -203,7 +284,9 @@ public class FatEnemy : Enemy
         }
 
         Debug.Log(lvlSound);
-
+        
+        //Llista de resposta al so per part del monstre. Com més fort és el nivell de so
+        //més a prop d'aquest va, fins que si és molt alt el monstre atacarà.
         if (lvlSound > 0 && _CurrentState == EnemyStates.PATROL)
         {
             if (lvlSound > 0 && lvlSound <= 2)
@@ -223,10 +306,11 @@ public class FatEnemy : Enemy
             }
             else if (lvlSound > 7)
             {
+                _RangeSearchSound = 0;
+                _Search = true;
                 _NavMeshAgent.SetDestination(_SoundPos);
             }
 
-            _PointOfPatrol = pos;
             if (_CurrentState == EnemyStates.PATROL)
                 ChangeState(EnemyStates.PATROL);
         }
@@ -242,29 +326,18 @@ public class FatEnemy : Enemy
         }
     }
 
-    IEnumerator OpenDoors()
+    private void OpenDoors(Door door)
     {
-        while (true)
+        if (!door.isLocked && !door.isOpen && !_OpeningDoor)
         {
-            if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 2.5f, _LayerDoor))
-            {
-                Door door = hit.collider.GetComponentInChildren<Door>();
-
-                if (!door.isLocked && !door.isOpen && !_OpeningDoor)
-                {
-                    door.onDoorOpen += Resume;
-                    _NavMeshAgent.isStopped = true;
-                    door.Open(transform.position);
-                    _OpeningDoor = true;
-                }
-                else if (door.isLocked)
-                {
-                    _NavMeshAgent.SetDestination(transform.position);
-                    yield return new WaitForSeconds(2);
-                }
-            }
-
-            yield return new WaitForSeconds(0.5f);
+            door.onDoorOpen += Resume;
+            _NavMeshAgent.isStopped = true;
+            door.Open(transform.position);
+            _OpeningDoor = true;
+        }
+        else if (door.isLocked)
+        {
+            _NavMeshAgent.SetDestination(transform.position);
         }
     }
 
@@ -284,8 +357,10 @@ public class FatEnemy : Enemy
 
     IEnumerator WakeUp()
     {
-        yield return new WaitForSeconds(5);
-        Collider[] aux = Physics.OverlapSphere(transform.position, 2f, _LayerPlayer);
+        yield return new WaitForSeconds(10);
+        _Hp = MAXHEALTH;
+        Collider[] aux = Physics.OverlapSphere(transform.position, 1.5f, _LayerPlayer);
+        Collider[] aux2 = Physics.OverlapSphere(transform.position, 4f, _LayerPlayer);
         if (aux.Length > 0)
         {
             if (Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit info, _LayerObjectsAndPlayer))
@@ -296,17 +371,30 @@ public class FatEnemy : Enemy
                 }
             }
         }
+        else if (aux2.Length > 0)
+        {
+            ChangeState(EnemyStates.CHASE);
+        }
         else
             ChangeState(EnemyStates.PATROL);
     }
 
-    IEnumerator AttackPlayer()
+    IEnumerator LookAttackPlayer()
     {
         while (true)
         {
-            //Animation -> attack
             transform.LookAt(_Player.transform.position);
-            _Player.GetComponent<Player>().TakeDamage(1);
+            yield return new WaitForSeconds(0.5f);
+        }
+    }
+
+    IEnumerator ChasePlayer()
+    {
+        while (true)
+        {
+            transform.LookAt(_Player.transform.position);
+            _NavMeshAgent.SetDestination(_Player.transform.position);
+            Debug.Log(_NavMeshAgent.destination);
             yield return new WaitForSeconds(0.5f);
         }
     }
@@ -318,15 +406,57 @@ public class FatEnemy : Enemy
         ChangeState(EnemyStates.PATROL);
     }
 
-    private void ActivateAttackCoroutine()
+    private void ActivateChaseCoroutine()
     {
-        _NavMeshAgent.SetDestination(transform.position);
-        ChangeState(EnemyStates.ATTACK);
+        if(_CurrentState != EnemyStates.KNOCKED)
+            ChangeState(EnemyStates.CHASE);
     }
 
-    private void DeactivateAttackCoroutine()
+    private void DeactivateChaseCoroutine()
     {
         _Search = false;
         ChangeState(EnemyStates.PATROL);
+    }
+
+    private void ActivateAttack()
+    {
+        if (_CurrentState != EnemyStates.KNOCKED)
+        {
+            //Si el jugador està davant de l'enemic quan entra dins de l'àrea d'atac (i aquest no està noquejat) l'atacarà.
+            Physics.Raycast(transform.position, (_Player.transform.position - transform.position), out RaycastHit thing, 12,
+                _LayerObjectsAndPlayer);
+            if(thing.transform.gameObject.TryGetComponent(out Player player))
+            {
+                _Animator.SetBool("Chase", false);
+                ChangeState(EnemyStates.ATTACK);
+            }
+        }
+    }
+
+    private void DeactivateAttack()
+    {
+        _Animator.SetBool("Chase", true);
+        if(_ChangeToChase == null)
+            StartCoroutine(ChangeToChase());
+    }
+
+    IEnumerator ChangeToChase()
+    {
+        while(true)
+        {
+            //Esperem que el monstre acabi l'animació d'atac per poder canviar d'estat
+            if (!_Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack") && _CurrentState != EnemyStates.KNOCKED)
+            {
+                //Si aquest està a prop del jugador el perseguirà, si no passarà a patrullar.
+                if(Vector3.Distance(transform.position, _Player.transform.position) <= 3.5f)
+                    ChangeState(EnemyStates.CHASE);
+                else
+                    ChangeState(EnemyStates.PATROL);
+                
+                break;
+            }
+
+            yield return new WaitForSeconds(0.1f);
+        }
     }
 }

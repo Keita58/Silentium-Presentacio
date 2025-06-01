@@ -5,8 +5,8 @@ using UnityEngine;
 public class SilencerItem : Item
 {
     [Header("Common values")]
-    [SerializeField] private string nom;
-    public override string Name => name;
+    [SerializeField] private string itemName;
+    public override string Name => itemName;
     [SerializeField] private string description;
     public override string Description => description;
 

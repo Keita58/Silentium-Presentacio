@@ -1007,6 +1007,15 @@
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Finish",
+                    "type": "Button",
+                    "id": "6e2c384a-1890-4741-9c98-e55e32a0eb20",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
                     "initialStateCheck": false
                 }
             ],
@@ -1030,6 +1039,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Paint",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "df9f481b-9ce4-4de1-b03f-b7c6de0ca567",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Finish",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

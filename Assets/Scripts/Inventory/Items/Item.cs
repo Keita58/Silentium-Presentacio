@@ -26,12 +26,12 @@ public abstract class Item : ScriptableObject
     public abstract bool isCombinable { get; }
 
     public abstract int id { get; }
-    
-    public abstract void Use();
 
-    public abstract void Combine(Item item);
+    public virtual void Use() { }
 
-    public abstract void Equip();
+    public virtual void Combine(Item item) { }
+
+    public virtual void Equip() { }
 }
 
 public enum ItemTypes

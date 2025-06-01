@@ -6,7 +6,7 @@ public class FogManager : MonoBehaviour
 {
     Volume volume;
     Fog fog;
-    [SerializeField] PostProcessEvents postProcessEvent;
+    [SerializeField] Events postProcessEvent;
 
     private void Start()
     {
@@ -18,5 +18,10 @@ public class FogManager : MonoBehaviour
     private void ActivateFog(bool enable)
     {
         fog.enabled.value = enable;
+    }
+
+    private void OnDestroy()
+    {
+        postProcessEvent.OnToggleFog -= ActivateFog;
     }
 }

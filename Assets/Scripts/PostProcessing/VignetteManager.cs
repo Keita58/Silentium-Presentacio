@@ -7,7 +7,7 @@ public class VignetteManager : MonoBehaviour
 {
     private Volume volume;
     private Vignette vignette;
-    [SerializeField] private PostProcessEvents postProcessEvents;
+    [SerializeField] private Events postProcessEvents;
     //public DigitalGlitch glitch;
     //Glitch glitch;
 
@@ -37,5 +37,10 @@ public class VignetteManager : MonoBehaviour
         }
         vignette.active = false;
         vignette.intensity.value = 0.545f;
+    }
+
+    private void OnDestroy()
+    {
+        postProcessEvents.OnVignetteActive -= ActivateVignette;
     }
 }

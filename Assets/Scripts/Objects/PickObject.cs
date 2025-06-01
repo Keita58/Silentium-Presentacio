@@ -4,7 +4,7 @@ using UnityEngine;
 [Serializable]
 public class PickObject : MonoBehaviour
 {
-    [SerializeField] private Player _Player;
+    [SerializeField] private Events events;
     public Item Object;
     [SerializeField] public bool Picked;
     [SerializeField] public int Id; 
@@ -18,7 +18,12 @@ public class PickObject : MonoBehaviour
     private void Awake()
     {
         Picked = false;
-        _Player.OnPickItem += SetPicked;
+        events.OnPickItem += SetPicked;
+    }
+
+    private void OnDestroy()
+    {
+        events.OnPickItem -= SetPicked;
     }
 
     public void SetPicked(int id)

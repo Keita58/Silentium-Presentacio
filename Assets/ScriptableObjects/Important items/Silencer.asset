@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e3265da449bb22418b7c9a61178f218, type: 3}
   m_Name: Silencer
   m_EditorClassIdentifier: 
-  nom: Silenciador
+  itemName: Silenciador
   description: "Silenciador de pacotilla para silenciar los disparos. No servir\xE1
     para muchos tiros..."
-  sprite: {fileID: 0}
+  sprite: {fileID: 21300000, guid: c9b342c7076bf4c45a0d6c06c919f502, type: 3}
   prefab: {fileID: 0}
+  prefabInst: {fileID: 0}
   itemsToCombine: []
   stackable: 0
   itemType: 13

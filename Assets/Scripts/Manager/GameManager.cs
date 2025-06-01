@@ -23,9 +23,9 @@ public class GameManager : MonoBehaviour
         _Load = false;
     }
 
-    private void Start()
+    private void OnDestroy()
     {
-        onLoadedScene?.Invoke();
+        instance = null;
     }
 
     public void SceneNewGame()

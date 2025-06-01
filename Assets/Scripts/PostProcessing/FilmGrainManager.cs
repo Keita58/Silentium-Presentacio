@@ -6,12 +6,11 @@ public class FilmGrainManager : MonoBehaviour
 {
     Volume volume;
     FilmGrain filmGrain;
-    [SerializeField] PostProcessEvents postProcessEvents;
+    [SerializeField] Events postProcessEvents;
     void Start()
     {
         volume = GetComponent<Volume>();
         volume.profile.TryGet(out filmGrain);
-        filmGrain.active = false;
         postProcessEvents.OnIncreaseIntesityFilmGrain += IncreaseIntensity;
     }
 
@@ -21,5 +20,9 @@ public class FilmGrainManager : MonoBehaviour
             filmGrain.active = true;
 
         filmGrain.intensity.value += intensity;
+    }
+    private void OnDestroy()
+    {
+        postProcessEvents.OnIncreaseIntesityFilmGrain -= IncreaseIntensity;
     }
 }

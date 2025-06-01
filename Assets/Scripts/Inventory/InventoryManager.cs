@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Linq.Expressions;
 using TMPro;
@@ -18,36 +19,51 @@ public class InventoryManager : MonoBehaviour
 
     [SerializeField] Player player;
     [SerializeField] public InventorySO inventory;
-    [SerializeField] InventorySO chestInventory;
+    [SerializeField] public InventorySO chestInventory;
     [SerializeField] NoteInventorySO noteInventory;
     [SerializeField] GameObject notesRoot;
     [SerializeField] GameObject notesDiaryPanel;
+    [SerializeField] GameObject notesDiaryPanelScroll;
     [SerializeField] GameObject unequipButton;
     [SerializeField] GameObject itemDescriptionPanel;
     [SerializeField] GameObject notesPanel;
     [SerializeField] GameObject notesPanelScroll;
     [SerializeField] private GameObject imagePanel;
     [SerializeField] private GameObject bookPanel;
-    [SerializeField] private PostProcessEvents postProcessEvents;
+    [SerializeField] private Events events;
+    [SerializeField] public bool glitchDone = false;
+    public event Action<bool> OnNote;
 
-    private Item equippedItem;
+    public Item equippedItem;
 
     public bool isCombining { get; private set; }
     public bool chestOpened { get; private set; }
     private Item targetItemToCombine;
     public InputSystem_Actions _inputActions { get; private set; }
 
+    [Header("Audio")]
+    AudioSource inventoryAudioSource;
+    [SerializeField]
+    AudioClip tapeAudio;
+    
     private void Awake()
     {
         if (instance == null)
             instance = this;
         _inputActions = new InputSystem_Actions();
         _inputActions.Chest.OpenClose.performed += ToggleChest;
+        inventoryAudioSource = this.GetComponent<AudioSource>();
     }
 
     private void Start()
     {
         InitState(ActionStates.NOACTION);
+    }
+
+    private void OnDestroy()
+    {
+        _inputActions.Chest.OpenClose.performed -= ToggleChest;
+        instance = null;
     }
 
     public void ItemSelected(Item item)
@@ -123,6 +139,8 @@ public class InventoryManager : MonoBehaviour
                 isCombining = false;
                 ToggleActionsButtons(false);
                 FillClearItemDescriptionPanel("", "", true);
+                notesDiaryPanel.SetActive(false);
+                notesDiaryPanelScroll.SetActive(false);
                 break;
             case ActionStates.SELECT_ACTION:
                 ToggleActionsButtons(true);
@@ -172,6 +190,7 @@ public class InventoryManager : MonoBehaviour
                 _inputActions.Chest.Enable();
                 player.ToggleInputPlayer(false, false);
                 player.ToggleChestAnimation(true);
+                player.inventoryOpened = true;
                 //player.ResumeInteract(false);
                 break;
             case ActionStates.ACTION_CHEST_SELECT:
@@ -225,6 +244,7 @@ public class InventoryManager : MonoBehaviour
 
     public void AddNewItemAfterCombine(Item newItem)
     {
+        inventoryAudioSource.PlayOneShot(tapeAudio);
         inventory.UseItem(itemSelected);
         inventory.UseItem(targetItemToCombine);
         inventory.AddItem(newItem);
@@ -271,7 +291,6 @@ public class InventoryManager : MonoBehaviour
         Cursor.visible = true;
         player.inventoryOpened = true;
         player.ToggleInputPlayer(false, true);
-        inventoryUI.target = target;
         inventoryUI.Show();
         ChangeState(ActionStates.NOACTION);
     }
@@ -281,12 +300,12 @@ public class InventoryManager : MonoBehaviour
         Cursor.visible = false;
         player.inventoryOpened = false;
         player.ToggleInputPlayer(true, true);
-        inventoryUI.target = null;
         inventoryUI.Hide();
     }
 
     public void UseHealingItem(int healing, Item item)
     {
+        
         Debug.Log("Player usa item de curacion");
         inventory.UseItem(item);
         inventoryUI.Show();
@@ -295,10 +314,24 @@ public class InventoryManager : MonoBehaviour
 
     public void UseAmmo(int numAmmo, Item item)
     {
-        player.ReloadAmmo(numAmmo);
-        Debug.Log("Player recarrega les bales");
-        inventory.UseItem(item);
-        inventoryUI.Show();
+        if(player.gunAmmo < 12)
+        {
+            if(player.gunAmmo + numAmmo <= 12)
+                player.ReloadAmmo(numAmmo);
+            else
+            {
+                player.gunAmmo = 0;
+                player.ReloadAmmo(12); //Nomes entrara aqui quan sobrepassi el limit de 12 bales
+            }
+
+            Debug.Log("Player recarrega les bales");
+            inventory.UseItem(item);
+            inventoryUI.Show();
+        }
+        else
+        {
+            //Avisar de que no pots carregar bales
+        }
     }
 
     public void UseKeyItem(Item item)
@@ -330,19 +363,25 @@ public class InventoryManager : MonoBehaviour
         inventoryUI.GetComponent<ShowInventory>().ChangeItemSelected();
     }
 
-    public void OpenNote(NotesSO note)
+    public void OpenDiaryNote(NotesSO note)
     {
         notesDiaryPanel.SetActive(true);
         notesDiaryPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text=note.name;
         notesDiaryPanel.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = note.noteContent;
+    }  
+    public void OpenDiaryNoteScroll(NotesSO note)
+    {
+        notesDiaryPanelScroll.SetActive(true);
+        notesDiaryPanelScroll.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text=note.name;
+        notesDiaryPanelScroll.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = note.noteContent;
     }
 
     public void DiscoverNote(NotesSO note)
     {
         noteInventory.AddNote(note);
-        postProcessEvents.IncreaseIntensityChAb(0.167f);
-        postProcessEvents.IncreaseSampleChAb(3);
-        postProcessEvents.IncreaseIntensityFilmGrain(0.167f);
+        events.IncreaseIntensityChAb(0.167f);
+        events.IncreaseSampleChAb(3);
+        events.IncreaseIntensityFilmGrain(0.167f);
     }
 
     public void ShowNoteScroll(NotesSO note)
@@ -352,6 +391,7 @@ public class InventoryManager : MonoBehaviour
         notesPanelScroll.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = note.noteContent;
         player.ToggleInputPlayer(false, false);
         Cursor.visible = true;
+        OnNote?.Invoke(true);
 
     }
     public void ShowNote(NotesSO note)
@@ -361,6 +401,7 @@ public class InventoryManager : MonoBehaviour
         notesPanel.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = note.noteContent;
         player.ToggleInputPlayer(false, false);
         Cursor.visible = true;
+        OnNote?.Invoke(true);
 
     }
 
@@ -370,6 +411,7 @@ public class InventoryManager : MonoBehaviour
         imagePanel.transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = content;
         player.ToggleInputPlayer(false, false);
         Cursor.visible = true;
+        OnNote?.Invoke(true);
     }
 
     public void ShowBookNote(string content)
@@ -378,31 +420,36 @@ public class InventoryManager : MonoBehaviour
         bookPanel.SetActive(true);
         bookPanel.transform.GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>().text = content;
         player.ToggleInputPlayer(false, false);
+        OnNote?.Invoke(true);
     }
 
     public void CloseNote()
     {
         notesPanel.SetActive(false);
         player.ToggleInputPlayer(true, true);
+        OnNote?.Invoke(false);
+        
     }    
     public void CloseNoteScroll()
     {
         Cursor.visible = false;
         notesPanelScroll.SetActive(false);
         player.ToggleInputPlayer(true, true);
+        OnNote?.Invoke(false);
     }
 
     public void CloseImageNote()
     {
         imagePanel.SetActive(false);
         player.ToggleInputPlayer(true, true);
-        player.ToggleInputPlayer(true, true);
+        OnNote?.Invoke(false);
     }
 
     public void CloseBookNote()
     {
         bookPanel.SetActive(false);
         player.ToggleInputPlayer(true, true);
+        OnNote?.Invoke(false);
     }
 
     //pasar este metodo al ui.
@@ -441,6 +488,7 @@ public class InventoryManager : MonoBehaviour
         _inputActions.Chest.Disable();
         inventoryUI.Hide();
         player.ToggleChestAnimation(false);
+        player.inventoryOpened = false;
         ChangeState(ActionStates.NOACTION);
     }
 
@@ -471,5 +519,8 @@ public class InventoryManager : MonoBehaviour
     {
         inventoryUI.SetEquippedItem(null, false);
         unequipButton.SetActive(false);
+        player.equipedObject = null;
+        player.itemSlotOccuped = false;
+        equippedItem = null;
     }
 }

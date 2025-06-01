@@ -5,8 +5,8 @@ using UnityEngine;
 public class SaveItem : Item
 {
     [Header("Common values")]
-    [SerializeField] private string nom;
-    public override string Name => name;
+    [SerializeField] private string itemName;
+    public override string Name => itemName;
     [SerializeField] private string description;
     public override string Description => description;
 
@@ -39,19 +39,4 @@ public class SaveItem : Item
 
     [SerializeField] private int saveId;
     public override int id => saveId;
-
-    public override void Use()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public override void Combine(Item item)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public override void Equip()
-    {
-        throw new System.NotImplementedException();
-    }
 }
