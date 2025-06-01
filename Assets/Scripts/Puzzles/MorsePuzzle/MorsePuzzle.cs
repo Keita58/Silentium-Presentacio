@@ -57,7 +57,7 @@ public class MorsePuzzle : MonoBehaviour
 
             foreach (char c in message)
             {
-                //agafem el codi en morse segons el car�cter
+                //agafem el codi en morse segons el caracter
                 string code = morseCode[c];
 
                 if (code == " ")
@@ -65,7 +65,7 @@ public class MorsePuzzle : MonoBehaviour
                     yield return new WaitForSeconds(letterSpace); //espai entre paraula
                     continue;
                 }
-                //Recorrem cada car�cter 
+                //Recorrem cada caracter del morse 
                 foreach (char symbol in code)
                 {
                     morseLight.enabled = true;

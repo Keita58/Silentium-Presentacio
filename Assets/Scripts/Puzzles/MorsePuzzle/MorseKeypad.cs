@@ -71,16 +71,17 @@ namespace NavKeypad
                     CheckCombo();
                     break;
                 default:
-                    
+                    //Si la paraula actual és més llarga que 14 caràcters, no acceptem més entrades
                     if (currentInput != null && currentInput.Length ==14)
                     {
                         return;
                     }
-
+                    //Si l'entrada és un punt o un guió, l'afegim al caràcter morse actual
                     if (input == "." || input == "-")
                     {
                         currentMorseCharacter += input;
                     }
+                    //Si l'entrada és "endLetter", comprovem si el caràcter morse actual és al diccionari i si ho és, afegim la lletra corresponent a l'entrada actual. Si no, afegim un "?".
                     else if (input == "endLetter") 
                     {
                         if (morseCode.ContainsKey(currentMorseCharacter))
@@ -94,10 +95,13 @@ namespace NavKeypad
 
                         currentMorseCharacter = "";
                     }
+                    //Si l'entrada és un espai, l'afegim a l'entrada actual
                     else if (input == "/")
                     {
                         currentInput += " ";
-                    }else if (input == "delete")
+                    }
+                    //Si l'entrada és "delete", eliminem l'últim caràcter de l'entrada actual
+                    else if (input == "delete")
                     {
                         char[] aux= currentInput.ToCharArray();
                         currentInput = "";
@@ -109,7 +113,6 @@ namespace NavKeypad
                             }
                         }
                     }
-
                     keypadDisplayText.text = currentInput;
                     break;
             }
