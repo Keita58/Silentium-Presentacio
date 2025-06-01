@@ -10,6 +10,7 @@ public class Credits : MonoBehaviour
     private void Awake()
     {
         video = GetComponent<VideoPlayer>();
+        video.enabled = false;
     }
 
     float deltaTime = 0f;
@@ -19,6 +20,7 @@ public class Credits : MonoBehaviour
         canvas.enabled = false;
         credits = true;
         deltaTime = 0f;
+        video.enabled = true;
     }
     private void Update()
     {
@@ -30,6 +32,7 @@ public class Credits : MonoBehaviour
                 deltaTime = 0f;
                 credits = false;
                 canvas.enabled = true;
+                video.enabled = false;
             }
         }
     }
