@@ -233,7 +233,7 @@ public class BlindEnemy : Enemy
                 if (_Search && _CurrentState != EnemyStates.ATTACK && _ChangeStateToPatrol == null)
                 {
                     Debug.Log("Activo la corutina WakeUp");
-                    _ChangeStateToPatrol = StartCoroutine(WakeUp(10));
+                    _ChangeStateToPatrol = StartCoroutine(WakeUp(2));
                 }
                 _Animator.enabled = false;
                 _Patrolling = false;
