@@ -53,11 +53,23 @@ public class Load : MonoBehaviour
     {
         LoadConfig();
         GameManager.instance.onLoadedScene += LoadGame;
+        GameManager.instance.onNewScene += NewGameLoad;
     }
 
     private void OnDestroy()
     {
-        GameManager.instance.onLoadedScene -= LoadGame;
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.onLoadedScene -= LoadGame;
+            GameManager.instance.onNewScene -= NewGameLoad;
+        }
+    }
+
+    private void NewGameLoad()
+    {
+        _ChestInventory.items.Clear();
+        _Inventory.items.Clear();
+        _NotesInventory.notes.Clear();
     }
 
     public void LoadGame()

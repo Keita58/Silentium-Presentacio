@@ -17,7 +17,6 @@ public class PuzzleManager : MonoBehaviour
     private Camera cam_Clock;
     [SerializeField]
     private Camera cam_Player;
-    private InputSystem_Actions inputActionPlayer;
     public bool clockPuzzleCompleted { get; set; }
 
     [Header("Hieroglyphic Puzzle")]
@@ -115,24 +114,10 @@ public class PuzzleManager : MonoBehaviour
     private Transform positionAfterPoem;
 
     [Header("All puzzles")]
-    private float animationTime;
+    [SerializeField] private float animationTime;
     [SerializeField]
-    private AnimationClip fadeOut;
-    private bool fadeOutStarted = false;
     private bool teleported = false;
     private Transform positionToTeleport;
-
-    [Header("Glitch")]
-    [SerializeField]
-    private Material material;
-    [SerializeField]
-    private float noiseAmount;
-    [SerializeField]
-    private float glitchStrength;
-    [SerializeField]
-    private float scanLinesStrength;
-    [SerializeField]
-    private float FlickeringStrength;
     [SerializeField] 
     private Events events;
 
@@ -144,7 +129,6 @@ public class PuzzleManager : MonoBehaviour
     private void Awake()
     {
         glitchAudioSource = this.GetComponent<AudioSource>();
-        inputActionPlayer = new InputSystem_Actions();
         if (instance == null)
             instance = this;
     }
@@ -209,7 +193,7 @@ public class PuzzleManager : MonoBehaviour
         player._inputActions.Player.Disable();
         player.ResumeInteract(false);
         events.ToggleCustomPass(false);
-        cam_Hierogliphic.transform.parent.GetComponent<LineRendererExample>()._inputAction.Hieroglyphic.Enable();
+        cam_Hierogliphic.transform.parent.GetComponent<LineRenderer>()._inputAction.Hieroglyphic.Enable();
         Cursor.visible = true;
         events.ToggleUI(false);
     }
@@ -248,7 +232,7 @@ public class PuzzleManager : MonoBehaviour
 
         player._inputActions.Player.Enable();
         events.ToggleCustomPass(false);
-        cam_Hierogliphic.transform.parent.GetComponent<LineRendererExample>()._inputAction.Hieroglyphic.Disable();
+        cam_Hierogliphic.transform.parent.GetComponent<LineRenderer>()._inputAction.Hieroglyphic.Disable();
         player.ResumeInteract(true);
         cam_Player.gameObject.SetActive(true);
         Cursor.visible = false;

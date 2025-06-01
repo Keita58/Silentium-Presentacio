@@ -1,17 +1,15 @@
-// Programatically add a LineRenderer component and draw a 3D line.
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class LineRendererExample : MonoBehaviour
+public class LineRenderer : MonoBehaviour
 {
     [SerializeField]
     private AI ocr;
     [SerializeField]
     Camera cam;
-    private List<LineRenderer> lineRenderer;
+    private List<UnityEngine.LineRenderer> lineRenderer;
     [SerializeField]
     private float minDistance;
     [SerializeField]
@@ -20,7 +18,7 @@ public class LineRendererExample : MonoBehaviour
     public InputSystem_Actions _inputAction { get; private set; }
     private Vector3 previousPosition;
     DrawSystem drawSystem;
-    LineRenderer lr;
+    UnityEngine.LineRenderer lr;
     bool correctPosition = false;
     void Start()
     {
@@ -30,14 +28,14 @@ public class LineRendererExample : MonoBehaviour
         _inputAction.Hieroglyphic.Finish.performed += PaintingFinished;
         _inputAction.Hieroglyphic.Exit.performed += Exit;
         // _inputAction.Hieroglyphic.Paint.canceled += a; // crea dos quad por esto.
-        lineRenderer = new List<LineRenderer>();
+        lineRenderer = new List<UnityEngine.LineRenderer>();
         // Set the material
         previousPosition = transform.position;
         GameObject lineObject = new GameObject("Line");
         lineObject.transform.parent = this.transform;
         lineObject.transform.localPosition = Vector3.zero;
         lineObject.layer = 14;
-        lr = lineObject.AddComponent<LineRenderer>();
+        lr = lineObject.AddComponent<UnityEngine.LineRenderer>();
         lr.SetColors(Color.black, Color.black);
         lr.startWidth = 0.05f;                 // Ancho de la lnea
         lr.endWidth = 0.05f;
@@ -84,7 +82,7 @@ public class LineRendererExample : MonoBehaviour
                 lineObject.transform.parent = this.transform;
                 lineObject.transform.localPosition = Vector3.zero;
                 lineObject.layer = 14;
-                lr = lineObject.AddComponent<LineRenderer>();
+                lr = lineObject.AddComponent<UnityEngine.LineRenderer>();
                 lr.SetColors(Color.black, Color.black);
                 lr.startWidth = 0.05f;
                 lr.endWidth = 0.05f;
@@ -122,7 +120,7 @@ public class LineRendererExample : MonoBehaviour
         GameObject lineObject = new GameObject("Line");
         lineObject.transform.parent = this.transform;
         lineObject.layer = 14;
-        lr = lineObject.AddComponent<LineRenderer>();
+        lr = lineObject.AddComponent<UnityEngine.LineRenderer>();
         lr.SetColors(Color.black, Color.black);
         lr.startWidth = 0.05f;                 // Ancho de la linea
         lr.endWidth = 0.05f;
@@ -140,7 +138,7 @@ public class LineRendererExample : MonoBehaviour
         GameObject lineObject = new GameObject("Line");
         lineObject.transform.parent = this.transform;
         lineObject.layer = 14;
-        lr = lineObject.AddComponent<LineRenderer>();
+        lr = lineObject.AddComponent<UnityEngine.LineRenderer>();
         lr.SetColors(Color.black, Color.black);
         lr.startWidth = 0.05f;                 // Ancho de la linea
         lr.endWidth = 0.05f;

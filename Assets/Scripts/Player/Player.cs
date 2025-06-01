@@ -202,7 +202,7 @@ public class Player : MonoBehaviour
     void Start()
     {
         Cursor.visible = false;
-        coroutineInteract = StartCoroutine(InteractuarRaycast());
+        coroutineInteract = StartCoroutine(InteractRaycast());
         inventoryOpened = false;
 
         hp = 6;
@@ -244,12 +244,12 @@ public class Player : MonoBehaviour
 
     private void Interact(InputAction.CallbackContext context)
     {
-        Debug.Log("ENTRO?");
+        //Si el jugador està interactuant amb un objecte
         if (interactiveGameObject != null)
         {
+            //Si és una porta cridem a l'Interact de la porta, ja que és diferent (necessita la posició del jugador per obrir-se).
             if (interactiveGameObject.GetComponent<IInteractuable>() is InteractuableDoor)
             {
-                Debug.DrawRay(_Camera.transform.position, _Camera.transform.forward, Color.magenta, 5f);
                 if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask))
                 {
                     if (hit.collider.TryGetComponent<InteractuableDoor>(out InteractuableDoor door))
@@ -259,6 +259,7 @@ public class Player : MonoBehaviour
                     }
                 }
             }
+            //Si és un llibre, cridem a l'Interact del llibre, ja que necessita l'objecte equipat per interactuar.
             else if (interactiveGameObject.GetComponent<IInteractuable>() is InteractuableCellBook)
             {
                 if (equipedObject != null)
@@ -273,9 +274,10 @@ public class Player : MonoBehaviour
             {
                 interactiveGameObject.GetComponent<IInteractuable>().Interact();
             }
+            //Si l'objecte interactuable és remarkable, li tornem a posar el material base per tal que no es vegi l'outliner quan es fa el puzle per exemple.
             if (interactiveGameObject.GetComponent<IInteractuable>().isRemarkable)
                 interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
-
+            //Netegem la referència de l'objecte interactuable per tal que no es pugui tornar a interactuar fins que no es torni a fer un raycast.
             if (interactiveGameObject != null)
                 interactiveGameObject = null;
             {
@@ -294,7 +296,7 @@ public class Player : MonoBehaviour
         if (resume)
         {
             if (coroutineInteract == null)
-                coroutineInteract = StartCoroutine(InteractuarRaycast());
+                coroutineInteract = StartCoroutine(InteractRaycast());
         }
         else
         {
@@ -479,8 +481,6 @@ public class Player : MonoBehaviour
                 break;
             case PlayerStates.CROUCH:
                 playerAudioSource.Stop();
-                //this.GetComponent<CharacterController>().center = new Vector3(0f, crouchedCenterCollider, 0f);
-                //this.GetComponent<CharacterController>().height = crouchedHeightCollider;
                 _Camera.transform.localPosition = new Vector3(0f, 0f, -0.198f);
                 cameraShenanigansGameObject.transform.localPosition = Vector3.zero;
                 _VelocityMove /= 2;
@@ -594,16 +594,6 @@ public class Player : MonoBehaviour
                 }
                 break;
             case PlayerStates.CROUCH:
-                //if (coroutineCrouch != null)
-                //    StopCoroutine(coroutineCrouch);
-                //if (!crouched)
-                //{
-                //    this.GetComponent<CharacterController>().center = Vector3.zero;
-                //    this.GetComponent<CharacterController>().height = 2;
-                //    _Camera.transform.localPosition = cameraPositionBeforeCrouch;
-                //    cameraShenanigansGameObject.transform.localPosition = new Vector3(0f, _Camera.transform.localPosition.y, 0f);
-                //    _VelocityMove *= 2;
-                //}
                 if (coroutineCrouch != null)
                 {
                     StopCoroutine(coroutineCrouch);
@@ -611,8 +601,6 @@ public class Player : MonoBehaviour
                 }
                 break;
             case PlayerStates.CROUCH_IDLE:
-                //this.GetComponent<CharacterController>().center = Vector3.zero;
-                //this.GetComponent<CharacterController>().height = 2;
                 _Camera.transform.localPosition = cameraPositionBeforeCrouch;
                 cameraShenanigansGameObject.transform.localPosition = new Vector3(0f, _Camera.transform.localPosition.y, 0f);
                 _VelocityMove *= 2;
@@ -624,25 +612,26 @@ public class Player : MonoBehaviour
 
     #endregion
 
-    public IEnumerator InteractuarRaycast()
+    public IEnumerator InteractRaycast()
     {
         while (true)
         {
             Debug.DrawRay(_Camera.transform.position, _Camera.transform.forward, Color.magenta, 5f);
-            //Lanzar Raycast interactuar con el mundo.
-
             if (Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit, 5f, interactLayerMask))
             {
                 if (hit.transform.TryGetComponent<IInteractuable>(out IInteractuable interactuable))
                 {
                     if (interactuable.isInteractuable)
                     {
+                        //Traiem el material de l'objecte interactuable si es remarkable i és un objecte diferent amb el que vam interactuar
                         if (interactiveGameObject != null && !interactiveGameObject.Equals(hit.transform.gameObject) && interactuable.isRemarkable && interactiveGameObject.GetComponent<MeshRenderer>() != null)
                         {
                             interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
                             interactiveGameObject = null;
                         }
+                        //Guardem una referència a l'objecte interactuable
                         interactiveGameObject = hit.transform.gameObject;
+                        //Si l'objecte interactuable és remarkable, li afegim el material
                         if (interactuable.isRemarkable)
                         {
                             interactiveGameObject.GetComponent<MeshRenderer>().materials = new Material[] { interactiveGameObject.GetComponent<MeshRenderer>().materials[0] };
@@ -658,6 +647,7 @@ public class Player : MonoBehaviour
                     }
                 }
             }
+            //Si no hi ha cap objecte interactuable a la vista, netegem la referència i invoquem l'event OnNotInteractuable
             else if (!Physics.Raycast(_Camera.transform.position, _Camera.transform.forward, out RaycastHit hit2, 5f, interactLayerMask))
             {
                 if (interactiveGameObject != null)

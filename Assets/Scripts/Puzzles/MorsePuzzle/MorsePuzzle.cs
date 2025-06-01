@@ -7,11 +7,11 @@ public class MorsePuzzle : MonoBehaviour
     private Light morseLight;
 
     //Morse durations
-    private float dotDuration = 0.3f;
-    private float dashDuration = 0.9f;
-    private float spaceDuration = 0.3f;
-    private float letterSpace = 2.1f;
-    private string message = "Despierta papa";
+    [SerializeField] private float dotDuration = 0.3f;
+    [SerializeField] private float dashDuration = 0.9f;
+    [SerializeField] private float spaceDuration = 0.3f;
+    [SerializeField] private float letterSpace = 2.1f;
+    [SerializeField] private string message = "Despierta papa";
 
     [SerializeField] DetectMorseEntry detectMorseEntry;
 
@@ -57,7 +57,7 @@ public class MorsePuzzle : MonoBehaviour
 
             foreach (char c in message)
             {
-                //agafem el codi en morse segons el caràcter
+                //agafem el codi en morse segons el caracter
                 string code = morseCode[c];
 
                 if (code == " ")
@@ -65,7 +65,7 @@ public class MorsePuzzle : MonoBehaviour
                     yield return new WaitForSeconds(letterSpace); //espai entre paraula
                     continue;
                 }
-                //Recorrem cada caràcter 
+                //Recorrem cada caracter del morse 
                 foreach (char symbol in code)
                 {
                     morseLight.enabled = true;

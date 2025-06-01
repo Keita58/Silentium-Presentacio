@@ -6,15 +6,9 @@ using UnityEngine.UI;
 
 public class ShowInventory : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    [SerializeField] public GameObject target;
-
     [SerializeField] GameObject parentGameObject;
     [SerializeField] GameObject chestRootGameObject;
     [SerializeField] GameObject notesRoot;
-
-    [SerializeField] InventorySO inventory;
-    [SerializeField] InventorySO chestInventory;
 
     [SerializeField] GameObject itemPrefab;
     [SerializeField] GameObject itemEquippedSlotPrefab;
@@ -32,10 +26,10 @@ public class ShowInventory : MonoBehaviour
         InventoryManager.instance.ShowDiscoveredNotes();
         
         parentGameObject.transform.parent.gameObject.SetActive(true);
-        for (int i = 0; i < inventory.items.Count; i++)
+        for (int i = 0; i < InventoryManager.instance.inventory.items.Count; i++)
         {
             GameObject displayedItem = Instantiate(itemPrefab, parentGameObject.transform.GetChild(i).transform);
-            displayedItem.GetComponent<ShowItem>().Load(inventory.items[i]);
+            displayedItem.GetComponent<ShowItem>().Load(InventoryManager.instance.inventory.items[i]);
             displayedItem.GetComponent<ShowItem>().OnUseItem += Show;
         }
         
@@ -56,10 +50,10 @@ public class ShowInventory : MonoBehaviour
     {
         notesRoot.SetActive(false);
         chestRootGameObject.SetActive(true) ;
-        for (int i=0; i < chestInventory.items.Count; i++)
+        for (int i=0; i <  InventoryManager.instance.chestInventory.items.Count; i++)
         {
             GameObject displayedItem = Instantiate(chestSlot, chestRootGameObject.transform.GetChild(i).transform);
-            displayedItem.GetComponent<ShowChestItem>().Load(chestInventory.items[i]);
+            displayedItem.GetComponent<ShowChestItem>().Load(InventoryManager.instance.chestInventory.items[i]);
         }
     }
     public void Hide()
@@ -97,9 +91,9 @@ public class ShowInventory : MonoBehaviour
         {
             for (int x = 0; x < itemsToCombine.Count; x++)
             {
-                for (int i = 0; i < inventory.items.Count; i++)
+                for (int i = 0; i < InventoryManager.instance.inventory.items.Count; i++)
                 {
-                    if (inventory.items.ElementAt(i).item != itemsToCombine.ElementAt(x))
+                    if (InventoryManager.instance.inventory.items.ElementAt(i).item != itemsToCombine.ElementAt(x))
                     {
                         Transform child = parentGameObject.transform;
                         if (child.childCount > i)
@@ -113,7 +107,7 @@ public class ShowInventory : MonoBehaviour
         }
         else
         {
-            for (int i = 0; i < inventory.items.Count; i++)
+            for (int i = 0; i < InventoryManager.instance.inventory.items.Count; i++)
             {
                 Transform child = parentGameObject.transform;
                 if (child.childCount > i)
