@@ -129,6 +129,7 @@ public class BlindEnemy : Enemy
                 break;
             case EnemyStates.KNOCKED:
                 _Collider.enabled = false;
+                _Animator.enabled = false;
                 StartCoroutine(WakeUp(10));
                 break;
         }
@@ -162,6 +163,7 @@ public class BlindEnemy : Enemy
                 break;
             case EnemyStates.KNOCKED:
                 _Collider.enabled = true;
+                _Animator.enabled = false;
                 _Hp = MAXHEALTH;
                 break;
         }
@@ -345,7 +347,6 @@ public class BlindEnemy : Enemy
                     //No necessiten comprovació ja que només entrarà aquí quan pugui tornar a saltar,
                     //que es recupera quan acaba la corutina de RecoverJump
                     _BlindAudioSource.PlayOneShot(_blindAttackAudioClip);
-                    StartCoroutine(RecoverAgent());
                     StartCoroutine(RecoverJump());
                 }
                 //Si la distància és massa gran només anirà fins al punt d'orígen del so.
@@ -411,13 +412,11 @@ public class BlindEnemy : Enemy
         door.Close();
     }
 
-    IEnumerator RecoverAgent()
+    public void ActivatePatrol()
     {
-        yield return new WaitForSeconds(1f);
-        if (_CurrentState != EnemyStates.ATTACK)
-            ChangeState(EnemyStates.PATROL);
+        ChangeState(EnemyStates.PATROL);
     }
-
+    
     IEnumerator RecoverJump()
     {
         yield return new WaitForSeconds(3);

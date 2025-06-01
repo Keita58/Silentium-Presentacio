@@ -18,14 +18,17 @@ public class Load : MonoBehaviour
     [SerializeField] private InventorySO _ChestInventory;
     [SerializeField] private NoteInventorySO _NotesInventory;
     [SerializeField] private ShowInventory _ShowInventory;
+    [SerializeField] private InventoryManager _InventoryManager;
 
     [Header("DataBase for the notes")]
     [SerializeField] private BDNotes _Notes;
     [SerializeField] private BDItems _Items;
     [SerializeField] private BDBooks _Books;
 
-    [Header("Shaders")]
-    [SerializeField] private GameObject _Shaders;
+    [Header("Shaders")] 
+    [SerializeField] private GameObject _Shader;
+    private ChromaticAberration _Chromatic;
+    private FilmGrain _FilmGrain;
 
     [Header("Player")]
     [SerializeField] private Player _Player;
@@ -58,11 +61,8 @@ public class Load : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (GameManager.instance != null)
-        {
-            GameManager.instance.onLoadedScene -= LoadGame;
-            GameManager.instance.onNewScene -= NewGameLoad;
-        }
+        GameManager.instance.onLoadedScene -= LoadGame;
+        GameManager.instance.onNewScene -= NewGameLoad;
     }
 
     private void NewGameLoad()
@@ -128,26 +128,25 @@ public class Load : MonoBehaviour
             }
 
             //Treure la info del Volume
-            Volume VolumeInfo = _Shaders.GetComponent<Volume>();
+            Volume VolumeInfo = _Shader.GetComponent<Volume>();
 
-            VolumeInfo.profile.TryGet(out ChromaticAberration Chromatic);
-            Chromatic.active = info.ChromaticAberration;
-            Chromatic.intensity.value = info.IntensityChromaticAberration;
-            Chromatic.maxSamples = info.Samples;
+            VolumeInfo.profile.TryGet(out _Chromatic);
+            _Chromatic.active = info.ChromaticAberration;
+            _Chromatic.intensity.value = info.IntensityChromaticAberration;
+            _Chromatic.maxSamples = info.Samples;
 
-            VolumeInfo.profile.TryGet(out FilmGrain Film);
-            Film.active = info.FilmGrain;
-            Film.intensity.value = info.IntensityFilmGrain;
-            
-            VolumeInfo.profile.TryGet(out Fog Fog);
-            Fog.active = info.Fog;
+            VolumeInfo.profile.TryGet(out _FilmGrain);
+            _FilmGrain.active = info.FilmGrain;
+            _FilmGrain.intensity.value = info.IntensityFilmGrain;
 
             //Info del jugador
             _Player.hp = info.Hp;
             _Player.isSilencerEquipped = info.Silencer;
             _Player.silencerUses = info.SilencerUses;
             _Player.gunAmmo = info.Ammo;
+            _Player.GetComponent<CharacterController>().enabled = false;
             _Player.transform.position = info.Position;
+            _Player.GetComponent<CharacterController>().enabled = true;
 
             //Puzles
             _PuzzleManager.clockPuzzleCompleted = info.ClockPuzzle;
@@ -156,6 +155,7 @@ public class Load : MonoBehaviour
             _PuzzleManager.poemPuzzleCompleted = info.PoemPuzzle;
             _PuzzleManager.isMorseCompleted = info .MorsePuzzle;
             _PuzzleManager.weaponPuzzleCompleted = info.WeaponPuzzle;
+            _InventoryManager.glitchDone = info.GlithDone;
 
             _PuzzleManager.LoadGame();
 
@@ -183,6 +183,8 @@ public class Load : MonoBehaviour
 
             if (File.Exists(temporalExistingFile))
                 File.Delete(temporalExistingFile);
+            
+            Time.timeScale = 1;
         }
     }
 

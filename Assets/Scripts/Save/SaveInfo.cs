@@ -28,6 +28,7 @@ public class SaveInfo
     public bool PoemPuzzle;
     public bool MorsePuzzle;
     public bool WeaponPuzzle;
+    public bool GlithDone;
 
     //Puzle llibres
     public List<CellBookSave> CellBooks;

@@ -166,6 +166,7 @@ public class Waves : MonoBehaviour
     {
         player.OnMakeImpactSound -= MakeImpactSound;
         player.OnMakeSound -= MakeSound;
+        player.OnHpChange -= ChangeColorWave;
     }
 
 }

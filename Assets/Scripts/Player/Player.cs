@@ -760,6 +760,9 @@ public class Player : MonoBehaviour
             _inputActions.Player.Throw.performed -= ThrowItem;
             _inputActions.Player.Pause.performed -= OpenMenu;
             _inputActions.Player.Flashlight.performed -= Flashlight;
+            _inputActions.Player.Disable();
+            if(InventoryManager.instance != null)
+                InventoryManager.instance.OnNote -= SetNoteOpened;
         }
     }
 }

@@ -72,6 +72,16 @@ public class Save : MonoBehaviour
         _Settings.onSaveConfig += SaveConfigMenu;
     }
 
+    private void OnDestroy()
+    {
+        if(_Camera1 != null && _Camera2 != null)
+        {
+            _Camera1.onSaveGame -= SaveGame;
+            _Camera2.onSaveGame -= SaveGame;
+        }
+        _Settings.onSaveConfig -= SaveConfigMenu;
+    }
+
     public void SaveGame()
     {
         if(filepath == "")
@@ -147,6 +157,7 @@ public class Save : MonoBehaviour
             PoemPuzzle = _PuzzleManager.poemPuzzleCompleted,
             MorsePuzzle = _PuzzleManager.isMorseCompleted,
             WeaponPuzzle = _PuzzleManager.weaponPuzzleCompleted,
+            GlithDone = _InventoryManager.glitchDone,
             ChromaticAberration = Chromatic.active,
             IntensityChromaticAberration = Chromatic.intensity.value,
             Samples = Chromatic.maxSamples,
@@ -163,6 +174,8 @@ public class Save : MonoBehaviour
 
         string infoToSave = JsonUtility.ToJson(info, true);
         File.WriteAllText(filepath, infoToSave);
+        
+        Time.timeScale = 1;
     }
 
     public void TemporalSaveGame()

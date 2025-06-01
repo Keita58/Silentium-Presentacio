@@ -10,8 +10,6 @@ public class FilmGrainManager : MonoBehaviour
     void Start()
     {
         volume = GetComponent<Volume>();
-        volume.profile.TryGet(out filmGrain);
-        filmGrain.active = false;
         postProcessEvents.OnIncreaseIntesityFilmGrain += IncreaseIntensity;
     }
 

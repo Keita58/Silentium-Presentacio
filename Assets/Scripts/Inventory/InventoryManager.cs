@@ -45,9 +45,9 @@ public class InventoryManager : MonoBehaviour
     AudioSource inventoryAudioSource;
     [SerializeField]
     AudioClip tapeAudio;
+    
     private void Awake()
     {
-
         if (instance == null)
             instance = this;
         _inputActions = new InputSystem_Actions();
@@ -58,6 +58,12 @@ public class InventoryManager : MonoBehaviour
     private void Start()
     {
         InitState(ActionStates.NOACTION);
+    }
+
+    private void OnDestroy()
+    {
+        _inputActions.Chest.OpenClose.performed -= ToggleChest;
+        instance = null;
     }
 
     public void ItemSelected(Item item)

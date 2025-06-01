@@ -1,3 +1,4 @@
+using System;
 using NavKeypad;
 using System.Collections.Generic;
 using System.Linq;
@@ -144,6 +145,11 @@ public class PuzzleManager : MonoBehaviour
         animationTime = 0f;
     }
 
+    private void OnDestroy()
+    {
+        instance = null;
+    }
+
     public void InteractClockPuzzle()
     {
         cam_Player.gameObject.SetActive(false);
@@ -216,6 +222,7 @@ public class PuzzleManager : MonoBehaviour
 
     public void HieroglyphicPuzzleExitAnimation2()
     {
+        hieroglyphicAnimator.enabled = false;
         cam_HieroglyphicAnimation.gameObject.SetActive(false);
         cam_HieroglyphicAnimation2.gameObject.SetActive(true);
         hieroglyphicAnimator2.Play(HieroglyphicAnimation2.name);
@@ -243,6 +250,7 @@ public class PuzzleManager : MonoBehaviour
     {
         if(isHieroglyphicCompleted)
         {
+            hieroglyphicAnimator.enabled = false;
             cam_Hierogliphic.gameObject.SetActive(false);
             cam_Player.gameObject.SetActive(true);
             Cursor.visible = false;

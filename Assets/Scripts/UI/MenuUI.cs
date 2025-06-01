@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 
@@ -34,6 +35,12 @@ public class MenuUI : MonoBehaviour
     {
         events.OnToggleUI += ToggleUI;
         player.OnAmmoChange += ChangeNumAmmo;
+    }
+
+    private void OnDestroy()
+    {
+        events.OnToggleUI -= ToggleUI;
+        player.OnAmmoChange -= ChangeNumAmmo;
     }
 
     private void ToggleUI(bool active)

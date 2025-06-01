@@ -34,6 +34,7 @@ public class DetectionFloor : MonoBehaviour
             _NavMeshAgent.enabled = true;
             _Animator.enabled = true;
             _Collider.enabled = true;
+            _Enemy.ActivatePatrol();
         }
     }
 }

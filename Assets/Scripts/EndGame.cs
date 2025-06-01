@@ -7,8 +7,7 @@ public class EndGame : MonoBehaviour
     {
         if (other.TryGetComponent(out Player player))
         {
-            if (player != null)
-                SceneManager.LoadScene("Fin");
+            SceneManager.LoadScene("Fin");
         }
             
     }

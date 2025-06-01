@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.VFX;
@@ -11,6 +12,11 @@ public class ParticlesShoot : MonoBehaviour
     private void Awake()
     {
         player.OnShoot += PlayParticles;
+    }
+
+    private void OnDestroy()
+    {
+        player.OnShoot -= PlayParticles;
     }
 
     public void PlayParticles()

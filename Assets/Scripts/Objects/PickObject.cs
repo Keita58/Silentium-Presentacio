@@ -21,6 +21,11 @@ public class PickObject : MonoBehaviour
         events.OnPickItem += SetPicked;
     }
 
+    private void OnDestroy()
+    {
+        events.OnPickItem -= SetPicked;
+    }
+
     public void SetPicked(int id)
     {
         if(id == this.Id)

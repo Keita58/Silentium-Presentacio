@@ -46,7 +46,11 @@ namespace NavKeypad
             ClearInput();
         }
 
-
+        private void OnDestroy()
+        {
+            inputActions.Hieroglyphic.Exit.started -= ExitPuzzle;
+        }
+        
         //Gets value from pressedbutton
         public void AddInput(string input)
         {
