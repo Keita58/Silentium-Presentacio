@@ -58,8 +58,11 @@ public class Load : MonoBehaviour
 
     private void OnDestroy()
     {
-        GameManager.instance.onLoadedScene -= LoadGame;
-        GameManager.instance.onNewScene -= NewGameLoad;
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.onLoadedScene -= LoadGame;
+            GameManager.instance.onNewScene -= NewGameLoad;
+        }
     }
 
     private void NewGameLoad()

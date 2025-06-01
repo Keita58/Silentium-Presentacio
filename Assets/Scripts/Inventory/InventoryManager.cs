@@ -133,6 +133,8 @@ public class InventoryManager : MonoBehaviour
                 isCombining = false;
                 ToggleActionsButtons(false);
                 FillClearItemDescriptionPanel("", "", true);
+                notesDiaryPanel.SetActive(false);
+                notesDiaryPanelScroll.SetActive(false);
                 break;
             case ActionStates.SELECT_ACTION:
                 ToggleActionsButtons(true);
