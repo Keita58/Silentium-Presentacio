@@ -1,11 +1,8 @@
-using System;
 using NavKeypad;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.Rendering.HighDefinition;
 
 public class PuzzleManager : MonoBehaviour
 {
@@ -233,6 +230,7 @@ public class PuzzleManager : MonoBehaviour
         {
             cam_HieroglyphicAnimation2.gameObject.SetActive(false);
             hieroglyphicAnimator2.enabled = false;
+            unlockDoor.isLocked = false;
         }
         else
             cam_Hierogliphic.gameObject.SetActive(false);
@@ -322,6 +320,7 @@ public class PuzzleManager : MonoBehaviour
         player.ToggleInputPlayer(false, false);
         positionToTeleport = positionAfterBook;
         events.ToggleCustomPass(false);
+        events.ToggleUI(false);
         glitchAnimator.Play("Glitch");
         glitchStarted = true;
         teleported = false;

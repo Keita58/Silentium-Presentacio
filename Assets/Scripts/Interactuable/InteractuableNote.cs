@@ -14,7 +14,7 @@ public class InteractuableNote : MonoBehaviour, IInteractuable
     public void Interact()
     {
         NotesSO noteSO = GetComponent<Notes>().note;
-        if (noteSO.noteId < 6)
+        if (noteSO.noteId <= 6)
         {
             InventoryManager.instance.DiscoverNote(noteSO);
             gameObject.SetActive(false);

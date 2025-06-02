@@ -19,7 +19,7 @@ public class Player : MonoBehaviour
     InputAction _RunAction;
 
     [Tooltip("Player movement speed")]
-    [SerializeField] private float _VelocityRun = 6f;
+    [SerializeField] private float _VelocityRun = 4.5f;
     [SerializeField] private float _VelocityMove = 3f;
 
     [Tooltip("Mouse velocity in degrees per second.")]
@@ -385,7 +385,7 @@ public class Player : MonoBehaviour
             }
             else
             {
-                MakeNoise(20, 25); 
+                MakeNoise(40, 25); 
                 OnMakeImpactSound?.Invoke(8);
             }
             Debug.DrawRay(shootPosition.transform.position, -shootPosition.transform.right);
@@ -566,8 +566,6 @@ public class Player : MonoBehaviour
                     ChangeState(PlayerStates.IDLE);
                 }
                 break;
-            default:
-                break;
         }
         characterController.Move(velocity * Time.deltaTime);
     }
@@ -686,7 +684,7 @@ public class Player : MonoBehaviour
         while (true)
         {
             Debug.Log("CORUTINACORRER");
-            MakeNoise(18, 7);
+            MakeNoise(18, 12);
             OnMakeSound?.Invoke(7);
             yield return new WaitForSeconds(0.5f);
         }

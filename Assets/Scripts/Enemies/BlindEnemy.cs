@@ -26,6 +26,7 @@ public class BlindEnemy : Enemy
     [Header("Detection spheres")]
     [SerializeField] private GameObject _DetectionSphere;
     [SerializeField] private GameObject _DetectionDoors;
+    [SerializeField] private GameObject _DetectionPlayer;
     
     [Header("Waypoints")]
     [SerializeField] private List<GameObject> _WaypointsFirstPart;
@@ -85,12 +86,14 @@ public class BlindEnemy : Enemy
         
         _DetectionSphere.GetComponent<DetectionSphere>().OnEnter += OnEnter;
         _DetectionDoors.GetComponent<DetectionDoorSphere>().OnDetectDoor += OpenDoors;
+        _DetectionPlayer.GetComponent<DetectionBox>().OnEnter += PlayerAhead;
     }
 
     private void OnDestroy()
     {
         _DetectionSphere.GetComponent<DetectionSphere>().OnEnter -= OnEnter;
         _DetectionDoors.GetComponent<DetectionDoorSphere>().OnDetectDoor -= OpenDoors;
+        _DetectionPlayer.GetComponent<DetectionBox>().OnEnter -= PlayerAhead;
     }
 
     private void Start()
@@ -439,5 +442,10 @@ public class BlindEnemy : Enemy
             if (!_NavMeshAgent.enabled)
                 _NavMeshAgent.enabled = true;
         }
+    }
+
+    private void PlayerAhead(Player player)
+    {
+        ListenSound(player.transform.position, 20);
     }
 }

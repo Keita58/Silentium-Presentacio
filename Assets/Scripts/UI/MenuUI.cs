@@ -4,12 +4,13 @@ using UnityEngine;
 
 public class MenuUI : MonoBehaviour
 {
-    [SerializeField] GameObject panelParent;
-    [SerializeField] GameObject optionsPanel;
-    [SerializeField] Player player;
-    [SerializeField] Events events;
-    [SerializeField] GameObject waves;
-    [SerializeField] TextMeshProUGUI ammoQuantity;
+    [SerializeField] private GameObject panelParent;
+    [SerializeField] private GameObject optionsPanel;
+    [SerializeField] private Player player;
+    [SerializeField] private Events events;
+    [SerializeField] private GameObject waves;
+    [SerializeField] private TextMeshProUGUI ammoQuantity;
+    [SerializeField] private GameObject pointer;
 
     public void OpenMenu()
     {
@@ -45,10 +46,12 @@ public class MenuUI : MonoBehaviour
 
     private void ToggleUI(bool active)
     {
-        if (waves !=null)
+        if (waves != null)
             waves.SetActive(active);
-        if (ammoQuantity!=null)
+        if (ammoQuantity != null)
             ammoQuantity.gameObject.SetActive(active);
+        if(pointer != null)
+            pointer.SetActive(active);
     }
 
     private void ChangeNumAmmo(int ammo)

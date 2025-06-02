@@ -11,8 +11,11 @@ public class Attack : MonoBehaviour
         if (!other.TryGetComponent(out Player player)) return;
         if (_Enemy)
         {
-            if(_Enemy.Jumping)
+            if (_Enemy.Jumping)
+            {
                 player.TakeDamage(_Damage);
+                Debug.Log($"L'enemic cec fa: " + _Damage);
+            }
         }
         else
         {

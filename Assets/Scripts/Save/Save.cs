@@ -95,6 +95,8 @@ public class Save : MonoBehaviour
             if(!_Temp && (item.item is ThrowableItem || item.item is SilencerItem || item.item is HealingItem || item.item is AmmunitionItem) && !_Delete)
             {
                 _Delete = true;
+                if(item.amount > 3)
+                    Inventory.Add(new ItemSlotSave(item.item.id, item.amount/2, item.stackable));
             }
             else
                 Inventory.Add(new ItemSlotSave(item.item.id, item.amount, item.stackable));
@@ -107,6 +109,8 @@ public class Save : MonoBehaviour
             if (!_Temp && (item.item is ThrowableItem || item.item is SilencerItem || item.item is HealingItem || item.item is AmmunitionItem) && !_Delete)
             {
                 _Delete = true;
+                if(item.amount > 3)
+                    ChestInventory.Add(new ItemSlotSave(item.item.id, item.amount/2, item.stackable));
             }
             else
                 ChestInventory.Add(new ItemSlotSave(item.item.id, item.amount, item.stackable));
