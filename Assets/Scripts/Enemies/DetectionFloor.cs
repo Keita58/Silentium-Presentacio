@@ -29,7 +29,7 @@ public class DetectionFloor : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         Debug.Log("Suelo colisiona con: " + other.gameObject.name);
-        if (_IsJumping && other.CompareTag("Floor"))
+        if (_IsJumping && (other.CompareTag("Floor") || other.CompareTag("Wall")))
         {
             _Rigidbody.isKinematic = true;
             _NavMeshAgent.enabled = true;

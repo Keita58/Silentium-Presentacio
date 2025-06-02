@@ -15,7 +15,7 @@ MonoBehaviour:
   itemName: Paracetamol
   description: "Cura de peque\xF1o efecto."
   sprite: {fileID: 21300000, guid: fc301c0a06484a94c85499d3e0d6a6e1, type: 3}
-  healing: 3
+  healing: 1
   prefab: {fileID: 0}
   prefabInst: {fileID: 8474635125787463359, guid: 46b7d683be7451646ad35bdeeaf63f5f, type: 3}
   itemsToCombine:

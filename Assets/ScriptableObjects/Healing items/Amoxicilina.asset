@@ -15,7 +15,7 @@ MonoBehaviour:
   itemName: Amoxicilina
   description: Cura de grande efecto. Creada a partir de dos Paracetamoles.
   sprite: {fileID: 21300000, guid: 7e18085c06cb88147aa9e499634e2e71, type: 3}
-  healing: 2
+  healing: 3
   prefab: {fileID: 0}
   prefabInst: {fileID: 0}
   itemsToCombine: []
