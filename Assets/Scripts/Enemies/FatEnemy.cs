@@ -111,7 +111,8 @@ public class FatEnemy : Enemy
         {
             case EnemyStates.PATROL:
                 _Patrolling = false;
-                _PatrolCoroutine = StartCoroutine(Patrol());
+                if(_PatrolCoroutine == null)
+                    _PatrolCoroutine = StartCoroutine(Patrol());
                 if (_Search)
                     _ChangeToPatrolCoroutine = StartCoroutine(ChangeToPatrol(7));
                 break;
@@ -139,7 +140,11 @@ public class FatEnemy : Enemy
         switch (exitState)
         {
             case EnemyStates.PATROL:
-                StopCoroutine(_PatrolCoroutine);
+                if (_PatrolCoroutine != null)
+                {
+                    StopCoroutine(_PatrolCoroutine);
+                    _PatrolCoroutine = null;
+                }
                 if (_ChangeToPatrolCoroutine != null)
                 {
                     StopCoroutine(_ChangeToPatrolCoroutine);
@@ -414,8 +419,11 @@ public class FatEnemy : Enemy
 
     private void DeactivateChaseCoroutine()
     {
-        _Search = false;
-        ChangeState(EnemyStates.PATROL);
+        if (_CurrentState != EnemyStates.KNOCKED)
+        {
+            _Search = false;
+            ChangeState(EnemyStates.PATROL);
+        }
     }
 
     private void ActivateAttack()

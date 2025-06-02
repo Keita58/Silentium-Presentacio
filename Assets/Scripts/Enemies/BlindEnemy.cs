@@ -52,6 +52,7 @@ public class BlindEnemy : Enemy
     private bool _Search;
     
     public bool Jumping { get; private set; }
+    public bool AttackAvaliable;
 
     private Coroutine _PatrolCoroutine;
     private Coroutine _ChangeStateToPatrol;
@@ -74,9 +75,10 @@ public class BlindEnemy : Enemy
         _NavMeshAgent = GetComponent<NavMeshAgent>();
         _SoundPos = Vector3.zero;
         _RangeSearchSound = 55;
+        AttackAvaliable = true;
+        _OpeningDoor = false;
         _Patrolling = false;
         _Search = false;
-        _OpeningDoor = false;
         Jumping = false;
         _Hp = MAXHEALTH;
 
@@ -424,7 +426,8 @@ public class BlindEnemy : Enemy
     
     IEnumerator RecoverJump()
     {
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(3f);
+        AttackAvaliable = true;
         Jumping = false;
     }
 
@@ -446,6 +449,7 @@ public class BlindEnemy : Enemy
 
     private void PlayerAhead(Player player)
     {
-        ListenSound(player.transform.position, 20);
+        if(!Jumping)
+            ListenSound(player.transform.position, 20);
     }
 }
