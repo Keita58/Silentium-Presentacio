@@ -48,8 +48,9 @@ public class BlindEnemy : Enemy
     private float _RangeSearchSound;
     private bool _OpeningDoor;
     private bool _Patrolling;
-    private bool _Jumping;
     private bool _Search;
+    
+    public bool Jumping { get; private set; }
 
     private Coroutine _PatrolCoroutine;
     private Coroutine _ChangeStateToPatrol;
@@ -75,7 +76,7 @@ public class BlindEnemy : Enemy
         _Patrolling = false;
         _Search = false;
         _OpeningDoor = false;
-        _Jumping = false;
+        Jumping = false;
         _Hp = MAXHEALTH;
 
         _PatrolCoroutine = null;
@@ -130,6 +131,7 @@ public class BlindEnemy : Enemy
             case EnemyStates.KNOCKED:
                 _Collider.enabled = false;
                 _Animator.enabled = false;
+                _NavMeshAgent.SetDestination(transform.position);
                 StartCoroutine(WakeUp(10));
                 break;
         }
@@ -333,10 +335,10 @@ public class BlindEnemy : Enemy
             {
                 //Si la distància calculada anteriorment està entre 1.5 i 8, no té cap paret davant i pot saltar,
                 //saltarà cap a la font de so, independentment de si aquesta és produïda pel jugador o per un objecte.
-                if (dist > 1.5f && dist <= 8 && !wall && !_Jumping)
+                if (dist <= 8 && !wall && !Jumping)
                 {
                     Debug.Log("Faig salt!");
-                    _Jumping = true;
+                    Jumping = true;
                     ChangeState(EnemyStates.ATTACK);
                     Vector3 start = transform.position;
                     Vector3 end = _SoundPos;
@@ -420,7 +422,7 @@ public class BlindEnemy : Enemy
     IEnumerator RecoverJump()
     {
         yield return new WaitForSeconds(5f);
-        _Jumping = false;
+        Jumping = false;
     }
 
     private void OnEnter()

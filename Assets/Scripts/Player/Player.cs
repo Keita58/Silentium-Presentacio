@@ -415,7 +415,8 @@ public class Player : MonoBehaviour
     public void Heal(int hpToheal)
     {
         playerAudioSource.PlayOneShot(healthAudio);
-        hp += hpToheal;
+        if(hp + hpToheal <= 6)
+            hp += hpToheal;
         OnHpChange?.Invoke(hp, maxHp);
     }
 
