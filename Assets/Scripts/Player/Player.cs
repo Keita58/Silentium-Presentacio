@@ -373,7 +373,7 @@ public class Player : MonoBehaviour
             {
                 Debug.Log("Hago sonido silenciador");
                 OnMakeImpactSound?.Invoke(5);
-                MakeNoise(10, 5);
+                MakeNoise(5, 40);
                 silencerUses--;
                 Debug.Log("Silenciador usos: " + silencerUses);
                 
@@ -385,7 +385,7 @@ public class Player : MonoBehaviour
             }
             else
             {
-                MakeNoise(40, 25); 
+                MakeNoise(20, 40); 
                 OnMakeImpactSound?.Invoke(8);
             }
             Debug.DrawRay(shootPosition.transform.position, -shootPosition.transform.right);
@@ -673,7 +673,7 @@ public class Player : MonoBehaviour
     {
         while (true)
         {
-            MakeNoise(8, 3);
+            MakeNoise(6, 40);
             OnMakeSound?.Invoke(4);
             yield return new WaitForSeconds(0.5f);
         }
@@ -684,7 +684,7 @@ public class Player : MonoBehaviour
         while (true)
         {
             Debug.Log("CORUTINACORRER");
-            MakeNoise(18, 12);
+            MakeNoise(8, 40);
             OnMakeSound?.Invoke(7);
             yield return new WaitForSeconds(0.5f);
         }
@@ -695,12 +695,12 @@ public class Player : MonoBehaviour
         while (true)
         {
             Debug.Log("CORUTINACROUCH");
-            MakeNoise(3, 1);
+            MakeNoise(1, 40);
             OnMakeSound?.Invoke(3);
             yield return new WaitForSeconds(0.5f);
         }
     }
-    private void MakeNoise(int radius, int noiseQuantity)
+    private void MakeNoise(int noiseQuantity, int radius = 40)
     {
         Collider[] colliderHits = Physics.OverlapSphere(this.transform.position, radius);
         foreach (Collider collider in colliderHits)
