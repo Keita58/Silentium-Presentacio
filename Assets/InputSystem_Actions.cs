@@ -1161,6 +1161,194 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Cheats"",
+            ""id"": ""b7f4b416-d71d-4b49-9a41-ab6d07e84b05"",
+            ""actions"": [
+                {
+                    ""name"": ""Jeroglifics"",
+                    ""type"": ""Button"",
+                    ""id"": ""b8258b33-556a-4e78-a4a0-e85439363503"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CameraCec"",
+                    ""type"": ""Button"",
+                    ""id"": ""b10bbd80-f515-4905-a657-a380dcd46ccc"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CameraGras"",
+                    ""type"": ""Button"",
+                    ""id"": ""5a174d32-b7b1-4648-80bd-01fc3866a8a3"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CameraRapid"",
+                    ""type"": ""Button"",
+                    ""id"": ""4ab69ae7-3e5e-40b2-b675-c245741d0f71"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""LlibresPuzle"",
+                    ""type"": ""Button"",
+                    ""id"": ""369a7156-3621-4725-af45-5751cee920ac"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CodiMorse"",
+                    ""type"": ""Button"",
+                    ""id"": ""8a5c7f61-2fd4-45f9-b9b7-472961a09008"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""OmplirCofre"",
+                    ""type"": ""Button"",
+                    ""id"": ""33e9d596-8e2b-4955-90e0-280b9f35dff1"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""VidaInfinita"",
+                    ""type"": ""Button"",
+                    ""id"": ""b2177b4a-e7ac-4f57-b031-621e448c9aea"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""NotesDiari"",
+                    ""type"": ""Button"",
+                    ""id"": ""70bf5c7c-8a0f-4b35-8661-f31cd7084334"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""e16593bc-db52-4a48-9932-9ba6e076f864"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jeroglifics"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""450c7691-2bc1-4148-991d-fc23356f14fd"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CameraCec"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""267b6740-9af9-4a96-8a8d-6b2625c3513b"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CameraGras"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b53ac84b-39b4-4d6c-81b7-3a59b13253cc"",
+                    ""path"": ""<Keyboard>/4"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CameraRapid"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9aa577a8-2db5-4f1d-99a0-ea38d3b527c0"",
+                    ""path"": ""<Keyboard>/5"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LlibresPuzle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""603d5571-5522-4e70-a400-82aca9e5f74a"",
+                    ""path"": ""<Keyboard>/6"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CodiMorse"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6919a269-24b2-476d-a6fc-4d31df57e224"",
+                    ""path"": ""<Keyboard>/8"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""VidaInfinita"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3e9a01e9-c168-4859-96fa-37f60695e010"",
+                    ""path"": ""<Keyboard>/7"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OmplirCofre"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""310ea148-e6b2-48b8-a255-d3ae185ba0d6"",
+                    ""path"": ""<Keyboard>/9"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""NotesDiari"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -1271,6 +1459,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         // Chest
         m_Chest = asset.FindActionMap("Chest", throwIfNotFound: true);
         m_Chest_OpenClose = m_Chest.FindAction("OpenClose", throwIfNotFound: true);
+        // Cheats
+        m_Cheats = asset.FindActionMap("Cheats", throwIfNotFound: true);
+        m_Cheats_Jeroglifics = m_Cheats.FindAction("Jeroglifics", throwIfNotFound: true);
+        m_Cheats_CameraCec = m_Cheats.FindAction("CameraCec", throwIfNotFound: true);
+        m_Cheats_CameraGras = m_Cheats.FindAction("CameraGras", throwIfNotFound: true);
+        m_Cheats_CameraRapid = m_Cheats.FindAction("CameraRapid", throwIfNotFound: true);
+        m_Cheats_LlibresPuzle = m_Cheats.FindAction("LlibresPuzle", throwIfNotFound: true);
+        m_Cheats_CodiMorse = m_Cheats.FindAction("CodiMorse", throwIfNotFound: true);
+        m_Cheats_OmplirCofre = m_Cheats.FindAction("OmplirCofre", throwIfNotFound: true);
+        m_Cheats_VidaInfinita = m_Cheats.FindAction("VidaInfinita", throwIfNotFound: true);
+        m_Cheats_NotesDiari = m_Cheats.FindAction("NotesDiari", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
@@ -1282,6 +1481,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         Debug.Assert(!m_WeaponPuzzle.enabled, "This will cause a leak and performance issues, InputSystem_Actions.WeaponPuzzle.Disable() has not been called.");
         Debug.Assert(!m_Morse.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Morse.Disable() has not been called.");
         Debug.Assert(!m_Chest.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Chest.Disable() has not been called.");
+        Debug.Assert(!m_Cheats.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Cheats.Disable() has not been called.");
     }
 
     public void Dispose()
@@ -1853,6 +2053,116 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         }
     }
     public ChestActions @Chest => new ChestActions(this);
+
+    // Cheats
+    private readonly InputActionMap m_Cheats;
+    private List<ICheatsActions> m_CheatsActionsCallbackInterfaces = new List<ICheatsActions>();
+    private readonly InputAction m_Cheats_Jeroglifics;
+    private readonly InputAction m_Cheats_CameraCec;
+    private readonly InputAction m_Cheats_CameraGras;
+    private readonly InputAction m_Cheats_CameraRapid;
+    private readonly InputAction m_Cheats_LlibresPuzle;
+    private readonly InputAction m_Cheats_CodiMorse;
+    private readonly InputAction m_Cheats_OmplirCofre;
+    private readonly InputAction m_Cheats_VidaInfinita;
+    private readonly InputAction m_Cheats_NotesDiari;
+    public struct CheatsActions
+    {
+        private @InputSystem_Actions m_Wrapper;
+        public CheatsActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Jeroglifics => m_Wrapper.m_Cheats_Jeroglifics;
+        public InputAction @CameraCec => m_Wrapper.m_Cheats_CameraCec;
+        public InputAction @CameraGras => m_Wrapper.m_Cheats_CameraGras;
+        public InputAction @CameraRapid => m_Wrapper.m_Cheats_CameraRapid;
+        public InputAction @LlibresPuzle => m_Wrapper.m_Cheats_LlibresPuzle;
+        public InputAction @CodiMorse => m_Wrapper.m_Cheats_CodiMorse;
+        public InputAction @OmplirCofre => m_Wrapper.m_Cheats_OmplirCofre;
+        public InputAction @VidaInfinita => m_Wrapper.m_Cheats_VidaInfinita;
+        public InputAction @NotesDiari => m_Wrapper.m_Cheats_NotesDiari;
+        public InputActionMap Get() { return m_Wrapper.m_Cheats; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(CheatsActions set) { return set.Get(); }
+        public void AddCallbacks(ICheatsActions instance)
+        {
+            if (instance == null || m_Wrapper.m_CheatsActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_CheatsActionsCallbackInterfaces.Add(instance);
+            @Jeroglifics.started += instance.OnJeroglifics;
+            @Jeroglifics.performed += instance.OnJeroglifics;
+            @Jeroglifics.canceled += instance.OnJeroglifics;
+            @CameraCec.started += instance.OnCameraCec;
+            @CameraCec.performed += instance.OnCameraCec;
+            @CameraCec.canceled += instance.OnCameraCec;
+            @CameraGras.started += instance.OnCameraGras;
+            @CameraGras.performed += instance.OnCameraGras;
+            @CameraGras.canceled += instance.OnCameraGras;
+            @CameraRapid.started += instance.OnCameraRapid;
+            @CameraRapid.performed += instance.OnCameraRapid;
+            @CameraRapid.canceled += instance.OnCameraRapid;
+            @LlibresPuzle.started += instance.OnLlibresPuzle;
+            @LlibresPuzle.performed += instance.OnLlibresPuzle;
+            @LlibresPuzle.canceled += instance.OnLlibresPuzle;
+            @CodiMorse.started += instance.OnCodiMorse;
+            @CodiMorse.performed += instance.OnCodiMorse;
+            @CodiMorse.canceled += instance.OnCodiMorse;
+            @OmplirCofre.started += instance.OnOmplirCofre;
+            @OmplirCofre.performed += instance.OnOmplirCofre;
+            @OmplirCofre.canceled += instance.OnOmplirCofre;
+            @VidaInfinita.started += instance.OnVidaInfinita;
+            @VidaInfinita.performed += instance.OnVidaInfinita;
+            @VidaInfinita.canceled += instance.OnVidaInfinita;
+            @NotesDiari.started += instance.OnNotesDiari;
+            @NotesDiari.performed += instance.OnNotesDiari;
+            @NotesDiari.canceled += instance.OnNotesDiari;
+        }
+
+        private void UnregisterCallbacks(ICheatsActions instance)
+        {
+            @Jeroglifics.started -= instance.OnJeroglifics;
+            @Jeroglifics.performed -= instance.OnJeroglifics;
+            @Jeroglifics.canceled -= instance.OnJeroglifics;
+            @CameraCec.started -= instance.OnCameraCec;
+            @CameraCec.performed -= instance.OnCameraCec;
+            @CameraCec.canceled -= instance.OnCameraCec;
+            @CameraGras.started -= instance.OnCameraGras;
+            @CameraGras.performed -= instance.OnCameraGras;
+            @CameraGras.canceled -= instance.OnCameraGras;
+            @CameraRapid.started -= instance.OnCameraRapid;
+            @CameraRapid.performed -= instance.OnCameraRapid;
+            @CameraRapid.canceled -= instance.OnCameraRapid;
+            @LlibresPuzle.started -= instance.OnLlibresPuzle;
+            @LlibresPuzle.performed -= instance.OnLlibresPuzle;
+            @LlibresPuzle.canceled -= instance.OnLlibresPuzle;
+            @CodiMorse.started -= instance.OnCodiMorse;
+            @CodiMorse.performed -= instance.OnCodiMorse;
+            @CodiMorse.canceled -= instance.OnCodiMorse;
+            @OmplirCofre.started -= instance.OnOmplirCofre;
+            @OmplirCofre.performed -= instance.OnOmplirCofre;
+            @OmplirCofre.canceled -= instance.OnOmplirCofre;
+            @VidaInfinita.started -= instance.OnVidaInfinita;
+            @VidaInfinita.performed -= instance.OnVidaInfinita;
+            @VidaInfinita.canceled -= instance.OnVidaInfinita;
+            @NotesDiari.started -= instance.OnNotesDiari;
+            @NotesDiari.performed -= instance.OnNotesDiari;
+            @NotesDiari.canceled -= instance.OnNotesDiari;
+        }
+
+        public void RemoveCallbacks(ICheatsActions instance)
+        {
+            if (m_Wrapper.m_CheatsActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(ICheatsActions instance)
+        {
+            foreach (var item in m_Wrapper.m_CheatsActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_CheatsActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public CheatsActions @Cheats => new CheatsActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     public InputControlScheme KeyboardMouseScheme
     {
@@ -1949,5 +2259,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     public interface IChestActions
     {
         void OnOpenClose(InputAction.CallbackContext context);
+    }
+    public interface ICheatsActions
+    {
+        void OnJeroglifics(InputAction.CallbackContext context);
+        void OnCameraCec(InputAction.CallbackContext context);
+        void OnCameraGras(InputAction.CallbackContext context);
+        void OnCameraRapid(InputAction.CallbackContext context);
+        void OnLlibresPuzle(InputAction.CallbackContext context);
+        void OnCodiMorse(InputAction.CallbackContext context);
+        void OnOmplirCofre(InputAction.CallbackContext context);
+        void OnVidaInfinita(InputAction.CallbackContext context);
+        void OnNotesDiari(InputAction.CallbackContext context);
     }
 }
