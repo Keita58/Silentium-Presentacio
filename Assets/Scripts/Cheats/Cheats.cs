@@ -10,7 +10,8 @@ public class Cheats : MonoBehaviour
 
     [Header("Player")] 
     [SerializeField] private GameObject _player;
-    [SerializeField] private Camera _cameraPlayer;
+    [SerializeField] private GameObject _cameraPlayer;
+    private Player _playerComponent;
 
     [Header("Enemies cams")] 
     [SerializeField] private GameObject _blindCam;
@@ -51,6 +52,8 @@ public class Cheats : MonoBehaviour
         _cameraFastBool = false;
         _infiniteLives = false;
         bookCheatDone = false;
+        
+        _playerComponent = _player.GetComponent<Player>();
 
         inputActions = new InputSystem_Actions();
         inputActions.Cheats.Jeroglifics.started += EnableCheatsHieroglyphics;
@@ -135,7 +138,7 @@ public class Cheats : MonoBehaviour
     {
         if (!_cameraBlindBool)
         {
-            _cameraPlayer.enabled = false;
+            _cameraPlayer.SetActive(false);
             _blindCam.SetActive(true);
             _bigCam.SetActive(false);
             _fastCam.SetActive(false);
@@ -144,7 +147,8 @@ public class Cheats : MonoBehaviour
         }
         else
         {
-            _cameraPlayer.enabled = true;
+            _cameraPlayer.SetActive(true);
+            _playerComponent.ResumeInteract(true);
             _blindCam.SetActive(false);
             _cameraBlindBool = false;
             _light.SetActive(false);
@@ -155,7 +159,7 @@ public class Cheats : MonoBehaviour
     {
         if (!_cameraBigBool)
         {
-            _cameraPlayer.enabled = false;
+            _cameraPlayer.SetActive(false);
             _blindCam.SetActive(false);
             _bigCam.SetActive(true);
             _fastCam.SetActive(false);
@@ -164,7 +168,8 @@ public class Cheats : MonoBehaviour
         }
         else
         {
-            _cameraPlayer.enabled = true;
+            _cameraPlayer.SetActive(true);
+            _playerComponent.ResumeInteract(true);
             _bigCam.SetActive(false);
             _cameraBigBool = false;
             _light.SetActive(false);
@@ -175,7 +180,7 @@ public class Cheats : MonoBehaviour
     {
         if (!_cameraFastBool)
         {
-            _cameraPlayer.enabled = false;
+            _cameraPlayer.SetActive(false);
             _blindCam.SetActive(false);
             _bigCam.SetActive(false);
             _fastCam.SetActive(true);
@@ -184,7 +189,8 @@ public class Cheats : MonoBehaviour
         }
         else
         {
-            _cameraPlayer.enabled = true;
+            _cameraPlayer.SetActive(true);
+            _playerComponent.ResumeInteract(true);
             _fastCam.SetActive(false);
             _cameraFastBool = false;
             _light.SetActive(false);
